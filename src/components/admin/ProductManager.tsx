@@ -324,6 +324,7 @@ export const ProductManager = ({ products }: { products: Product[] }) => {
                                 <option className="bg-black" value="mente">Mente</option>
                                 <option className="bg-black" value="calma">Calma</option>
                                 <option className="bg-black" value="energia">Energía</option>
+                                <option className="bg-black" value="energia">Cuerpo</option>
                                 </select>
                                 <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-stone-500">▼</div>
                             </div>
