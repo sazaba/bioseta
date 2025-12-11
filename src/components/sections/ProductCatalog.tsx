@@ -2,88 +2,83 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// 1. DATA ENRIQUECIDA CON CATEGORÍAS
-// Categorías: 'mente', 'calma', 'energia', 'inmunidad'
+// --- DATOS DEL PRODUCTO ---
 const products = [
   {
     id: 1,
     category: "mente",
     name: "MELENA DE LEÓN",
     subtitle: "Enfoque Cognitivo & Memoria",
-    description: "El secreto ancestral para la claridad mental. Un nootrópico natural que potencia la neurogénesis y despierta tu máximo potencial intelectual.",
+    description: "El secreto ancestral para la claridad mental. Potencia la neurogénesis.",
     price: "$120.000",
-    gradient: "from-amber-200 via-yellow-400 to-amber-600",
-    benefits: ["Claridad Mental", "Memoria", "Neurogénesis"],
+    gradient: "from-amber-300 via-yellow-500 to-amber-700",
+    benefits: ["Claridad", "Memoria", "Focus"],
   },
   {
     id: 2,
     category: "calma",
     name: "ASHWAGANDHA",
     subtitle: "Poder Adaptógeno & Calma",
-    description: "Domina el estrés y recupera tu vigor. La raíz de la inmortalidad que equilibra el cortisol y fortalece tu resiliencia física y mental.",
+    description: "Domina el estrés y recupera tu vigor. Equilibra el cortisol.",
     price: "$115.000",
-    gradient: "from-orange-200 via-amber-400 to-red-600",
-    benefits: ["Anti-Estrés", "Vigor Físico", "Sueño Profundo"],
+    gradient: "from-orange-300 via-amber-500 to-red-700",
+    benefits: ["Anti-Estrés", "Vigor", "Sueño"],
   },
   {
     id: 3,
     category: "energia",
-    name: "CORDYCEPS MILITARIS",
+    name: "CORDYCEPS",
     subtitle: "Energía ATP & Rendimiento",
-    description: "El combustible biológico de los atletas de élite. Aumenta la producción de oxígeno y ATP para una resistencia inagotable.",
+    description: "El combustible biológico. Aumenta el oxígeno y la resistencia.",
     price: "$130.000",
     gradient: "from-orange-400 via-red-500 to-rose-700",
-    benefits: ["Energía Física", "Libido", "Oxigenación"],
+    benefits: ["Energía", "Libido", "Oxígeno"],
   },
   {
     id: 4,
     category: "calma",
     name: "REISHI",
     subtitle: "El Hongo de la Inmortalidad",
-    description: "Calma el espíritu y nutre el cuerpo. Un potente modulador del sistema inmune que promueve la longevidad y la paz interior.",
+    description: "Calma el espíritu y nutre el cuerpo. Longevidad y paz interior.",
     price: "$125.000",
-    gradient: "from-red-800 via-red-600 to-amber-900",
-    benefits: ["Relajación", "Sueño Reparador", "Longevidad"],
+    gradient: "from-red-900 via-red-700 to-amber-900",
+    benefits: ["Relax", "Longevidad", "Inmunidad"],
   },
   {
     id: 5,
     category: "mente",
     name: "FOCUS BLEND",
     subtitle: "Sinergia Cognitiva",
-    description: "Mezcla exclusiva de Melena de León y Cordyceps para mantener la mente aguda y el cuerpo activo durante largas jornadas.",
+    description: "Mezcla exclusiva para mantener la mente aguda y el cuerpo activo.",
     price: "$145.000",
-    gradient: "from-blue-200 via-indigo-400 to-purple-600", // Un tono diferente para blends
-    benefits: ["Productividad", "Sin Cafeína", "Flow State"],
+    gradient: "from-indigo-300 via-purple-500 to-indigo-800",
+    benefits: ["Flow State", "Productividad", "Sin Cafeína"],
   },
 ];
 
-// Definición de las categorías para el menú
 const CATEGORIES = [
-  { id: "all", label: "TODO EL PORTAFOLIO" },
-  { id: "mente", label: "MENTE & ENFOQUE" },
-  { id: "calma", label: "CALMA & ESTRÉS" },
-  { id: "energia", label: "ENERGÍA & VIGOR" },
+  { id: "all", label: "All" },
+  { id: "mente", label: "Mente" },
+  { id: "calma", label: "Calma" },
+  { id: "energia", label: "Energía" },
 ];
 
-const ITEMS_PER_PAGE = 3; // Cuántos productos ver por página
+const ITEMS_PER_PAGE = 3;
 
 export const ProductCatalog = () => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
 
-  // 1. FILTRADO
   const filteredProducts = products.filter((product) => 
     activeCategory === "all" ? true : product.category === activeCategory
   );
 
-  // 2. PAGINACIÓN
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
   const paginatedProducts = filteredProducts.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
 
-  // Función para cambiar categoría (resetea la página a 1)
   const handleCategoryChange = (catId: string) => {
     setActiveCategory(catId);
     setCurrentPage(1);
@@ -92,137 +87,218 @@ export const ProductCatalog = () => {
   return (
     <section className="relative bg-[#0F1115] py-20 px-4 md:px-0 overflow-hidden min-h-screen">
       
-      {/* Título */}
+      {/* --- FONDO ANIMADO (Background FX) --- */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {/* Manchas de luz ambiental */}
+        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-amber-500/10 rounded-full blur-[120px] mix-blend-screen animate-pulse"></div>
+        <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-purple-500/5 rounded-full blur-[150px] mix-blend-screen"></div>
+        
+        {/* Esporas flotantes (Partículas) */}
+        <FloatingSpores />
+      </div>
+
+      {/* --- HEADER MODERNO --- */}
       <div className="text-center mb-16 relative z-10">
-        <span className="text-amber-500/60 tracking-[0.5em] text-[10px] md:text-xs uppercase font-sans">
-          Colección 2025
+        <span className="text-amber-200/50 tracking-[0.8em] text-[10px] md:text-xs uppercase font-sans font-bold">
+          The 2025 Collection
         </span>
-        <h2 
-          className="mt-4 text-4xl md:text-6xl text-transparent bg-clip-text bg-gradient-to-r from-stone-100 to-stone-500"
-          style={{ fontFamily: 'var(--font-cinzel)' }}
-        >
-          EL PORTAFOLIO
+        <h2 className="mt-4 text-5xl md:text-8xl font-sans font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-white/20 tracking-tighter"
+            style={{ fontFamily: 'var(--font-montserrat)' }}>
+          PORTFOLIO
         </h2>
       </div>
 
-      {/* --- BARRA DE FILTROS (Premium Tabs) --- */}
-      <div className="flex flex-wrap justify-center gap-6 md:gap-12 mb-20 max-w-4xl mx-auto px-4">
-        {CATEGORIES.map((cat) => (
-          <button
-            key={cat.id}
-            onClick={() => handleCategoryChange(cat.id)}
-            className={`text-[10px] md:text-xs tracking-[0.2em] uppercase pb-2 transition-all duration-300 border-b border-transparent ${
-              activeCategory === cat.id 
-                ? "text-amber-400 border-amber-400" 
-                : "text-stone-500 hover:text-stone-300"
-            }`}
-          >
-            {cat.label}
-          </button>
-        ))}
+      {/* --- TABS DE FILTRO GLASSMORPHISM --- */}
+      <div className="flex flex-wrap justify-center gap-4 mb-24 relative z-20">
+        <div className="flex p-1 bg-white/5 backdrop-blur-md rounded-full border border-white/10">
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => handleCategoryChange(cat.id)}
+              className={`px-6 py-2 rounded-full text-[10px] md:text-xs font-bold tracking-widest uppercase transition-all duration-300 ${
+                activeCategory === cat.id 
+                  ? "bg-amber-500 text-black shadow-[0_0_20px_rgba(245,158,11,0.4)]" 
+                  : "text-white/60 hover:text-white hover:bg-white/5"
+              }`}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* --- LISTA DE PRODUCTOS (Con AnimatePresence para transiciones) --- */}
-      <div className="flex flex-col gap-20 md:gap-32 max-w-7xl mx-auto min-h-[600px]">
+      {/* --- LISTA DE PRODUCTOS --- */}
+      <div className="flex flex-col gap-24 md:gap-40 max-w-7xl mx-auto relative z-10">
         <AnimatePresence mode="wait">
           {paginatedProducts.length > 0 ? (
             paginatedProducts.map((product, index) => (
-              <ProductRow key={product.id} product={product} index={index} />
+              <ProductCard key={product.id} product={product} index={index} />
             ))
           ) : (
-            // Mensaje si no hay productos en esa categoría
-            <motion.div 
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-              className="text-center text-stone-600 font-serif italic py-20"
-            >
-              Próximamente más productos en esta colección.
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center text-white/30 font-sans py-20">
+              Colección agotada momentáneamente.
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* --- CONTROLES DE PAGINACIÓN --- */}
+      {/* --- PAGINACIÓN MODERNA --- */}
       {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-8 mt-24 mb-10">
-          <button 
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className="text-xs font-sans tracking-[0.2em] uppercase text-stone-500 hover:text-amber-400 disabled:opacity-30 disabled:hover:text-stone-500 transition-colors"
-          >
-            Anterior
-          </button>
-
-          <span className="font-serif text-amber-500 text-lg">
-            {currentPage} <span className="text-stone-600 text-sm mx-2">/</span> {totalPages}
-          </span>
-
-          <button 
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-            className="text-xs font-sans tracking-[0.2em] uppercase text-stone-500 hover:text-amber-400 disabled:opacity-30 disabled:hover:text-stone-500 transition-colors"
-          >
-            Siguiente
-          </button>
+        <div className="flex justify-center mt-32 relative z-20">
+           <div className="flex items-center gap-8 backdrop-blur-md bg-white/5 px-8 py-4 rounded-full border border-white/10">
+              <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1} className="text-white/50 hover:text-amber-400 disabled:opacity-20 transition-colors">←</button>
+              <span className="font-mono text-amber-500">{currentPage} / {totalPages}</span>
+              <button onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} className="text-white/50 hover:text-amber-400 disabled:opacity-20 transition-colors">→</button>
+           </div>
         </div>
       )}
-
     </section>
   );
 };
 
-// Sub-componente (Igual que antes, solo agregué motion para la entrada suave)
-const ProductRow = ({ product, index }: { product: any; index: number }) => {
+// --- COMPONENTE DE TARJETA (Modern Glassmorphism) ---
+const ProductCard = ({ product, index }: { product: any; index: number }) => {
   const isEven = index % 2 === 0;
 
   return (
     <motion.div 
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -30 }}
-      transition={{ duration: 0.5 }}
-      className={`flex flex-col md:flex-row items-center justify-between gap-10 md:gap-24 ${isEven ? '' : 'md:flex-row-reverse'}`}
+      initial={{ opacity: 0, y: 100 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-10%" }}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      className={`flex flex-col md:flex-row items-center gap-12 md:gap-20 ${isEven ? '' : 'md:flex-row-reverse'}`}
     >
-      {/* 1. IMAGEN */}
-      <div className="w-full md:w-1/2 relative group cursor-pointer px-4 md:px-0">
-        <div className="absolute inset-0 border border-white/10 translate-x-4 translate-y-4 group-hover:translate-x-2 group-hover:translate-y-2 transition-transform duration-500 hidden md:block"></div>
-        <div className="relative aspect-[4/5] bg-[#15171C] overflow-hidden flex items-center justify-center border border-white/5 rounded-sm md:rounded-none">
-          <div className={`absolute inset-0 opacity-20 bg-gradient-to-br ${product.gradient} blur-[80px]`}></div>
-          <div className="relative z-10 w-32 h-52 md:w-40 md:h-64 border border-white/20 rounded-full flex flex-col items-center justify-end p-6 backdrop-blur-sm bg-white/5 shadow-2xl transition-transform duration-700 group-hover:scale-105">
-             <div className="absolute top-0 w-20 md:w-24 h-6 bg-gradient-to-r from-amber-200 to-amber-600 rounded-sm shadow-[0_0_15px_rgba(251,191,36,0.5)]"></div>
-             <span className="text-4xl mb-8 opacity-80">🍄</span>
-             <p className="font-serif text-[10px] tracking-[0.3em] text-amber-100 uppercase text-center">{product.name}</p>
-          </div>
-        </div>
+      
+      {/* 1. VISUAL (El Hongo Abstracto) */}
+      <div className="w-full md:w-1/2 relative group">
+         {/* Glass Container */}
+         <div className="relative aspect-square md:aspect-[4/5] overflow-hidden rounded-2xl bg-gradient-to-b from-white/10 to-white/0 backdrop-blur-sm border border-white/10 flex items-center justify-center transition-all duration-700 group-hover:border-amber-500/30">
+            
+            {/* Gradiente Interno Dinámico */}
+            <div className={`absolute inset-0 opacity-20 bg-gradient-to-br ${product.gradient} blur-[100px] group-hover:opacity-40 transition-opacity duration-700`}></div>
+            
+            {/* Visual Vectorial Abstracto */}
+            <div className="relative z-10 w-64 h-64 md:w-80 md:h-80 transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-3">
+               <AbstractFungi gradientId={`grad-${product.id}`} colors={product.gradient} />
+            </div>
+
+            {/* Etiqueta Flotante */}
+            <div className="absolute bottom-6 right-6 px-4 py-2 bg-black/50 backdrop-blur-md rounded-lg border border-white/10">
+               <span className="text-xs font-mono text-amber-500">{product.price}</span>
+            </div>
+         </div>
       </div>
 
-      {/* 2. TEXTO */}
-      <div className="w-full md:w-1/2 text-center md:text-left px-4">
-        <div className="flex flex-col items-center md:items-start">
-            <span className="text-amber-500 text-xs tracking-[0.3em] uppercase mb-4 font-sans border-b border-amber-500/30 pb-2">
-              N° 0{product.id}
-            </span>
-            <h3 className="text-3xl md:text-6xl text-white mb-4 leading-tight" style={{ fontFamily: 'var(--font-cormorant)' }}>
-              {product.name}
-            </h3>
-            <p className="text-lg md:text-xl text-stone-400 italic font-serif mb-6 md:mb-8">
-              "{product.subtitle}"
-            </p>
-            <p className="text-stone-300 font-sans leading-relaxed text-sm md:text-base max-w-md mb-8 opacity-80">
-              {product.description}
-            </p>
-            <ul className="flex flex-wrap justify-center md:justify-start gap-3 mb-10 text-[10px] md:text-xs tracking-widest text-amber-200/60 uppercase font-sans">
-                {product.benefits.map((benefit: string) => (
-                    <li key={benefit} className="border border-white/10 px-3 py-1 rounded-full whitespace-nowrap">{benefit}</li>
-                ))}
-            </ul>
-            <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8 w-full md:w-auto">
-                <span className="text-3xl font-serif text-white">{product.price}</span>
-                <button className="w-full md:w-auto px-8 py-4 md:py-3 bg-white text-black text-xs font-bold tracking-[0.2em] hover:bg-amber-400 transition-colors uppercase rounded-sm">
-                    Adquirir
-                </button>
-            </div>
-        </div>
+      {/* 2. INFO (Tipografía Moderna) */}
+      <div className="w-full md:w-1/2 px-4 md:px-0 text-center md:text-left">
+         <span className="inline-block px-3 py-1 mb-6 text-[10px] font-bold tracking-widest text-black bg-amber-500 rounded-sm uppercase">
+            N° 0{index + 1}
+         </span>
+         
+         <h3 className="text-5xl md:text-7xl font-black text-white mb-4 leading-[0.9] tracking-tighter uppercase" style={{ fontFamily: 'var(--font-montserrat)' }}>
+            {product.name}
+         </h3>
+         
+         <p className="text-xl md:text-2xl text-white/60 font-serif italic mb-8">
+            {product.subtitle}
+         </p>
+         
+         <p className="text-sm md:text-base text-stone-400 font-sans leading-relaxed max-w-md mx-auto md:mx-0 mb-8">
+            {product.description}
+         </p>
+
+         {/* Tags Modernos */}
+         <div className="flex flex-wrap justify-center md:justify-start gap-2 mb-10">
+            {product.benefits.map((benefit: string) => (
+               <span key={benefit} className="px-4 py-2 text-[10px] font-bold tracking-wider text-white border border-white/20 rounded-full hover:bg-white hover:text-black transition-colors uppercase cursor-default">
+                  {benefit}
+               </span>
+            ))}
+         </div>
+
+         <button className="w-full md:w-auto px-10 py-4 bg-white text-black font-black text-xs tracking-[0.2em] uppercase hover:bg-amber-400 transition-colors rounded-sm">
+            Add to Cart
+         </button>
       </div>
+
     </motion.div>
+  );
+};
+
+// --- COMPONENTE VISUAL: Hongo Abstracto SVG ---
+// Dibuja formas orgánicas que parecen hongos modernos/arte digital
+const AbstractFungi = ({ gradientId, colors }: { gradientId: string, colors: string }) => {
+  return (
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]">
+      <defs>
+        <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="white" stopOpacity="0.8" />
+          <stop offset="100%" stopColor="white" stopOpacity="0.1" />
+        </linearGradient>
+      </defs>
+      
+      {/* Cuerpo del Hongo Abstracto (Glass) */}
+      <motion.path 
+        d="M100 20 C 140 20, 170 50, 170 90 C 170 130, 140 180, 100 180 C 60 180, 30 130, 30 90 C 30 50, 60 20, 100 20 Z"
+        fill={`url(#${gradientId})`}
+        stroke="white"
+        strokeWidth="0.5"
+        strokeOpacity="0.5"
+        initial={{ d: "M100 30 C 140 30, 160 60, 160 90 C 160 130, 140 170, 100 170 C 60 170, 40 130, 40 90 C 40 60, 60 30, 100 30 Z" }}
+        animate={{ 
+          d: [
+            "M100 30 C 150 20, 180 60, 170 100 C 160 150, 130 180, 100 170 C 50 160, 20 120, 30 80 C 40 40, 70 30, 100 30 Z",
+            "M100 20 C 130 30, 160 50, 160 90 C 160 140, 140 170, 100 180 C 60 170, 40 140, 40 90 C 40 50, 70 20, 100 20 Z"
+          ],
+        }}
+        transition={{ duration: 5, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
+        style={{ filter: 'blur(1px)' }}
+      />
+      
+      {/* Núcleo Brillante */}
+      <motion.circle cx="100" cy="100" r="40" fill="white" fillOpacity="0.2" filter="blur(20px)" 
+        animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
+        transition={{ duration: 3, repeat: Infinity }}
+      />
+    </svg>
+  );
+};
+
+// --- COMPONENTE FONDO: Esporas Flotantes ---
+const FloatingSpores = () => {
+  // Generamos 10 esporas aleatorias
+  const spores = Array.from({ length: 10 }).map((_, i) => ({
+    id: i,
+    x: Math.random() * 100,
+    y: Math.random() * 100,
+    size: Math.random() * 4 + 1,
+    duration: Math.random() * 10 + 10,
+  }));
+
+  return (
+    <>
+      {spores.map((spore) => (
+        <motion.div
+          key={spore.id}
+          className="absolute rounded-full bg-white/20 blur-[1px]"
+          style={{
+            left: `${spore.x}%`,
+            top: `${spore.y}%`,
+            width: spore.size,
+            height: spore.size,
+          }}
+          animate={{
+            y: [0, -100, 0],
+            x: [0, Math.random() * 50 - 25, 0],
+            opacity: [0, 0.8, 0],
+          }}
+          transition={{
+            duration: spore.duration,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+        />
+      ))}
+    </>
   );
 };
