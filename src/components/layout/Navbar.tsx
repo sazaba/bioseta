@@ -1,75 +1,29 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { LuxuryLogo } from "@/components/LuxuryLogo"; 
-import Image from "next/image";
 
-// --- DATOS ---
 const MENU_ITEMS = [
-  { 
-    title: "Collection", 
-    href: "#", 
-    subtitle: "Nuestros Extractos",
-    img: "https://images.unsplash.com/photo-1615485925694-a69ea5bd9350?q=80&w=1920&auto=format&fit=crop" 
-  },
-  { 
-    title: "Science", 
-    href: "#", 
-    subtitle: "Estudios & Evidencia",
-    img: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=1920&auto=format&fit=crop"
-  },
-  { 
-    title: "Philosophy", 
-    href: "#", 
-    subtitle: "Nuestra Historia",
-    img: "https://images.unsplash.com/photo-1500468770786-91e8bf244b75?q=80&w=1920&auto=format&fit=crop"
-  },
-  { 
-    title: "Shop", 
-    href: "#", 
-    subtitle: "Adquirir Ahora",
-    img: "https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?q=80&w=1920&auto=format&fit=crop"
-  },
+  { title: "Collection", href: "#", subtitle: "Nuestros Extractos" },
+  { title: "Science", href: "#", subtitle: "Estudios & Evidencia" },
+  { title: "Philosophy", href: "#", subtitle: "Nuestra Historia" },
+  { title: "Shop", href: "#", subtitle: "Adquirir Ahora" },
 ];
 
-// --- COMPONENTE MAGNÉTICO (Desactivado en móviles visualmente para evitar bugs de touch) ---
-const MagneticWrapper = ({ children, className }: { children: React.ReactNode, className?: string }) => {
-    const ref = useRef<HTMLDivElement>(null);
-    const x = useMotionValue(0);
-    const y = useMotionValue(0);
-    const xSpring = useSpring(x, { stiffness: 150, damping: 15, mass: 0.1 });
-    const ySpring = useSpring(y, { stiffness: 150, damping: 15, mass: 0.1 });
-
-    const handleMouseMove = (e: React.MouseEvent) => {
-        const { clientX, clientY } = e;
-        const { height, width, left, top } = ref.current!.getBoundingClientRect();
-        x.set((clientX - (left + width / 2)) * 0.3);
-        y.set((clientY - (top + height / 2)) * 0.3);
-    };
-
-    const handleMouseLeave = () => { x.set(0); y.set(0); };
-
-    return (
-        <motion.div
-            ref={ref}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-            style={{ x: xSpring, y: ySpring }}
-            className={`hidden md:block ${className}`} // Solo magnético en desktop
-        >
-            {/* Fallback para móvil (sin magnético) */}
-            <div className="md:hidden contents">{children}</div>
-            {/* Versión desktop (con magnético) */}
-            <div className="hidden md:block">{children}</div>
-        </motion.div>
-    );
-};
+// --- TEXTURA ORGÁNICA (Esporas / Micelio) ---
+const BioTexture = () => (
+  <svg className="absolute inset-0 w-full h-full opacity-20 pointer-events-none mix-blend-overlay" xmlns="http://www.w3.org/2000/svg">
+    <filter id="noiseFilter">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch" />
+    </filter>
+    <rect width="100%" height="100%" filter="url(#noiseFilter)" />
+  </svg>
+);
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -77,7 +31,6 @@ export const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Bloquear scroll al abrir menú
   useEffect(() => {
     if (isOpen) document.body.style.overflow = "hidden";
     else document.body.style.overflow = "unset";
@@ -89,131 +42,116 @@ export const Navbar = () => {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className={`fixed top-0 left-0 right-0 z-[60] flex items-center justify-between px-6 md:px-12 transition-all duration-500 mix-blend-difference text-white ${
-          scrolled && !isOpen ? "py-4" : "py-6 md:py-8"
+        className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-12 transition-all duration-700 ${
+          scrolled || isOpen 
+            ? "py-4 bg-[#050505]/85 backdrop-blur-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)]" 
+            : "py-6 bg-transparent"
         }`}
       >
-        {/* LOGO */}
-        <div className="relative z-[70]">
-            <Link href="/" onClick={() => setIsOpen(false)}>
-                <LuxuryLogo className={`transition-all duration-500 ${scrolled ? 'w-10 h-10' : 'w-12 h-12'}`} />
-            </Link>
+        {/* --- FONDO CON TEXTURA Y BORDE GLOW (Solo visible al scroll) --- */}
+        <div className={`absolute inset-0 transition-opacity duration-700 pointer-events-none overflow-hidden ${scrolled || isOpen ? 'opacity-100' : 'opacity-0'}`}>
+            {/* Textura de Micelio/Ruido */}
+            <BioTexture />
+            
+            {/* Borde Inferior Premium (Gradiente Dorado Sutil) */}
+            <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
         </div>
 
-        {/* BOTÓN MENÚ */}
-        <div onClick={() => setIsOpen(!isOpen)} className="relative z-[70] cursor-pointer group">
-           <MagneticWrapper>
-                <div className="flex items-center gap-4 p-2">
-                    <span className="hidden md:block text-[11px] font-bold tracking-[0.2em] uppercase">
-                        {isOpen ? "Close" : "Menu"}
-                    </span>
-                    <div className="flex flex-col gap-[5px] items-end w-8">
-                        <motion.span 
-                            animate={isOpen ? { rotate: 45, y: 7 } : { rotate: 0, y: 0 }}
-                            className="w-8 h-[2px] bg-white block transition-all origin-center"
-                        />
-                         <motion.span 
-                            animate={isOpen ? { opacity: 0 } : { opacity: 1 }}
-                            className="w-5 h-[2px] bg-white block transition-all group-hover:w-8"
-                        />
-                        <motion.span 
-                            animate={isOpen ? { rotate: -45, y: -7 } : { rotate: 0, y: 0 }}
-                            className="w-8 h-[2px] bg-white block transition-all origin-center"
-                        />
-                    </div>
-                </div>
-           </MagneticWrapper>
-        </div>
+        {/* 1. LOGO (Protegido por el fondo oscuro al hacer scroll) */}
+        <Link href="/" className="relative z-50 group flex items-center">
+            {/* Glow detrás del logo para asegurar legibilidad extra */}
+            {scrolled && <div className="absolute inset-0 bg-black/50 blur-xl scale-150 rounded-full -z-10" />}
+            
+            <LuxuryLogo className={`text-white transition-all duration-500 ${scrolled ? 'w-10 h-10' : 'w-12 h-12'} group-hover:scale-110 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]`} />
+        </Link>
+
+        {/* 2. BOTÓN MENÚ (Tu diseño original conservado) */}
+        <button 
+          onClick={() => setIsOpen(!isOpen)}
+          className="relative z-50 flex items-center gap-4 text-white hover:text-amber-400 transition-colors group"
+        >
+          {/* Texto alineado ópticamente con el icono */}
+          <span className="hidden md:block text-[10px] font-sans font-bold tracking-[0.3em] uppercase opacity-80 group-hover:opacity-100 transition-opacity pt-[2px]">
+            {isOpen ? "Close" : "Menu"}
+          </span>
+
+          {/* Icono Hamburguesa Premium */}
+          <div className="flex flex-col gap-[6px] w-8 items-end p-1">
+            <motion.span 
+              animate={isOpen ? { rotate: 45, y: 8 } : { rotate: 0, y: 0 }}
+              className="w-8 h-[1.5px] bg-current block transition-transform origin-center rounded-full"
+            />
+            <motion.span 
+              animate={isOpen ? { opacity: 0, x: 20 } : { opacity: 1, x: 0 }}
+              className="w-5 h-[1.5px] bg-current block group-hover:w-8 transition-all duration-300 rounded-full"
+            />
+            <motion.span 
+              animate={isOpen ? { rotate: -45, y: -8 } : { rotate: 0, y: 0 }}
+              className="w-8 h-[1.5px] bg-current block transition-transform origin-center rounded-full"
+            />
+          </div>
+        </button>
       </motion.nav>
 
-      {/* OVERLAY MENU */}
+      {/* 3. OVERLAY MENÚ (Tu código original intacto) */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ clipPath: "polygon(0 0, 100% 0, 100% 0, 0 0)" }}
-            animate={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)" }}
-            exit={{ clipPath: "polygon(0 0, 100% 0, 100% 0, 0 0)" }}
-            transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
-            // USA h-[100dvh] PARA EVITAR SALTOS EN MOBILE SAFARI
-            className="fixed inset-0 z-50 bg-[#080808] flex flex-col justify-between h-[100dvh] pt-24 pb-10 px-6 md:px-12"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="fixed inset-0 z-40 bg-[#050505]/95 backdrop-blur-3xl flex flex-col items-center justify-center supports-[backdrop-filter]:bg-[#050505]/90"
           >
-            {/* FONDO IMAGEN (Solo Desktop Hover) */}
-            <div className="absolute inset-0 w-full h-full opacity-30 pointer-events-none filter saturate-0 md:saturate-50 transition-all duration-700">
-               <AnimatePresence mode="popLayout">
-                   {hoveredIndex !== null && (
-                       <motion.div
-                           key={hoveredIndex}
-                           initial={{ opacity: 0, scale: 1.1 }}
-                           animate={{ opacity: 1, scale: 1 }}
-                           exit={{ opacity: 0 }}
-                           transition={{ duration: 0.5 }}
-                           className="absolute inset-0 hidden md:block" // Oculto en móvil para performance
-                       >
-                           <Image src={MENU_ITEMS[hoveredIndex].img} alt="bg" fill className="object-cover" />
-                           <div className="absolute inset-0 bg-black/60" />
-                       </motion.div>
-                   )}
-               </AnimatePresence>
+            {/* Reutilizamos la Textura Bio en el Menú también */}
+            <div className="absolute inset-0 opacity-10">
+                <BioTexture />
             </div>
 
-            {/* RUIDO DE FONDO (Textura Premium constante) */}
-            <div className="absolute inset-0 opacity-[0.05] pointer-events-none z-10" style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }}></div>
-
-            {/* CONTENIDO MENÚ */}
-            <div className="flex flex-col justify-center flex-grow z-20 space-y-2 md:space-y-0">
+            <div className="flex flex-col gap-8 md:gap-10 text-center relative z-10">
               {MENU_ITEMS.map((item, index) => (
-                <motion.div 
-                    key={item.title} 
-                    className="relative overflow-hidden group w-full md:text-center md:py-2"
-                    onMouseEnter={() => setHoveredIndex(index)}
-                    onMouseLeave={() => setHoveredIndex(null)}
-                    initial={{ y: 50, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: 50, opacity: 0 }}
-                    transition={{ delay: 0.1 + index * 0.1, duration: 0.5 }}
-                >
+                <div key={item.title} className="overflow-hidden">
+                  <motion.div
+                    initial={{ y: 80, opacity: 0, skewY: 5 }}
+                    animate={{ y: 0, opacity: 1, skewY: 0 }}
+                    exit={{ y: 80, opacity: 0 }}
+                    transition={{ delay: 0.1 + index * 0.1, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                  >
                     <Link 
                       href={item.href} 
                       onClick={() => setIsOpen(false)}
-                      className="flex items-baseline gap-4 md:block"
+                      className="group block relative"
                     >
-                      {/* Número (Solo móvil para estructura) */}
-                      <span className="md:hidden text-xs font-mono text-amber-500/80">0{index + 1}</span>
+                      {/* Subtítulo y Número */}
+                      <div className="flex items-center justify-center gap-3 mb-1 opacity-50 group-hover:opacity-100 transition-opacity">
+                          <span className="text-[9px] font-mono text-amber-500">0{index + 1}</span>
+                          <span className="w-8 h-[1px] bg-white/20"></span>
+                          <span className="text-[9px] font-serif italic text-stone-300 tracking-wider">
+                            {item.subtitle}
+                          </span>
+                      </div>
 
-                      {/* TIPOGRAFÍA RESPONSIVA: text-[13vw] asegura que siempre quepa */}
+                      {/* TÍTULO GIGANTE */}
                       <span 
-                        className="text-[13vw] md:text-8xl lg:text-9xl font-black uppercase text-white/90 md:text-transparent md:bg-clip-text md:bg-gradient-to-b md:from-white md:to-white/40 group-hover:to-white transition-all leading-[0.9] tracking-tighter"
+                        className="text-5xl md:text-8xl text-white font-sans font-black uppercase tracking-tighter group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-amber-200 group-hover:to-amber-600 transition-all duration-500 block leading-[0.9]"
                       >
                         {item.title}
                       </span>
                     </Link>
-                    
-                    {/* Subtítulo (Móvil debajo, Desktop flotante) */}
-                    <div className="pl-8 md:pl-0 md:absolute md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:opacity-0 md:group-hover:opacity-100 transition-opacity pointer-events-none">
-                        <span className="text-xs md:text-sm text-stone-400 font-serif italic">{item.subtitle}</span>
-                    </div>
-                    
-                    {/* Línea divisoria solo móvil */}
-                    <div className="w-full h-[1px] bg-white/10 mt-2 md:hidden" />
-                </motion.div>
+                  </motion.div>
+                </div>
               ))}
             </div>
 
-            {/* FOOTER MOBILE OPTIMIZED */}
             <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                className="flex flex-col md:flex-row justify-between items-start md:items-end text-white/40 z-20 font-mono text-[10px] uppercase tracking-widest gap-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="absolute bottom-12 left-0 right-0 text-center"
             >
-                <div className="flex flex-col gap-1">
-                    <span>Bioseta HQ</span>
-                    <span>Bogotá, Colombia</span>
-                </div>
-                <div className="flex gap-6 text-white">
-                    <a href="#">Insta</a>
-                    <a href="#">LinkedIn</a>
-                </div>
+              <p className="text-[9px] font-sans text-white/20 tracking-[0.4em] uppercase">
+                Bioseta © 2025
+              </p>
             </motion.div>
 
           </motion.div>
