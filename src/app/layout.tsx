@@ -1,18 +1,27 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display } from "next/font/google"; // Fuente premium para títulos
+// Importamos las nuevas fuentes premium
+import { Montserrat, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 
-// Fuente para cuerpo de texto (limpia)
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-// Fuente para títulos (elegante/serif)
-const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
+// Fuente para cuerpo de texto (moderna, limpia, alta legibilidad)
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  variable: "--font-montserrat",
+  display: "swap",
+});
+
+// Fuente para títulos (clásica, elegante, lujosa)
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  variable: "--font-cormorant",
+  weight: ["400", "500", "600", "700"], // Varios pesos para versatilidad
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: "Bioseta | Extractos Naturales Premium",
-  description: "Eleva tu mente y cuerpo con extractos de hongos funcionales. Melena de León, Ashwagandha y más. Ciencia y naturaleza en cada frasco.",
-  icons: {
-    icon: "/favicon.ico", // Por ahora usará el default, luego lo cambiamos
-  },
+  title: "Bioseta | Extractos Naturales de Alta Gama",
+  description: "Redescubre tu potencial con la pureza de la naturaleza. Suplementos de hongos funcionales ultra-premium.",
+  // El favicon lo actualizaremos en el siguiente paso
 };
 
 export default function RootLayout({
@@ -22,7 +31,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" className="scroll-smooth">
-      <body className={`${inter.variable} ${playfair.variable} bg-stone-950 text-stone-100 antialiased selection:bg-amber-500 selection:text-black`}>
+      {/* Aplicamos las nuevas variables de fuente al body */}
+      <body className={`${montserrat.variable} ${cormorant.variable} bg-[#0a0a0a] text-stone-100 antialiased selection:bg-amber-500/30 selection:text-amber-100`}>
         {children}
       </body>
     </html>
