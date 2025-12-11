@@ -20,7 +20,7 @@ export default async function Dashboard() {
   });
 
   return (
-    <main className="min-h-screen bg-[#050505] p-6 md:p-12 relative">
+    <main className="min-h-screen bg-[#050505] pt-32 px-6 md:p-12 relative">
       <div className="absolute inset-0 opacity-[0.05] pointer-events-none" style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }}></div>
       
       <div className="relative z-10 max-w-7xl mx-auto">

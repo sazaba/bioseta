@@ -1,57 +1,129 @@
 "use client";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { createProduct, deleteProduct, toggleProductStatus } from "@/actions/products";
+import { createProduct, deleteProduct, toggleProductStatus, updateProduct } from "@/actions/products";
 import { CldUploadWidget } from "next-cloudinary";
+
+// Iconos Premium
+import { LuPlus, LuTrash2, LuPencil, LuEye, LuEyeOff, LuImagePlus, LuX } from "react-icons/lu";
+
+// Sweet Alert
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
+
+const MySwal = withReactContent(Swal);
+
+// Configuración visual de la Alerta Premium
+const alertConfig = {
+  background: '#0a0a0a',
+  color: '#ffffff',
+  confirmButtonColor: '#d97706', // Amber-600
+  cancelButtonColor: '#262626',  // Neutral-800
+  customClass: {
+    popup: 'border border-white/10 rounded-none shadow-2xl',
+    title: 'font-serif tracking-widest uppercase text-amber-500',
+    htmlContainer: 'font-sans text-sm text-stone-400',
+    confirmButton: 'rounded-none font-bold tracking-widest uppercase px-6 py-3',
+    cancelButton: 'rounded-none font-bold tracking-widest uppercase px-6 py-3 text-stone-400'
+  }
+};
 
 interface Product {
   id: number;
   name: string;
   price: any;
   category: string;
+  subtitle?: string | null;
+  description: string;
   stock: number;
   isActive: boolean;
   imageUrl: string;
+  benefits?: any;
 }
 
 export const ProductManager = ({ products }: { products: Product[] }) => {
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null); // Estado para saber si editamos
   const [imageUrl, setImageUrl] = useState("");
-  const [isSaving, setIsSaving] = useState(false); // Estado de carga al guardar
+  const [isSaving, setIsSaving] = useState(false);
 
-  // --- HANDLERS CON CONFIRMACIÓN ---
-  const handleDelete = async (id: number) => {
-    if (window.confirm("¿ESTÁS SEGURO? \n\nEsta acción eliminará el producto permanentemente de la base de datos.")) {
-      await deleteProduct(id);
+  // --- ABRIR FORMULARIO (CREAR O EDITAR) ---
+  const handleOpenForm = (product?: Product) => {
+    if (product) {
+      // Modo Edición: Cargar datos
+      setEditingProduct(product);
+      setImageUrl(product.imageUrl);
+    } else {
+      // Modo Crear: Limpiar todo
+      setEditingProduct(null);
+      setImageUrl("");
     }
+    setIsFormOpen(true);
   };
 
+  // --- BORRAR ---
+  const handleDelete = async (id: number) => {
+    MySwal.fire({
+      ...alertConfig,
+      title: '¿ELIMINAR?',
+      text: "Esta acción borrará el producto de la base de datos permanentemente.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'SÍ, BORRAR',
+      cancelButtonText: 'CANCELAR'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await deleteProduct(id);
+        MySwal.fire({ ...alertConfig, title: 'ELIMINADO', icon: 'success', timer: 1500, showConfirmButton: false });
+      }
+    });
+  };
+
+  // --- TOGGLE ESTADO ---
   const handleToggle = async (id: number, currentStatus: boolean) => {
-    // Para el toggle suele ser mejor ser rápido, pero si quieres confirmar:
-    // if (!confirm("¿Cambiar estado del producto?")) return;
     await toggleProductStatus(id, currentStatus);
   };
 
+  // --- GUARDAR (CREAR O EDITAR) ---
   const handleSave = async (formData: FormData) => {
-    // Validación manual de imagen
     if (!imageUrl) {
-        alert("Por favor sube una imagen primero.");
+        MySwal.fire({ ...alertConfig, title: 'FALTA IMAGEN', text: 'Por favor sube una fotografía.', icon: 'error' });
         return;
     }
 
-    if (window.confirm("¿CONFIRMAR CREACIÓN? \n\nEl producto se publicará inmediatamente.")) {
-      setIsSaving(true);
-      await createProduct(formData);
-      setIsSaving(false);
-      setIsFormOpen(false);
-      setImageUrl(""); // Limpiar
-    }
+    const actionText = editingProduct ? "¿GUARDAR CAMBIOS?" : "¿CREAR PRODUCTO?";
+
+    MySwal.fire({
+      ...alertConfig,
+      title: actionText,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'CONFIRMAR',
+      cancelButtonText: 'CANCELAR'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        setIsSaving(true);
+        
+        if (editingProduct) {
+          await updateProduct(editingProduct.id, formData);
+        } else {
+          await createProduct(formData);
+        }
+
+        setIsSaving(false);
+        setIsFormOpen(false);
+        setImageUrl("");
+        setEditingProduct(null);
+        
+        MySwal.fire({ ...alertConfig, title: 'ÉXITO', icon: 'success', timer: 1500, showConfirmButton: false });
+      }
+    });
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto mt-8 md:mt-12 px-4 md:px-0">
+    <div className="w-full max-w-7xl mx-auto mt-8 md:mt-12 px-4 md:px-0 pb-20">
       
-      {/* HEADER RESPONSIVE */}
+      {/* HEADER */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6 border-b border-white/10 pb-6">
         <div>
           <h2 className="text-3xl md:text-4xl text-white font-sans font-black tracking-tighter uppercase">
@@ -62,17 +134,17 @@ export const ProductManager = ({ products }: { products: Product[] }) => {
           </p>
         </div>
         <button 
-          onClick={() => setIsFormOpen(true)}
+          onClick={() => handleOpenForm()}
           className="w-full md:w-auto bg-white text-black hover:bg-amber-400 px-6 py-4 rounded-sm font-bold text-xs tracking-[0.2em] uppercase transition-all flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(251,191,36,0.4)]"
         >
-          <PlusIcon /> Nuevo Producto
+          <LuPlus size={18} /> Nuevo Producto
         </button>
       </div>
 
       {/* --- LISTA DE PRODUCTOS --- */}
       <div className="bg-[#0a0a0a] border border-white/10 rounded-xl overflow-hidden">
         
-        {/* CABECERA (SOLO VISIBLE EN DESKTOP) */}
+        {/* CABECERA (SOLO DESKTOP) */}
         <div className="hidden md:grid grid-cols-12 bg-white/[0.02] p-5 text-[10px] font-mono text-stone-500 uppercase tracking-widest border-b border-white/10">
           <div className="col-span-1 text-center">ID</div>
           <div className="col-span-1">Visual</div>
@@ -92,92 +164,76 @@ export const ProductManager = ({ products }: { products: Product[] }) => {
             products.map((product) => (
               <div key={product.id} className="group transition-colors hover:bg-white/[0.02]">
                 
-                {/* --- VERSION DESKTOP (Tabla) --- */}
+                {/* --- MODO DESKTOP (TABLA) --- */}
                 <div className="hidden md:grid grid-cols-12 items-center p-4 text-sm">
-                  <div className="col-span-1 text-center text-stone-700 font-mono text-xs">
-                    #{product.id}
-                  </div>
-                  
+                  <div className="col-span-1 text-center text-stone-700 font-mono text-xs">#{product.id}</div>
                   <div className="col-span-1">
                      <div className="w-12 h-12 rounded bg-white/5 overflow-hidden border border-white/10 relative">
                         <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
                      </div>
                   </div>
-
                   <div className="col-span-4 flex items-center gap-3">
                     <div className={`w-1.5 h-1.5 rounded-full ${product.isActive ? 'bg-green-500 shadow-[0_0_8px_#22c55e]' : 'bg-red-500'}`}></div>
                     <div>
-                        <span className="block font-sans font-black text-white uppercase tracking-tight text-lg leading-none">
-                            {product.name}
-                        </span>
+                        <span className="block font-sans font-black text-white uppercase tracking-tight text-lg leading-none">{product.name}</span>
                         <span className={`text-[9px] font-mono uppercase tracking-wider ${product.isActive ? 'text-green-500/50' : 'text-red-500/50'}`}>
                             {product.isActive ? 'Activo' : 'Inactivo'}
                         </span>
                     </div>
                   </div>
-                  
                   <div className="col-span-2">
-                    <span className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[10px] text-stone-300 uppercase tracking-wider">
-                      {product.category}
-                    </span>
+                    <span className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[10px] text-stone-300 uppercase tracking-wider">{product.category}</span>
                   </div>
-                  
                   <div className="col-span-2 text-right font-mono text-amber-500">
                     ${Number(product.price).toLocaleString()}
                   </div>
-                  
-                  <div className="col-span-2 flex justify-center gap-4 opacity-40 group-hover:opacity-100 transition-opacity">
-                    <button 
-                        onClick={() => handleToggle(product.id, product.isActive)} 
-                        className="p-2 hover:bg-white/10 rounded-full transition-colors"
-                        title={product.isActive ? "Desactivar" : "Activar"}
-                    >
-                      {product.isActive ? <EyeIcon className="text-white" /> : <EyeSlashIcon className="text-stone-500" />}
+                  <div className="col-span-2 flex justify-center gap-3 opacity-40 group-hover:opacity-100 transition-opacity">
+                    <button onClick={() => handleToggle(product.id, product.isActive)} className="p-2 hover:bg-white/10 rounded-full transition-colors text-stone-400 hover:text-white">
+                      {product.isActive ? <LuEye size={18} /> : <LuEyeOff size={18} />}
                     </button>
-                    <button 
-                        onClick={() => handleDelete(product.id)} 
-                        className="p-2 hover:bg-red-500/10 rounded-full transition-colors group/delete"
-                        title="Eliminar permanentemente"
-                    >
-                      <TrashIcon className="text-stone-500 group-hover/delete:text-red-500 transition-colors" />
+                    <button onClick={() => handleOpenForm(product)} className="p-2 hover:bg-amber-500/10 rounded-full transition-colors text-stone-400 hover:text-amber-500">
+                      <LuPencil size={18} />
+                    </button>
+                    <button onClick={() => handleDelete(product.id)} className="p-2 hover:bg-red-500/10 rounded-full transition-colors text-stone-400 hover:text-red-500">
+                      <LuTrash2 size={18} />
                     </button>
                   </div>
                 </div>
 
-                {/* --- VERSION MÓVIL (Tarjetas) --- */}
-                <div className="md:hidden flex items-center justify-between p-5">
-                    <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 rounded bg-white/5 border border-white/10 overflow-hidden shrink-0">
+                {/* --- MODO MÓVIL (TARJETAS) --- */}
+                <div className="md:hidden flex flex-col p-5 gap-4">
+                    <div className="flex items-start gap-4">
+                        <div className="w-20 h-20 rounded bg-white/5 border border-white/10 overflow-hidden shrink-0">
                             <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
                         </div>
-                        <div>
-                            <div className="flex items-center gap-2 mb-1">
-                                <div className={`w-1.5 h-1.5 rounded-full ${product.isActive ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                                <span className="text-[10px] font-mono text-stone-500 uppercase">
-                                    {product.category}
-                                </span>
+                        <div className="flex-1">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <div className={`w-1.5 h-1.5 rounded-full ${product.isActive ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                                        <span className="text-[10px] font-mono text-stone-500 uppercase">{product.category}</span>
+                                    </div>
+                                    <h3 className="font-sans font-black text-white text-xl uppercase tracking-tighter leading-none mb-1">
+                                        {product.name}
+                                    </h3>
+                                    <p className="text-amber-500 font-mono text-sm">
+                                        ${Number(product.price).toLocaleString()}
+                                    </p>
+                                </div>
                             </div>
-                            <h3 className="font-sans font-black text-white text-lg uppercase tracking-tight leading-none mb-1">
-                                {product.name}
-                            </h3>
-                            <p className="text-amber-500 font-mono text-xs">
-                                ${Number(product.price).toLocaleString()}
-                            </p>
                         </div>
                     </div>
-
-                    <div className="flex flex-col gap-2">
-                        <button 
-                            onClick={() => handleToggle(product.id, product.isActive)}
-                            className="p-2 bg-white/5 border border-white/10 rounded active:scale-95 transition-transform"
-                        >
-                            {product.isActive ? <EyeIcon className="w-4 h-4 text-white" /> : <EyeSlashIcon className="w-4 h-4 text-stone-500" />}
+                    
+                    {/* Botones Móvil (Anchos y fáciles de tocar) */}
+                    <div className="grid grid-cols-3 gap-2">
+                        <button onClick={() => handleToggle(product.id, product.isActive)} className="py-2 flex justify-center items-center bg-white/5 border border-white/10 rounded text-stone-400">
+                            {product.isActive ? <LuEye size={20} /> : <LuEyeOff size={20} />}
                         </button>
-                        <button 
-                            onClick={() => handleDelete(product.id)}
-                            className="p-2 bg-red-500/10 border border-red-500/20 rounded active:scale-95 transition-transform"
-                        >
-                            <TrashIcon className="w-4 h-4 text-red-500" />
+                        <button onClick={() => handleOpenForm(product)} className="py-2 flex justify-center items-center bg-amber-500/10 border border-amber-500/20 rounded text-amber-500">
+                            <LuPencil size={20} />
+                        </button>
+                        <button onClick={() => handleDelete(product.id)} className="py-2 flex justify-center items-center bg-red-500/10 border border-red-500/20 rounded text-red-500">
+                            <LuTrash2 size={20} />
                         </button>
                     </div>
                 </div>
@@ -192,14 +248,12 @@ export const ProductManager = ({ products }: { products: Product[] }) => {
       <AnimatePresence>
         {isFormOpen && (
           <>
-            {/* Backdrop */}
             <motion.div 
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => setIsFormOpen(false)}
               className="fixed inset-0 bg-black/90 backdrop-blur-md z-40"
             />
             
-            {/* Panel */}
             <motion.div 
               initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
@@ -208,10 +262,16 @@ export const ProductManager = ({ products }: { products: Product[] }) => {
               {/* Header Panel */}
               <div className="p-8 border-b border-white/10 flex justify-between items-center sticky top-0 bg-[#0F1115]/95 backdrop-blur z-10">
                 <div>
-                    <h3 className="text-2xl font-sans font-black text-white uppercase tracking-tight">Alta de Producto</h3>
-                    <p className="text-stone-500 text-[10px] font-mono tracking-widest mt-1">NUEVO ITEM</p>
+                    <h3 className="text-2xl font-sans font-black text-white uppercase tracking-tight">
+                        {editingProduct ? "Editar Producto" : "Nuevo Producto"}
+                    </h3>
+                    <p className="text-stone-500 text-[10px] font-mono tracking-widest mt-1">
+                        {editingProduct ? `ID REF: #${editingProduct.id}` : "ALTA DE ITEM"}
+                    </p>
                 </div>
-                <button onClick={() => setIsFormOpen(false)} className="text-stone-500 hover:text-white transition-colors p-2">✕</button>
+                <button onClick={() => setIsFormOpen(false)} className="text-stone-500 hover:text-white transition-colors p-2">
+                    <LuX size={24} />
+                </button>
               </div>
 
               {/* Form Body */}
@@ -219,7 +279,7 @@ export const ProductManager = ({ products }: { products: Product[] }) => {
                 
                 {/* UPLOADER */}
                 <div className="space-y-3">
-                   <label className="text-[10px] font-mono uppercase text-stone-500 tracking-widest">Fotografía (Requerido)</label>
+                   <label className="text-[10px] font-mono uppercase text-stone-500 tracking-widest">Fotografía</label>
                    <input type="hidden" name="imageUrl" value={imageUrl} required />
                    <CldUploadWidget 
                       uploadPreset="bioseta_preset"
@@ -234,8 +294,8 @@ export const ProductManager = ({ products }: { products: Product[] }) => {
                                <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
                              ) : (
                                <div className="text-center group-hover:scale-105 transition-transform">
-                                  <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-3 border border-white/10 group-hover:border-amber-500/30">
-                                    <CameraIcon />
+                                  <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-3 border border-white/10 group-hover:border-amber-500/30 text-stone-400 group-hover:text-amber-500">
+                                    <LuImagePlus size={24} />
                                   </div>
                                   <span className="text-xs text-stone-400 uppercase tracking-widest group-hover:text-amber-500">Subir Imagen</span>
                                </div>
@@ -248,19 +308,19 @@ export const ProductManager = ({ products }: { products: Product[] }) => {
                 <div className="space-y-6">
                     <div className="space-y-2">
                         <label className="text-[10px] font-mono uppercase text-stone-500 tracking-widest">Nombre Principal</label>
-                        <input name="name" required placeholder="Ej: MELENA DE LEÓN" className="w-full bg-white/5 border border-white/10 p-4 text-white text-sm focus:border-amber-500 focus:bg-white/10 outline-none rounded-sm font-sans font-bold tracking-wide transition-colors" />
+                        <input name="name" defaultValue={editingProduct?.name} required placeholder="Ej: MELENA DE LEÓN" className="w-full bg-white/5 border border-white/10 p-4 text-white text-sm focus:border-amber-500 focus:bg-white/10 outline-none rounded-sm font-sans font-black tracking-wide transition-colors uppercase" />
                     </div>
 
                     <div className="space-y-2">
                         <label className="text-[10px] font-mono uppercase text-stone-500 tracking-widest">Subtítulo (Efecto)</label>
-                        <input name="subtitle" placeholder="Ej: Claridad & Memoria" className="w-full bg-white/5 border border-white/10 p-4 text-white text-sm focus:border-amber-500 focus:bg-white/10 outline-none rounded-sm transition-colors" />
+                        <input name="subtitle" defaultValue={editingProduct?.subtitle || ""} placeholder="Ej: Claridad & Memoria" className="w-full bg-white/5 border border-white/10 p-4 text-white text-sm focus:border-amber-500 focus:bg-white/10 outline-none rounded-sm transition-colors" />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <label className="text-[10px] font-mono uppercase text-stone-500 tracking-widest">Categoría</label>
                             <div className="relative">
-                                <select name="category" className="w-full bg-white/5 border border-white/10 p-4 text-white text-sm focus:border-amber-500 outline-none rounded-sm appearance-none cursor-pointer">
+                                <select name="category" defaultValue={editingProduct?.category} className="w-full bg-white/5 border border-white/10 p-4 text-white text-sm focus:border-amber-500 outline-none rounded-sm appearance-none cursor-pointer">
                                 <option className="bg-black" value="mente">Mente</option>
                                 <option className="bg-black" value="calma">Calma</option>
                                 <option className="bg-black" value="energia">Energía</option>
@@ -270,24 +330,25 @@ export const ProductManager = ({ products }: { products: Product[] }) => {
                         </div>
                         <div className="space-y-2">
                             <label className="text-[10px] font-mono uppercase text-stone-500 tracking-widest">Precio</label>
-                            <input name="price" type="number" required placeholder="0" className="w-full bg-white/5 border border-white/10 p-4 text-white text-sm focus:border-amber-500 outline-none rounded-sm font-mono" />
+                            <input name="price" type="number" defaultValue={editingProduct?.price ? Number(editingProduct.price) : ""} required placeholder="0" className="w-full bg-white/5 border border-white/10 p-4 text-white text-sm focus:border-amber-500 outline-none rounded-sm font-mono" />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <label className="text-[10px] font-mono uppercase text-stone-500 tracking-widest">Stock</label>
-                            <input name="stock" type="number" defaultValue="100" className="w-full bg-white/5 border border-white/10 p-4 text-white text-sm focus:border-amber-500 outline-none rounded-sm font-mono" />
+                            <input name="stock" type="number" defaultValue={editingProduct?.stock || 100} className="w-full bg-white/5 border border-white/10 p-4 text-white text-sm focus:border-amber-500 outline-none rounded-sm font-mono" />
                         </div>
                         <div className="space-y-2">
                             <label className="text-[10px] font-mono uppercase text-stone-500 tracking-widest">Tags (Separa con comas)</label>
-                            <input name="benefits" placeholder="Focus, Memoria" className="w-full bg-white/5 border border-white/10 p-4 text-white text-sm focus:border-amber-500 outline-none rounded-sm" />
+                            {/* Convertimos el JSON de la BD a String para mostrarlo en el input */}
+                            <input name="benefits" defaultValue={editingProduct?.benefits ? (Array.isArray(editingProduct.benefits) ? editingProduct.benefits.join(", ") : editingProduct.benefits) : ""} placeholder="Focus, Memoria" className="w-full bg-white/5 border border-white/10 p-4 text-white text-sm focus:border-amber-500 outline-none rounded-sm" />
                         </div>
                     </div>
 
                     <div className="space-y-2">
                         <label className="text-[10px] font-mono uppercase text-stone-500 tracking-widest">Descripción Editorial</label>
-                        <textarea name="description" rows={5} className="w-full bg-white/5 border border-white/10 p-4 text-white text-sm focus:border-amber-500 focus:bg-white/10 outline-none rounded-sm leading-relaxed" placeholder="Escribe la descripción premium..."></textarea>
+                        <textarea name="description" defaultValue={editingProduct?.description} rows={5} className="w-full bg-white/5 border border-white/10 p-4 text-white text-sm focus:border-amber-500 focus:bg-white/10 outline-none rounded-sm leading-relaxed" placeholder="Escribe la descripción premium..."></textarea>
                     </div>
                 </div>
 
@@ -300,9 +361,11 @@ export const ProductManager = ({ products }: { products: Product[] }) => {
                         {isSaving ? (
                             <>
                                 <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>
-                                Guardando...
+                                {editingProduct ? "Guardando Cambios..." : "Publicar Producto"}
                             </>
-                        ) : "Publicar Producto"}
+                        ) : (
+                            editingProduct ? "Actualizar Producto" : "Publicar Producto"
+                        )}
                     </button>
                 </div>
 
@@ -314,36 +377,3 @@ export const ProductManager = ({ products }: { products: Product[] }) => {
     </div>
   );
 };
-
-// --- ICONOS SVG PREMIUM (Componentes internos) ---
-const PlusIcon = () => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-    <path d="M12 5V19M5 12H19" strokeLinecap="square" />
-  </svg>
-);
-
-const TrashIcon = ({ className }: { className?: string }) => (
-  <svg className={className || "w-5 h-5"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-    <path d="M3 6H21M19 6V20C19 21 18 22 17 22H7C6 22 5 21 5 20V6M8 6V4C8 3 9 2 10 2H14C15 2 16 3 16 4V6M10 11V17M14 11V17" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-
-const EyeIcon = ({ className }: { className?: string }) => (
-  <svg className={className || "w-5 h-5"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-    <path d="M2 12S5 4 12 4S22 12 22 12S19 20 12 20S2 12 2 12Z" strokeLinecap="round" strokeLinejoin="round"/>
-    <circle cx="12" cy="12" r="3" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-
-const EyeSlashIcon = ({ className }: { className?: string }) => (
-  <svg className={className || "w-5 h-5"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-    <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24M2.24 2.24l19.52 19.52M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-
-const CameraIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-stone-500">
-    <path d="M23 19C23 20.1046 22.1046 21 21 21H3C1.89543 21 1 20.1046 1 19V8C1 6.89543 1.89543 6 3 6H7L9 3H15L17 6H21C22.1046 6 23 6.89543 23 8V19Z" strokeLinecap="round" strokeLinejoin="round"/>
-    <circle cx="12" cy="13" r="4" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
