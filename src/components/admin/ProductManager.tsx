@@ -318,11 +318,12 @@ export const ProductManager = ({ products }: { products: Product[] }) => {
                         <div className="space-y-2">
                             <label className="text-[10px] font-mono uppercase text-stone-500 tracking-widest">Categoría</label>
                             <div className="relative">
+                                {/* CORRECCIÓN: El select está correcto con sus 4 valores */}
                                 <select name="category" defaultValue={editingProduct?.category} className="w-full bg-white/5 border border-white/10 p-4 text-white text-sm focus:border-amber-500 outline-none rounded-sm appearance-none cursor-pointer">
                                 <option className="bg-black" value="mente">Mente</option>
                                 <option className="bg-black" value="calma">Calma</option>
                                 <option className="bg-black" value="energia">Energía</option>
-                                <option className="bg-black" value="cuerpo">Cuerpo</option> {/* <--- Aquí está el nuevo valor */}
+                                <option className="bg-black" value="cuerpo">Cuerpo</option>
                                 </select>
                                 <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-stone-500">▼</div>
                             </div>
