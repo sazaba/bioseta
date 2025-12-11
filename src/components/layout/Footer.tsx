@@ -1,6 +1,7 @@
-"use client";
 import Link from "next/link";
 import { LuxuryLogo } from "@/components/LuxuryLogo";
+import { getSession, logout } from "@/lib/session"; // Importamos logout y getSession
+import { LogoutButton } from "./LogoutButton"
 
 // Enlaces simplificados
 const LINKS = {
@@ -8,7 +9,11 @@ const LINKS = {
   legal: ["Términos & Condiciones", "Política de Privacidad", "Envíos y Devoluciones"]
 };
 
-export const Footer = () => {
+export const Footer = async () => {
+  // 1. Verificamos si hay sesión
+  const session = await getSession();
+  const isLoggedIn = !!session; // true si existe, false si no
+
   return (
     <footer className="bg-[#050505] border-t border-white/10 pt-24 pb-12 px-6 overflow-hidden">
       <div className="max-w-7xl mx-auto">
@@ -30,72 +35,65 @@ export const Footer = () => {
 
         {/* MIDDLE SECTION: GRID SIMPLIFICADO */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 border-t border-white/5 pt-16 mb-16">
-           
-           {/* Columna 1: Colección */}
+           {/* ... (Las columnas de enlaces quedan IGUAL que antes) ... */}
            <div>
-              <h4 className="text-white font-mono text-[10px] uppercase tracking-[0.3em] mb-6 opacity-50">
-                Colección
-              </h4>
+              <h4 className="text-white font-mono text-[10px] uppercase tracking-[0.3em] mb-6 opacity-50">Colección</h4>
               <ul className="flex flex-col gap-3">
                  {LINKS.shop.map(item => (
                     <li key={item}>
-                       <Link href="#" className="text-stone-400 hover:text-white text-xs font-sans uppercase tracking-widest transition-colors">
-                          {item}
-                       </Link>
+                       <Link href="#" className="text-stone-400 hover:text-white text-xs font-sans uppercase tracking-widest transition-colors">{item}</Link>
                     </li>
                  ))}
               </ul>
            </div>
-
-           {/* Columna 2: Legal */}
            <div>
-              <h4 className="text-white font-mono text-[10px] uppercase tracking-[0.3em] mb-6 opacity-50">
-                Legal
-              </h4>
+              <h4 className="text-white font-mono text-[10px] uppercase tracking-[0.3em] mb-6 opacity-50">Legal</h4>
               <ul className="flex flex-col gap-3">
                  {LINKS.legal.map(item => (
                     <li key={item}>
-                       <Link href="#" className="text-stone-400 hover:text-white text-xs font-sans uppercase tracking-widest transition-colors">
-                          {item}
-                       </Link>
+                       <Link href="#" className="text-stone-400 hover:text-white text-xs font-sans uppercase tracking-widest transition-colors">{item}</Link>
                     </li>
                  ))}
               </ul>
            </div>
-
-           {/* Columna 3: Social / Contacto */}
            <div>
-              <h4 className="text-white font-mono text-[10px] uppercase tracking-[0.3em] mb-6 opacity-50">
-                Contacto
-              </h4>
+              <h4 className="text-white font-mono text-[10px] uppercase tracking-[0.3em] mb-6 opacity-50">Contacto</h4>
               <div className="flex gap-4">
-                 <Link href="#" className="w-10 h-10 border border-white/10 rounded-full flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
-                    IG
-                 </Link>
-                 <Link href="#" className="w-10 h-10 border border-white/10 rounded-full flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
-                    WA
-                 </Link>
+                 <Link href="#" className="w-10 h-10 border border-white/10 rounded-full flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">IG</Link>
+                 <Link href="#" className="w-10 h-10 border border-white/10 rounded-full flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">WA</Link>
               </div>
-              <p className="mt-6 text-stone-500 text-xs font-sans">
-                medellin@bioseta.com.co
-              </p>
+              <p className="mt-6 text-stone-500 text-xs font-sans">medellin@bioseta.com.co</p>
            </div>
         </div>
 
-        {/* BOTTOM SECTION: COPYRIGHT & ADMIN */}
+        {/* BOTTOM SECTION: COPYRIGHT & ADMIN INTELIGENTE */}
         <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-white/5 text-[10px] font-mono text-stone-600 uppercase tracking-widest">
            <div className="flex flex-col md:flex-row gap-4 md:gap-8 items-center">
               <p>© 2025 Bioseta Research Lab.</p>
               <p>Diseñado en Medellín, Colombia.</p>
            </div>
            
-           {/* ENLACE DE ACCESO ADMINISTRADOR (Discreto) */}
-           <Link 
-             href="/admin/login" 
-             className="mt-4 md:mt-0 text-stone-800 hover:text-amber-500 transition-colors"
-           >
-             Acceso Administrador
-           </Link>
+           {/* LÓGICA DE ACCESO */}
+           <div className="flex gap-6 mt-4 md:mt-0 items-center">
+             {isLoggedIn ? (
+               <>
+                 <Link 
+                   href="/admin/dashboard" 
+                   className="text-amber-500 hover:text-amber-300 transition-colors font-bold"
+                 >
+                   Ir al Dashboard
+                 </Link>
+                 <LogoutButton />
+               </>
+             ) : (
+               <Link 
+                 href="/admin/login" 
+                 className="text-stone-800 hover:text-amber-500 transition-colors"
+               >
+                 Acceso Administrador
+               </Link>
+             )}
+           </div>
         </div>
 
       </div>

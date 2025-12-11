@@ -2,7 +2,7 @@
 
 import { prisma } from "../lib/prisma";
 import { compare } from "bcryptjs";
-import { createSession } from "@/lib/session";
+import { createSession, logout } from "@/lib/session";
 import { redirect } from "next/navigation";
 
 // Definimos la interfaz para que TypeScript sepa qué es 'FormState'
@@ -40,4 +40,9 @@ export async function loginAction(prevState: FormState | undefined, formData: Fo
   
   // 4. Redirigir
   redirect("/admin/dashboard");
+}
+
+export async function logoutAction() {
+  await logout();
+  redirect("/admin/login");
 }
