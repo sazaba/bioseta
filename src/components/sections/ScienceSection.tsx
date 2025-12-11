@@ -1,77 +1,69 @@
 "use client";
-import { motion, Variants } from "framer-motion"; // <--- Importamos Variants
+import { motion, Variants } from "framer-motion";
 
 const FEATURES = [
   {
     id: "01",
-    title: "DOBLE EXTRACCIÓN",
-    description: "Proceso alquímico de 8 semanas. Alcohol para triterpenos, agua caliente para beta-glucanos. Espectro completo garantizado.",
-    type: "circle"
+    title: "POTENCIA PURA", // Marketero: Directo al beneficio
+    subtitle: "Doble Extracción",
+    description: "No es polvo de hongo, es un extracto concentrado. Usamos agua y alcohol para sacar el 100% de los nutrientes. Una dosis equivale a comer kilos de hongos.",
+    type: "mushroom" // Icono visual de hongo
   },
   {
     id: "02",
-    title: "100% CUERPO FRUCTÍFERO",
-    description: "Sin micelio en grano, sin almidones, sin rellenos. Solo el hongo real, cultivado en maderas nobles y cosechado a mano.",
-    type: "hexagon"
+    title: "ABSORCIÓN TOTAL", // Marketero: Resuelve el miedo de "¿esto si funciona?"
+    subtitle: "Bio-Disponibilidad",
+    description: "Tu cuerpo no digiere los hongos crudos. Nuestra tecnología 'Nano-Bana' rompe las paredes celulares para que absorbas cada gramo de beneficio al instante.",
+    type: "drop" // Icono de gota/absorción
   },
   {
     id: "03",
-    title: "BIO-DISPONIBILIDAD",
-    description: "Nanotecnología aplicada para romper la pared celular de quitina (Nano-bana), asegurando una absorción celular inmediata.",
-    type: "diamond"
+    title: "SOLO LO BUENO", // Marketero: Confianza y limpieza
+    subtitle: "Cero Rellenos",
+    description: "Sin arroz, sin granos, sin 'aserrín'. Solo el cuerpo fructífero del hongo (la parte medicinal). Lo que ves es pureza al 100%.",
+    type: "shield" // Icono de escudo/pureza
   }
 ];
 
 export const ScienceSection = () => {
   return (
-    <section className="relative bg-[#050505] py-32 px-4 overflow-hidden border-t border-white/5">
+    <section className="relative bg-[#050505] py-24 md:py-32 px-4 overflow-hidden border-t border-white/5">
       
-      {/* FONDO TÉCNICO (Grid) */}
-      <div className="absolute inset-0 opacity-[0.05]" 
-           style={{ 
-             backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', 
-             backgroundSize: '40px 40px' 
-           }}>
-      </div>
+      {/* FONDO SUTIL (Luz ambiental) */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gradient-to-b from-amber-900/10 to-transparent pointer-events-none" />
 
       <div className="max-w-7xl mx-auto relative z-10">
         
-        {/* HEADER DE LA SECCIÓN */}
-        <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
-          <div>
-            <motion.span 
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="text-amber-500 font-mono text-xs tracking-[0.3em] uppercase block mb-4"
-            >
-              Metodología
-            </motion.span>
-            <motion.h2 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="text-4xl md:text-6xl text-white font-sans font-black tracking-tighter uppercase leading-none"
-            >
-              ESTÁNDAR <br />
-              <span className="text-white/20">CLÍNICO</span>
-            </motion.h2>
-          </div>
-          
-          <motion.p 
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+        {/* HEADER: CLARO Y DIRECTO */}
+        <div className="text-center mb-20 md:mb-28">
+          <motion.span 
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.4 }}
-            className="text-stone-400 font-serif italic text-lg max-w-md text-right hidden md:block"
+            className="text-amber-500 font-mono text-xs tracking-[0.3em] uppercase block mb-6"
           >
-            "La pureza no es un accidente, es el resultado de la intención inteligente."
-          </motion.p>
+            ¿Por qué Bioseta?
+          </motion.span>
+          
+          <motion.h2 
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="text-4xl md:text-6xl text-white font-sans font-black uppercase tracking-tight leading-tight max-w-3xl mx-auto"
+          >
+            NO ES MAGIA, ES <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-600">
+              CIENCIA APLICADA.
+            </span>
+          </motion.h2>
+          
+          <p className="mt-6 text-stone-400 font-serif italic text-lg md:text-xl max-w-2xl mx-auto">
+            "La diferencia entre un suplemento normal y Bioseta es la cantidad de medicina que realmente llega a tu sangre."
+          </p>
         </div>
 
-        {/* GRID DE CARACTERÍSTICAS (Diagramas) */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 border-t border-white/10 pt-16">
+        {/* GRID DE BENEFICIOS VISUALES */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-8">
           {FEATURES.map((feature, index) => (
             <FeatureCard key={feature.id} feature={feature} index={index} />
           ))}
@@ -82,89 +74,113 @@ export const ScienceSection = () => {
   );
 };
 
-// TARJETA DE CARACTERÍSTICA CON GRÁFICO ANIMADO
 const FeatureCard = ({ feature, index }: { feature: any, index: number }) => {
   return (
     <motion.div 
-      initial={{ opacity: 0, y: 50 }}
+      initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.2, duration: 0.8 }}
-      className="flex flex-col group"
+      className="flex flex-col items-center text-center group"
     >
-      {/* 1. VISUALIZACIÓN TÉCNICA (El "Gráfico") */}
-      <div className="h-48 w-full border border-white/5 bg-white/[0.02] mb-8 relative flex items-center justify-center overflow-hidden rounded-sm group-hover:border-amber-500/30 transition-colors duration-500">
-         <TechShape type={feature.type} />
+      {/* ICONO PREMIUM ANIMADO (El Centro de Atención) */}
+      <div className="w-48 h-48 mb-8 relative flex items-center justify-center">
+         {/* Fondo Glow detrás del icono */}
+         <div className="absolute inset-0 bg-amber-500/5 rounded-full blur-2xl group-hover:bg-amber-500/10 transition-colors duration-500" />
          
-         {/* Etiqueta de datos flotante */}
-         <div className="absolute top-4 right-4 text-[9px] font-mono text-white/30 tracking-widest">
-            FIG. 0{index + 1}
-         </div>
+         {/* El SVG Vectorial Premium */}
+         <PremiumIcon type={feature.type} />
       </div>
 
-      {/* 2. TEXTO */}
-      <span className="text-amber-500 font-mono text-xs mb-4 block">0{index + 1}</span>
-      <h3 className="text-2xl text-white font-sans font-bold uppercase tracking-tight mb-4 group-hover:text-amber-100 transition-colors">
+      <h3 className="text-2xl md:text-3xl text-white font-sans font-black uppercase tracking-tight mb-2">
         {feature.title}
       </h3>
-      <p className="text-stone-400 font-sans text-sm leading-relaxed opacity-80 max-w-xs">
+      
+      <span className="text-amber-500 font-serif italic text-sm mb-4 block">
+        — {feature.subtitle}
+      </span>
+      
+      <p className="text-stone-400 font-sans text-sm md:text-base leading-relaxed max-w-xs mx-auto">
         {feature.description}
       </p>
     </motion.div>
   );
 };
 
-// COMPONENTE DE FIGURAS TÉCNICAS ANIMADAS (SVG)
-const TechShape = ({ type }: { type: string }) => {
+// --- ICONOS VECTORIALES PREMIUM (SVG DIBUJADOS A MANO) ---
+const PremiumIcon = ({ type }: { type: string }) => {
   
-  // CORRECCIÓN: Tipamos explícitamente como 'Variants'
   const draw: Variants = {
     hidden: { pathLength: 0, opacity: 0 },
     visible: {
       pathLength: 1,
       opacity: 1,
       transition: {
-        pathLength: { duration: 1.5, ease: "easeInOut" },
-        opacity: { duration: 0.01 }
+        pathLength: { duration: 2, ease: "easeInOut" },
+        opacity: { duration: 0.5 }
       }
     }
   };
 
   return (
     <motion.svg
-      width="120"
-      height="120"
-      viewBox="0 0 100 100"
+      viewBox="0 0 200 200"
+      className="w-full h-full stroke-amber-200 fill-none stroke-[1.5] drop-shadow-[0_0_10px_rgba(251,191,36,0.3)]"
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true }}
-      className="stroke-amber-500/80 stroke-[0.5] fill-none drop-shadow-[0_0_8px_rgba(245,158,11,0.3)]"
     >
-      {type === "circle" && (
-        <>
-          <motion.circle cx="50" cy="50" r="40" variants={draw} />
-          <motion.circle cx="50" cy="50" r="25" variants={draw} transition={{ delay: 0.5 }} className="stroke-white/30" />
-          <motion.line x1="50" y1="10" x2="50" y2="90" variants={draw} className="stroke-white/10" />
-          <motion.line x1="10" y1="50" x2="90" y2="50" variants={draw} className="stroke-white/10" />
-        </>
-      )}
-      
-      {type === "hexagon" && (
-        <>
-          <motion.path d="M50 10 L85 30 L85 70 L50 90 L15 70 L15 30 Z" variants={draw} />
-          <motion.path d="M50 30 L65 40 L65 60 L50 70 L35 60 L35 40 Z" variants={draw} transition={{ delay: 0.5 }} className="stroke-white/30" />
-          <motion.circle cx="50" cy="50" r="2" fill="white" className="stroke-none animate-pulse" />
-        </>
+      {/* 1. HONGO ESTILIZADO (Para "Potencia Pura") */}
+      {type === "mushroom" && (
+        <g transform="translate(50, 40) scale(0.5)">
+           {/* Sombrero del hongo */}
+           <motion.path 
+             d="M100 20 C 160 20, 190 60, 190 90 C 190 120, 170 130, 150 130 L 50 130 C 30 130, 10 120, 10 90 C 10 60, 40 20, 100 20 Z" 
+             variants={draw} 
+           />
+           {/* Tallo */}
+           <motion.path 
+             d="M70 130 C 70 130, 60 180, 50 220 L 150 220 C 140 180, 130 130, 130 130" 
+             variants={draw} 
+             transition={{ delay: 0.5 }}
+           />
+           {/* Detalles internos (branquias) */}
+           <motion.path d="M100 20 V 90" variants={draw} className="stroke-white/20" />
+           <motion.path d="M60 40 L 100 90" variants={draw} className="stroke-white/20" />
+           <motion.path d="M140 40 L 100 90" variants={draw} className="stroke-white/20" />
+        </g>
       )}
 
-      {type === "diamond" && (
-        <>
-          <motion.rect x="50" y="20" width="42" height="42" transform="rotate(45 50 50)" variants={draw} />
-          <motion.rect x="50" y="35" width="21" height="21" transform="rotate(45 50 50)" variants={draw} transition={{ delay: 0.5 }} className="stroke-white/30" />
-          {/* Líneas de conexión */}
-          <motion.line x1="50" y1="0" x2="50" y2="20" variants={draw} className="stroke-white/20" />
-          <motion.line x1="50" y1="80" x2="50" y2="100" variants={draw} className="stroke-white/20" />
-        </>
+      {/* 2. GOTA DE EXTRACTO (Para "Absorción") */}
+      {type === "drop" && (
+        <g transform="translate(60, 40) scale(0.4)">
+           {/* Gota principal */}
+           <motion.path 
+             d="M100 10 Q 150 80, 150 130 A 50 50 0 1 1 50 130 Q 50 80, 100 10 Z" 
+             variants={draw} 
+           />
+           {/* Ondas de expansión (absorción) */}
+           <motion.circle cx="100" cy="130" r="70" variants={draw} transition={{ delay: 0.5 }} className="stroke-amber-500/50 stroke-[2] stroke-dashed" />
+           <motion.circle cx="100" cy="130" r="90" variants={draw} transition={{ delay: 0.8 }} className="stroke-amber-500/30 stroke-[1] stroke-dashed" />
+        </g>
+      )}
+
+      {/* 3. ESCUDO / CÉLULA (Para "Solo lo Bueno") */}
+      {type === "shield" && (
+        <g transform="translate(50, 50) scale(0.5)">
+           {/* Escudo externo */}
+           <motion.path 
+             d="M100 10 L 180 50 V 120 C 180 170, 100 220, 100 220 C 100 220, 20 170, 20 120 V 50 L 100 10 Z" 
+             variants={draw} 
+           />
+           {/* Checkmark interno (Validación) */}
+           <motion.path 
+             d="M60 110 L 90 140 L 140 80" 
+             variants={draw} 
+             transition={{ delay: 0.5 }}
+             className="stroke-amber-400 stroke-[4]"
+           />
+        </g>
       )}
     </motion.svg>
   );
