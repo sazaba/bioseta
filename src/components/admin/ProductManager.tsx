@@ -50,11 +50,9 @@ export const ProductManager = ({ products }: { products: Product[] }) => {
   // --- ABRIR FORMULARIO (CREAR O EDITAR) ---
   const handleOpenForm = (product?: Product) => {
     if (product) {
-      // Modo Edición: Cargar datos
       setEditingProduct(product);
       setImageUrl(product.imageUrl);
     } else {
-      // Modo Crear: Limpiar todo
       setEditingProduct(null);
       setImageUrl("");
     }
@@ -324,7 +322,7 @@ export const ProductManager = ({ products }: { products: Product[] }) => {
                                 <option className="bg-black" value="mente">Mente</option>
                                 <option className="bg-black" value="calma">Calma</option>
                                 <option className="bg-black" value="energia">Energía</option>
-                                <option className="bg-black" value="energia">Cuerpo</option>
+                                <option className="bg-black" value="cuerpo">Cuerpo</option> {/* <--- Aquí está el nuevo valor */}
                                 </select>
                                 <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-stone-500">▼</div>
                             </div>
