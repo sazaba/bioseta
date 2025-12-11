@@ -37,20 +37,31 @@ export const ProductCatalog = ({ products }: { products: any[] }) => {
   return (
     <section className="bg-[#020202] relative min-h-screen">
       
-      {/* 1. HEADER FLOTANTE CORREGIDO */}
-      {/* CAMBIO: Agregado 'top-[70px] md:top-[90px]' para que no tape el Navbar principal */}
-      <div className="fixed top-[70px] md:top-[90px] left-0 w-full z-[40] px-4 py-2 pointer-events-none flex flex-col md:flex-row items-center justify-between gap-4 transition-all duration-300">
+      {/* DIFUMINADO DE CONEXIÓN SUPERIOR */}
+      <div className="absolute top-0 left-0 w-full h-[30vh] bg-gradient-to-b from-[#020202] via-[#020202]/90 to-transparent z-20 pointer-events-none" />
+
+      {/* 1. HEADER FLOTANTE (FILTROS) CORREGIDO 
+          - top-[110px]: Baja los filtros para que NO toquen el Navbar (que suele medir ~80px).
+          - z-[30]: Se mantiene por debajo del Navbar (z-50) y del Menú Abierto.
+      */}
+      <div className="fixed top-[110px] md:top-[140px] left-0 w-full z-[30] pointer-events-none flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all duration-300">
         
-        {/* Título discreto */}
-        <div className="pointer-events-auto mix-blend-difference">
+        {/* Título (Bioseta Lab Series) */}
+        <div className="pointer-events-auto mix-blend-difference relative z-50 px-4 md:px-6">
              <span className="text-white/40 font-mono text-[9px] uppercase tracking-[0.3em] block mb-1">
                 Bioseta Lab Series
              </span>
         </div>
 
-        {/* Barra de Filtros */}
-        <div className="pointer-events-auto w-full md:w-auto overflow-x-auto no-scrollbar pb-2 md:pb-0">
-          <div className="flex gap-2 md:gap-3 px-1 justify-center md:justify-end">
+        {/* BARRA DE FILTROS */}
+        <div className="pointer-events-auto w-full md:w-auto relative z-50">
+          <div 
+            className="flex gap-3 overflow-x-auto no-scrollbar items-center pl-4 pr-12 md:px-6 md:justify-end pb-2 md:pb-0"
+            style={{ 
+                maskImage: 'linear-gradient(to right, black 85%, transparent 100%)',
+                WebkitMaskImage: 'linear-gradient(to right, black 85%, transparent 100%)'
+            }}
+          >
             {CATEGORIES.map((cat) => (
                 <button
                 key={cat.id}
@@ -58,11 +69,10 @@ export const ProductCatalog = ({ products }: { products: any[] }) => {
                     window.scrollTo({ top: 0, behavior: 'smooth' }); 
                     setActiveCategory(cat.id);
                 }}
-                // Botones con fondo más sólido para mejorar legibilidad sobre los productos
-                className={`px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all duration-300 whitespace-nowrap shadow-lg ${
+                className={`flex-shrink-0 px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all duration-300 whitespace-nowrap shadow-lg backdrop-blur-xl ${
                     activeCategory === cat.id
                     ? "bg-white text-black border-white scale-105"
-                    : "bg-[#0a0a0a]/80 text-stone-400 border-white/10 hover:border-white/30 hover:text-white backdrop-blur-xl"
+                    : "bg-[#0a0a0a]/60 text-stone-400 border-white/10 hover:border-white/30 hover:text-white"
                 }`}
                 >
                 {cat.label}
@@ -73,7 +83,7 @@ export const ProductCatalog = ({ products }: { products: any[] }) => {
       </div>
 
       {/* 2. MAZO DE CARTAS (STACK) */}
-      <div className="w-full relative">
+      <div className="w-full relative z-10">
         <AnimatePresence mode="wait">
             {filteredProducts.length > 0 ? (
                 <div key={activeCategory}> 
@@ -94,7 +104,7 @@ export const ProductCatalog = ({ products }: { products: any[] }) => {
         </AnimatePresence>
       </div>
 
-      <div className="h-[20vh] bg-[#020202] flex items-end justify-center pb-10 text-white/10">
+      <div className="h-[20vh] bg-[#020202] flex items-end justify-center pb-10 text-white/10 relative z-10">
          <p className="font-mono text-[10px] uppercase tracking-widest">End of Archive</p>
       </div>
     </section>
@@ -112,10 +122,8 @@ const Card = ({ product, index, total }: { product: any, index: number, total: n
   const imageScale = useTransform(scrollYProgress, [0, 1], [1.3, 1]);
   const textParallax = useTransform(scrollYProgress, [0, 1], [200, -100]);
   
-  // --- CORRECCIÓN DE OPACIDAD ---
-  // Antes: [0.8, 1] -> Esto hacía que al 80% del scroll ya se viera negro.
-  // Ahora: [0.98, 1] -> Solo se desvanece en el último 2% del movimiento, prácticamente imperceptible.
-  const opacity = useTransform(scrollYProgress, [0.98, 1], [1, 0]); 
+  // Opacidad: Se mantiene visible al 30% en el fondo
+  const opacity = useTransform(scrollYProgress, [0.95, 1], [1, 0.3]); 
 
   const accentColor = getAccentColor(product.category);
 
@@ -140,7 +148,8 @@ const Card = ({ product, index, total }: { product: any, index: number, total: n
       />
       <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }}></div>
 
-      <div className="relative w-full max-w-[1600px] h-full px-6 md:px-12 flex flex-col md:flex-row items-center justify-center md:justify-between pt-24 md:pt-0">
+      {/* Aumentamos pt-32 para compensar la bajada del header de filtros */}
+      <div className="relative w-full max-w-[1600px] h-full px-6 md:px-12 flex flex-col md:flex-row items-center justify-center md:justify-between pt-32 md:pt-0">
         
         {/* TEXTO DE FONDO */}
         <div className="absolute inset-0 flex items-center justify-center overflow-hidden pointer-events-none z-0">
