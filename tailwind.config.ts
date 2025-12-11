@@ -8,10 +8,15 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+      fontFamily: {
+        // Con esto, cuando escribas 'font-sans', usará Montserrat
+        sans: ["var(--font-montserrat)", "sans-serif"],
+        // Con esto, cuando escribas 'font-serif', usará Cormorant
+        serif: ["var(--font-cormorant)", "serif"],
+        // Para Cinzel (si lo usas en el futuro)
+        mono: ["var(--font-cinzel)", "monospace"], 
       },
+      // ... tus colores y otras configs
     },
   },
   plugins: [],
