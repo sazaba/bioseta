@@ -14,9 +14,6 @@ export const Navbar = () => {
       {/* 1. Logo Pequeño a la Izquierda */}
       <Link href="/" className="flex items-center gap-3 group">
         <LuxuryLogo className="w-10 h-10 group-hover:scale-110 transition-transform duration-300" />
-        <span className="text-lg font-serif tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-600 font-bold hidden md:block">
-          BIOSETA
-        </span>
       </Link>
 
       {/* 2. Enlaces Centrales (Opcional) */}
