@@ -1,64 +1,46 @@
 import { getSession } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { LuxuryLogo } from "@/components/LuxuryLogo";
-import { prisma } from "@/lib/prisma"; // 1. Importamos la conexión a la BD
+import { prisma } from "@/lib/prisma";
+import { ProductManager } from "@/components/admin/ProductManager"; // Importar el componente nuevo
 
 export default async function Dashboard() {
-  // A. Verificamos la sesión (Cookie)
   const session = await getSession();
+  if (!session) redirect("/admin/login");
 
-  if (!session) {
-    redirect("/admin/login");
-  }
-
-  // B. Buscamos los datos frescos en la Base de Datos usando el ID de la sesión
-  // Convertimos el ID a número porque en la BD es un Int, pero en la cookie es string
   const user = await prisma.user.findUnique({
-    where: { 
-      id: Number(session.userId) 
-    },
+    where: { id: Number(session.userId) },
   });
 
-  // C. Seguridad extra: Si la cookie es válida pero el usuario fue borrado de la BD
-  if (!user) {
-    redirect("/admin/login");
-  }
+  if (!user) redirect("/admin/login");
+
+  // 1. OBTENER PRODUCTOS DE LA DB (Ordenados por fecha)
+  const products = await prisma.product.findMany({
+    orderBy: { createdAt: 'desc' },
+  });
 
   return (
-    <main className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-4">
-      {/* Fondo de ruido */}
+    <main className="min-h-screen bg-[#050505] p-6 md:p-12 relative">
       <div className="absolute inset-0 opacity-[0.05] pointer-events-none" style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }}></div>
       
-      <div className="z-10 flex flex-col items-center text-center space-y-8 animate-in fade-in zoom-in duration-700">
-        <LuxuryLogo className="w-24 h-24" />
+      <div className="relative z-10 max-w-7xl mx-auto">
+        {/* HEADER SIMPLE */}
+        <header className="flex flex-col md:flex-row justify-between items-center mb-12">
+          <div className="flex items-center gap-4">
+            <LuxuryLogo className="w-12 h-12" />
+            <div>
+              <h1 className="text-white font-serif text-2xl">PANEL DE CONTROL</h1>
+              <p className="text-stone-500 text-xs font-mono uppercase">Hola, {user.name}</p>
+            </div>
+          </div>
+          <div className="px-4 py-1 bg-green-900/20 border border-green-500/30 rounded-full text-green-500 text-[10px] font-mono tracking-widest uppercase">
+            ● Sistema Activo
+          </div>
+        </header>
+
+        {/* COMPONENTE PRINCIPAL DE GESTIÓN */}
+        <ProductManager products={products} />
         
-        <div className="space-y-2">
-          <h1 className="text-4xl md:text-6xl font-serif text-amber-500 tracking-widest">
-            BIENVENIDO
-          </h1>
-          
-          {/* AQUÍ ESTÁ EL CAMBIO: Leemos el nombre real */}
-          <p className="text-white font-sans font-bold text-xl tracking-[0.2em] uppercase">
-            {user.name}
-          </p>
-          
-          {/* Opcional: Mostrar el email para confirmar que es el correcto */}
-          <span className="text-stone-600 text-xs font-mono lowercase tracking-widest">
-            {user.email}
-          </span>
-        </div>
-
-        <div className="px-6 py-2 border border-green-500/30 bg-green-500/10 rounded-full">
-          <p className="text-green-400 font-mono text-xs tracking-widest uppercase flex items-center gap-2">
-            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-            Sistema Conectado
-          </p>
-        </div>
-
-        <p className="text-stone-500 text-sm max-w-md font-sans">
-          Estás dentro del panel de control de Bioseta. <br/>
-          Próximamente aquí podrás gestionar tus productos.
-        </p>
       </div>
     </main>
   );
