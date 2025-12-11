@@ -1,27 +1,21 @@
 import type { Metadata } from "next";
-// Importamos las nuevas fuentes premium
-import { Montserrat, Cormorant_Garamond } from "next/font/google";
+// 1. Agregamos 'Cinzel' a la importación
+import { Montserrat, Cormorant_Garamond, Cinzel } from "next/font/google";
 import "./globals.css";
 
-// Fuente para cuerpo de texto (moderna, limpia, alta legibilidad)
-const montserrat = Montserrat({
-  subsets: ["latin"],
-  variable: "--font-montserrat",
-  display: "swap",
-});
+const montserrat = Montserrat({ subsets: ["latin"], variable: "--font-montserrat", display: "swap" });
+const cormorant = Cormorant_Garamond({ subsets: ["latin"], variable: "--font-cormorant", weight: ["400", "500", "600", "700"], display: "swap" });
 
-// Fuente para títulos (clásica, elegante, lujosa)
-const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
-  variable: "--font-cormorant",
-  weight: ["400", "500", "600", "700"], // Varios pesos para versatilidad
-  display: "swap",
+// 2. Configuramos Cinzel
+const cinzel = Cinzel({ 
+  subsets: ["latin"], 
+  variable: "--font-cinzel",
+  display: "swap" 
 });
 
 export const metadata: Metadata = {
-  title: "Bioseta | Extractos Naturales de Alta Gama",
-  description: "Redescubre tu potencial con la pureza de la naturaleza. Suplementos de hongos funcionales ultra-premium.",
-  // El favicon lo actualizaremos en el siguiente paso
+  title: "Bioseta | Ultra Premium",
+  description: "Extractos naturales de alta gama.",
 };
 
 export default function RootLayout({
@@ -31,8 +25,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" className="scroll-smooth">
-      {/* Aplicamos las nuevas variables de fuente al body */}
-      <body className={`${montserrat.variable} ${cormorant.variable} bg-[#0a0a0a] text-stone-100 antialiased selection:bg-amber-500/30 selection:text-amber-100`}>
+      {/* 3. Agregamos la variable cinzel.variable aquí abajo */}
+      <body className={`${montserrat.variable} ${cormorant.variable} ${cinzel.variable} bg-[#0F1115] text-stone-100 antialiased`}>
         {children}
       </body>
     </html>

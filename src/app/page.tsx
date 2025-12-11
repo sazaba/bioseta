@@ -1,33 +1,36 @@
-import { Logo } from "@/components/Logo";
+import { LuxuryLogo } from "@/components/LuxuryLogo";
 
 export default function Home() {
   return (
-    // Usamos un fondo negro absoluto para mayor contraste premium
-    <main className="flex min-h-screen flex-col items-center justify-center bg-[#0a0a0a] p-6 overflow-hidden relative">
+    <main className="flex min-h-screen flex-col items-center justify-center bg-[#0F1115] p-6 relative overflow-hidden">
       
-      {/* Efecto de luz de fondo sutil (Opcional) */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-amber-500/10 blur-[120px] rounded-full pointer-events-none"></div>
+      {/* Fondo sutil tipo ajedrez oscuro (como en tu ejemplo) */}
+      <div className="absolute inset-0 opacity-10 pointer-events-none" 
+           style={{
+             backgroundImage: `linear-gradient(45deg, #1a1a1a 25%, transparent 25%), 
+                               linear-gradient(-45deg, #1a1a1a 25%, transparent 25%), 
+                               linear-gradient(45deg, transparent 75%, #1a1a1a 75%), 
+                               linear-gradient(-45deg, transparent 75%, #1a1a1a 75%)`,
+             backgroundSize: '20px 20px'
+           }}>
+      </div>
 
-      {/* Navbar */}
+      {/* Navbar Minimalista */}
       <nav className="fixed top-0 w-full flex justify-between items-center p-8 z-50">
-        <Logo />
-        {/* Botón de menú más elegante */}
-        <button className="group relative px-6 py-2 overflow-hidden rounded-full">
-          <span className="absolute inset-0 w-full h-full transition duration-300 ease-out opacity-0 bg-gradient-to-r from-amber-200/20 to-amber-600/20 group-hover:opacity-100 rounded-full"></span>
-          <span className="relative text-sm font-medium tracking-widest text-amber-100/80 group-hover:text-amber-50 transition-colors uppercase font-sans">Menú</span>
+        <span className="text-amber-500/50 text-xs tracking-[0.3em]">EST. 2025</span>
+        <button className="text-xs font-medium tracking-[0.2em] text-amber-100/80 border border-amber-900/30 px-6 py-2 rounded-sm hover:bg-amber-900/20 transition-colors uppercase">
+          Shop
         </button>
       </nav>
 
-      {/* Contenido Hero */}
-      <div className="text-center mt-20 relative z-10">
-        {/* Título con la nueva fuente Cormorant */}
-        <h1 className="font-serif text-6xl md:text-8xl leading-tight text-transparent bg-clip-text bg-gradient-to-b from-amber-50 to-amber-400/80 mb-8">
-          Naturaleza <br />
-          <span className="italic text-amber-100">Ancestral.</span>
-        </h1>
-        {/* Subtítulo con la nueva fuente Montserrat */}
-        <p className="font-sans text-amber-100/60 text-lg max-w-md mx-auto mb-12 leading-relaxed tracking-wide">
-          Suplementos adaptógenos de alta potencia para el humano moderno. Ciencia y pureza en cada dosis.
+      {/* EL LOGO NUEVO - Aquí es donde brilla */}
+      <div className="z-10 mt-10">
+        <LuxuryLogo className="w-[350px] h-[350px] md:w-[500px] md:h-[500px]" />
+      </div>
+
+      <div className="text-center z-10 -mt-10">
+        <p className="font-sans text-amber-100/40 text-sm tracking-[0.3em] uppercase mb-8">
+          Extractos Adaptógenos Ultra-Premium
         </p>
       </div>
 
