@@ -1,7 +1,40 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none">
   <defs>
-    <linearGradient id="golden-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#FBBF24;stop-opacity:1" /> <stop offset="100%" style="stop-color:#B45309;stop-opacity:1" /> </linearGradient>
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#BF953F" />
+      <stop offset="25%" stop-color="#FCF6BA" />
+      <stop offset="50%" stop-color="#B38728" />
+      <stop offset="75%" stop-color="#FBF5B7" />
+      <stop offset="100%" stop-color="#AA771C" />
+    </linearGradient>
   </defs>
-  <path fill="url(#golden-gradient)" d="M12 2C8.13 2 5 5.13 5 9c0 1.74.65 3.32 1.71 4.54L10 22h4l3.29-8.46A6.97 6.97 0 0019 9c0-3.87-3.13-7-7-7zm0 2a5 5 0 015 5c0 1.1-.36 2.13-.97 2.97L12 18l-4.03-6.03A4.978 4.978 0 017 9c0-2.76 2.24-5 5-5z" />
-</svg>
+
+  <g transform="translate(200, 200) scale(1.1)">
+    
+    <g transform="translate(-60, -90)">
+      <path
+        d="M60 10 C 90 10, 110 30, 115 50 C 130 55, 135 80, 125 100 C 120 120, 100 130, 90 150 C 80 170, 70 165, 60 180 C 50 165, 40 170, 30 150 C 20 130, 0 120, -5 100 C -15 80, -10 55, 5 50 C 10 30, 30 10, 60 10 Z"
+        stroke="url(#goldGradient)"
+        stroke-width="1.8"
+        fill="none"
+        stroke-linecap="round"
+      />
+      <path d="M60 20 C 60 40, 60 120, 60 170" stroke="url(#goldGradient)" stroke-width="0.8" stroke-linecap="round" />
+      <path d="M40 25 C 35 50, 30 110, 35 150" stroke="url(#goldGradient)" stroke-width="0.8" stroke-linecap="round" />
+      <path d="M80 25 C 85 50, 90 110, 85 150" stroke="url(#goldGradient)" stroke-width="0.8" stroke-linecap="round" />
+      <path d="M20 60 C 15 80, 10 110, 15 130" stroke="url(#goldGradient)" stroke-width="0.6" stroke-linecap="round" />
+      <path d="M100 60 C 105 80, 110 110, 105 130" stroke="url(#goldGradient)" stroke-width="0.6" stroke-linecap="round" />
+    </g>
+
+    <g transform="translate(-60, -90)">
+      <path d="M40 175 C 20 180, -20 160, -30 120" stroke="url(#goldGradient)" stroke-width="1.5" stroke-linecap="round" fill="none" />
+      <path d="M-30 120 Q -45 110, -35 100 Q -25 110, -30 120" stroke="url(#goldGradient)" stroke-width="0.8" fill="none" />
+      <path d="M-25 135 Q -40 135, -35 145" stroke="url(#goldGradient)" stroke-width="0.8" fill="none" />
+      <circle cx="-32" cy="120" r="3" stroke="url(#goldGradient)" stroke-width="1" fill="none" />
+      <circle cx="-25" cy="130" r="2.5" stroke="url(#goldGradient)" stroke-width="1" fill="none" />
+      
+      <path d="M80 175 C 100 180, 140 160, 150 120" stroke="url(#goldGradient)" stroke-width="1.5" stroke-linecap="round" fill="none" />
+      <circle cx="152" cy="120" r="3" stroke="url(#goldGradient)" stroke-width="1" fill="none" />
+    </g>
+  </g>
+  </svg>
