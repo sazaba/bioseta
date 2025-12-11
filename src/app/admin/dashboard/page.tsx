@@ -20,8 +20,8 @@ export default async function Dashboard() {
   });
 
   return (
-    // Ya no necesitamos tanto padding-top porque no hay Navbar fijo tapando
-    <main className="min-h-screen bg-[#050505] pt-12 pb-12 px-6 md:px-12 relative">
+    
+<main className="min-h-screen bg-[#050505] pt-12 pb-12 px-6 md:px-12 relative">
       
       <div className="absolute inset-0 opacity-[0.05] pointer-events-none" style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }}></div>
       
