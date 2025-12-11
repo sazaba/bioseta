@@ -2,6 +2,9 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+// Estilos compartidos para el efecto cristal (Glassmorphism)
+const glassClasses = "bg-white/5 backdrop-blur-xl border border-white/10 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] transition-all duration-300";
+
 const CATEGORIES = [
   { id: "all", label: "Todo" },
   { id: "mente", label: "Mente" },
@@ -21,48 +24,51 @@ export const ProductCatalog = ({ products }: { products: any[] }) => {
   return (
     <section className="relative bg-[#050505] min-h-screen py-20 px-4 md:px-12 overflow-hidden">
       
-      {/* 1. AMBIENTE & TEXTURA (Ultra sutil) */}
+      {/* 1. AMBIENTE & TEXTURA */}
       <div className="absolute inset-0 opacity-[0.04] pointer-events-none" 
            style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }}>
       </div>
-      
-      {/* Luces volumétricas tenues */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80vw] h-[500px] bg-gradient-to-b from-amber-500/10 to-transparent blur-[120px] pointer-events-none" />
+      {/* Luz ambiental dorada muy sutil */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-600/10 via-transparent to-transparent blur-[100px] pointer-events-none" />
 
       {/* 2. HEADER IMPACTANTE */}
-      <div className="relative z-10 max-w-[1400px] mx-auto mb-16 md:mb-32 flex flex-col items-center md:items-start">
+      <div className="relative z-10 max-w-[1400px] mx-auto mb-16 md:mb-28 flex flex-col items-center md:items-start">
         
-        {/* Etiqueta Superior */}
         <motion.span 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            className="text-amber-500/80 font-mono text-[10px] md:text-xs tracking-[0.4em] uppercase mb-4 md:mb-6"
+            className="text-amber-300/70 font-mono text-[9px] md:text-[10px] tracking-[0.4em] uppercase mb-4"
         >
             The Collection 2025
         </motion.span>
 
-        {/* TÍTULO "ALQUIMIA" (Centrado en móvil, Left en Desktop) */}
-        <h2 className="text-[18vw] md:text-[11vw] font-sans font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-white/40 leading-[0.8] tracking-tighter text-center md:text-left w-full md:w-auto">
+        {/* TÍTULO "ALQUIMIA" CON NEÓN ELEGANTE */}
+        {/* Nota: El estilo 'textShadow' crea el resplandor ámbar multicapa */}
+        <h2 
+            className="text-[12vw] md:text-[9vw] font-sans font-black text-white leading-[0.8] tracking-tighter text-center md:text-left w-full md:w-auto drop-shadow-2xl"
+            style={{ 
+                textShadow: '0 0 15px rgba(251, 191, 36, 0.3), 0 0 30px rgba(251, 191, 36, 0.2)' 
+            }}
+        >
           ALQUIMIA
         </h2>
 
-        {/* LÍNEA SEPARADORA & FILTROS */}
-        <div className="w-full flex flex-col md:flex-row items-center justify-between gap-8 mt-12 md:mt-16 border-t border-white/10 pt-8">
-             {/* Texto descriptivo oculto en móvil para limpieza */}
-            <p className="hidden md:block text-stone-500 text-sm max-w-xs leading-relaxed font-mono">
+        {/* LÍNEA SEPARADORA & FILTROS GLASSMORPHISM */}
+        <div className="w-full flex flex-col md:flex-row items-center justify-between gap-8 mt-12 pt-8 border-t border-white/5">
+             <p className="hidden md:block text-stone-500 text-xs max-w-xs leading-relaxed font-mono">
                 Extractos funcionales diseñados para potenciar la biología humana a través de la naturaleza.
             </p>
 
-            {/* FILTROS (Estilo Moderno Industrial) */}
-            <div className="flex gap-2 md:gap-3 overflow-x-auto w-full md:w-auto no-scrollbar px-2 md:px-0 scroll-smooth snap-x">
+            {/* FILTROS DE CRISTAL */}
+            <div className="flex gap-3 overflow-x-auto w-full md:w-auto no-scrollbar px-2 md:px-0 scroll-smooth snap-x py-2">
               {CATEGORIES.map((cat) => (
                 <button
                   key={cat.id}
                   onClick={() => setActiveCategory(cat.id)}
-                  className={`snap-center flex-shrink-0 px-5 py-3 md:px-6 md:py-2 rounded-full text-xs md:text-[11px] font-black uppercase tracking-widest border transition-all duration-300 ${
+                  className={`snap-center flex-shrink-0 px-5 py-2 rounded-full text-[10px] md:text-[11px] font-bold uppercase tracking-widest ${glassClasses} ${
                     activeCategory === cat.id
-                      ? "bg-white text-black border-white scale-105"
-                      : "bg-transparent text-stone-500 border-white/5 hover:border-white/20 hover:text-white"
+                      ? "bg-white/20 text-white border-white/30 shadow-[0_0_15px_rgba(255,255,255,0.1)]"
+                      : "text-stone-400 hover:text-white hover:bg-white/10"
                   }`}
                 >
                   {cat.label}
@@ -75,29 +81,23 @@ export const ProductCatalog = ({ products }: { products: any[] }) => {
       {/* 3. GRID DE PRODUCTOS */}
       <div className="max-w-[1400px] mx-auto relative z-10">
         <AnimatePresence mode="popLayout">
-           <div className="flex flex-col gap-24 md:gap-40">
+           <div className="flex flex-col gap-20 md:gap-32">
              {filtered.map((product, index) => (
                <ProductCard key={product.id} data={product} index={index} />
              ))}
            </div>
         </AnimatePresence>
-        
-        {filtered.length === 0 && (
-           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-32">
-             <span className="text-white/30 font-mono text-sm tracking-widest uppercase">Sin resultados en esta categoría</span>
-           </motion.div>
-        )}
       </div>
 
     </section>
   );
 };
 
-// --- TARJETA DE PRODUCTO "AWWWARDS STYLE" ---
+// --- TARJETA DE PRODUCTO REFINADA ---
 const ProductCard = ({ data, index }: { data: any, index: number }) => {
   const isEven = index % 2 === 0;
   
-  // Colores dinámicos
+  // Colores dinámicos para el glow ambiental
   const getColor = (cat: string) => {
       if(cat === 'mente') return '#fbbf24'; 
       if(cat === 'calma') return '#f87171'; 
@@ -108,98 +108,105 @@ const ProductCard = ({ data, index }: { data: any, index: number }) => {
   };
   const accentColor = getColor(data.category);
 
+  // Función placeholder para WhatsApp (Reemplazar con lógica real)
+  const handleWhatsAppClick = () => {
+      const message = `Hola, estoy interesado en el producto: ${data.name}`;
+      // window.open(`https://wa.me/TU_NUMERO?text=${encodeURIComponent(message)}`, '_blank');
+      console.log("Redirigiendo a WhatsApp con:", message);
+  };
+
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: 50 }}
+      initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-10%" }}
-      transition={{ duration: 0.8, ease: [0.215, 0.61, 0.355, 1] }} // Curva "Cubic Bezier" suave
-      className={`flex flex-col md:flex-row items-center gap-10 md:gap-20 group relative`}
+      transition={{ duration: 0.8, ease: [0.215, 0.61, 0.355, 1] }}
+      className={`flex flex-col md:flex-row items-center gap-8 md:gap-16 group relative`}
     >
-        {/* Orden alternado en Desktop, siempre Imagen primero en Mobile */}
+        {/* A. IMAGEN */}
         <div className={`contents ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
             
-            {/* A. IMAGEN ESCULTURAL */}
-            <div className="w-full md:w-7/12 relative aspect-square md:aspect-[4/3] flex justify-center items-center bg-[#080808] rounded-3xl overflow-hidden border border-white/5 shadow-2xl">
-                 {/* Glow Ambiental Detrás del producto */}
+            <div className="w-full md:w-6/12 relative aspect-square md:aspect-[4/3] flex justify-center items-center rounded-3xl overflow-hidden border border-white/5 shadow-2xl bg-[#080808]">
+                 {/* Glow Ambiental */}
                  <div 
-                    className="absolute inset-0 opacity-20 transition-opacity duration-1000 group-hover:opacity-40 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))]"
+                    className="absolute inset-0 opacity-15 transition-opacity duration-1000 group-hover:opacity-30 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))]"
                     style={{ '--tw-gradient-from': accentColor, '--tw-gradient-to': 'transparent' } as any}
                  ></div>
-                 
-                 <div className="absolute inset-0 opacity-[0.2] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-overlay"></div>
+                 <div className="absolute inset-0 opacity-[0.3] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-overlay"></div>
 
-                 {/* IMAGEN FLOTANTE */}
+                 {/* Producto Flotante */}
                  <motion.div 
-                    whileHover={{ scale: 1.05, rotate: -2, y: -10 }}
+                    whileHover={{ scale: 1.03, y: -5 }}
                     transition={{ type: "spring", stiffness: 100, damping: 20 }}
-                    className="relative z-10 w-[60%] h-[60%] md:w-[50%] md:h-[70%]"
+                    className="relative z-10 w-[55%] h-[55%] md:w-[50%] md:h-[70%]"
                  >
                     <img 
                         src={data.imageUrl} 
                         alt={data.name} 
-                        className="w-full h-full object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.6)]" 
+                        className="w-full h-full object-contain drop-shadow-[0_15px_30px_rgba(0,0,0,0.7)]" 
                     />
                  </motion.div>
 
-                 {/* Categoría Flotante (Etiqueta estilo militar/técnico) */}
-                 <div className="absolute top-6 left-6 md:top-8 md:left-8 px-3 py-1 bg-white/5 backdrop-blur-md border border-white/10 rounded-full">
-                    <span className="text-[10px] font-black tracking-widest uppercase text-white/60">
+                 {/* Etiqueta Categoría Glassmorphism */}
+                 <div className={`absolute top-4 left-4 md:top-6 md:left-6 px-3 py-1 rounded-full ${glassClasses}`}>
+                    <span className="text-[9px] font-black tracking-widest uppercase text-white/70">
                         {data.category}
                     </span>
                  </div>
             </div>
 
-            {/* B. INFO EDITORIAL */}
-            <div className="w-full md:w-5/12 flex flex-col items-center md:items-start text-center md:text-left">
+            {/* B. INFO REFINADA */}
+            <div className="w-full md:w-6/12 flex flex-col items-center md:items-start text-center md:text-left">
                  
-                 {/* Índice Numérico */}
-                 <span className="text-amber-500/50 font-mono text-xs mb-4 block">
-                    ( 00{index + 1} )
+                 <span className="text-amber-500/40 font-mono text-[10px] mb-4 block tracking-wider">
+                    — 00{index + 1}
                  </span>
 
-                 {/* Título Masivo */}
-                 <h3 className="text-5xl md:text-7xl lg:text-8xl font-sans font-black text-white mb-2 tracking-tighter uppercase leading-[0.85]">
+                 {/* Título Reducido */}
+                 <h3 className="text-4xl md:text-6xl lg:text-7xl font-sans font-black text-white mb-2 tracking-tighter uppercase leading-[0.9]">
                    {data.name}
                  </h3>
                  
-                 {/* Subtítulo Elegante */}
-                 <p className="text-lg md:text-2xl text-stone-400 font-serif italic mb-6">
+                 {/* Subtítulo Reducido */}
+                 <p className="text-base md:text-xl text-stone-300 font-serif italic mb-4">
                    {data.subtitle}
                  </p>
 
-                 {/* Descripción */}
-                 <p className="text-sm md:text-base text-stone-500 leading-relaxed max-w-md mb-8">
+                 {/* Descripción Reducida */}
+                 <p className="text-xs md:text-sm text-stone-500 leading-relaxed max-w-md mb-6">
                    {data.description}
                  </p>
 
-                 {/* Beneficios (Tags Minimalistas) */}
+                 {/* Beneficios Glassmorphism */}
                  {data.benefits && (
-                     <div className="flex flex-wrap justify-center md:justify-start gap-x-6 gap-y-2 mb-10 text-xs font-mono text-white/40 uppercase tracking-widest">
+                     <div className="flex flex-wrap justify-center md:justify-start gap-2 mb-8">
                         {data.benefits.map((b: string) => (
-                            <span key={b} className="flex items-center gap-2">
-                                <span className="w-1 h-1 bg-amber-500 rounded-full"></span>
+                            <span key={b} className={`px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider text-white/60 ${glassClasses}`}>
                                 {b}
                             </span>
                         ))}
                      </div>
                  )}
 
-                 {/* ZONA DE COMPRA: NUEVA TIPOGRAFÍA MODERNA */}
-                 <div className="w-full md:w-auto flex flex-col md:flex-row items-center gap-6 md:gap-10 border-t border-white/10 pt-6 md:border-none md:pt-0">
+                 {/* ZONA DE COMPRA (WhatsApp) */}
+                 <div className="w-full md:w-auto flex flex-col md:flex-row items-center gap-6 pt-6 border-t border-white/5 md:border-none md:pt-0">
                     
-                    {/* PRECIO: AHORA ES SANS-SERIF Y BOLD (Solicitado) */}
-                    <span className="text-4xl md:text-5xl font-sans font-black tracking-tighter text-white">
+                    {/* Precio Reducido */}
+                    <span className="text-3xl md:text-4xl font-sans font-black tracking-tighter text-white">
                         ${Number(data.price).toLocaleString()}
                     </span>
 
-                    {/* Botón CTA Premium */}
-                    <button className="relative overflow-hidden group/btn bg-white text-black px-8 py-4 w-full md:w-auto rounded-full md:rounded-sm transition-transform active:scale-95">
-                        <div className="absolute inset-0 bg-amber-400 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-in-out" />
-                        <span className="relative z-10 flex items-center justify-center gap-3 text-xs font-black uppercase tracking-[0.2em]">
-                            Adquirir
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                    {/* Botón WhatsApp Premium */}
+                    <button 
+                        onClick={handleWhatsAppClick}
+                        className="relative overflow-hidden group/btn bg-white text-black px-6 py-3 w-full md:w-auto rounded-full transition-all active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(251,191,36,0.3)]"
+                    >
+                        <div className="absolute inset-0 bg-gradient-to-r from-amber-300 to-amber-500 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
+                        <span className="relative z-10 flex items-center justify-center gap-2 text-[10px] md:text-xs font-black uppercase tracking-[0.15em] group-hover/btn:text-black transition-colors">
+                            ¡Quiero este producto!
+                            {/* Icono de flecha simple, podría cambiarse por logo de WA */}
+                            <svg className="w-4 h-4 -rotate-45 group-hover/btn:rotate-0 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                         </span>
                     </button>
                  </div>
