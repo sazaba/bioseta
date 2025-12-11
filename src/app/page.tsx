@@ -1,5 +1,6 @@
 import { Navbar } from "@/components/layout/Navbar"; // Recuerda que este ya lo movimos al layout, si ya lo hiciste, bórralo de aquí
 import { Hero } from "@/components/sections/Hero";
+import { PaymentSection } from "@/components/sections/PaymentSection";
 import { ProductCatalog } from "@/components/sections/ProductCatalog"; // <--- Importar
 import { ScienceSection } from "@/components/sections/ScienceSection";
 
@@ -16,14 +17,11 @@ export default function Home() {
            }}>
       </div>
       
-      {/* 1. Portada */}
+    
       <Hero />
-
-      {/* Science: La Autoridad y Confianza (El "Por qué") */}
       <ScienceSection />
-
-      {/* 2. El Catálogo Editorial */}
       <ProductCatalog />
+      <PaymentSection />
 
     </main>
   );
