@@ -13,7 +13,7 @@ export const Footer = () => {
     <footer className="bg-[#050505] border-t border-white/10 pt-24 pb-12 px-6 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         
-        {/* TOP SECTION: MARCA & MANIFIESTO (Ahora centrado o con más aire) */}
+        {/* TOP SECTION: MARCA & MANIFIESTO */}
         <div className="mb-24 max-w-2xl">
             <div className="flex items-center gap-3 mb-8">
                <LuxuryLogo className="w-10 h-10" />
@@ -28,10 +28,10 @@ export const Footer = () => {
             </p>
         </div>
 
-        {/* MIDDLE SECTION: GRID SIMPLIFICADO (3 Columnas) */}
+        {/* MIDDLE SECTION: GRID SIMPLIFICADO */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 border-t border-white/5 pt-16 mb-16">
            
-           {/* Columna 1: Colección (Futuros anclajes) */}
+           {/* Columna 1: Colección */}
            <div>
               <h4 className="text-white font-mono text-[10px] uppercase tracking-[0.3em] mb-6 opacity-50">
                 Colección
@@ -47,7 +47,7 @@ export const Footer = () => {
               </ul>
            </div>
 
-           {/* Columna 2: Legal (Pendientes por crear) */}
+           {/* Columna 2: Legal */}
            <div>
               <h4 className="text-white font-mono text-[10px] uppercase tracking-[0.3em] mb-6 opacity-50">
                 Legal
@@ -82,10 +82,20 @@ export const Footer = () => {
            </div>
         </div>
 
-        {/* BOTTOM SECTION: COPYRIGHT */}
+        {/* BOTTOM SECTION: COPYRIGHT & ADMIN */}
         <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-white/5 text-[10px] font-mono text-stone-600 uppercase tracking-widest">
-           <p>© 2025 Bioseta Research Lab.</p>
-           <p className="mt-2 md:mt-0">Diseñado en Medellín, Colombia.</p>
+           <div className="flex flex-col md:flex-row gap-4 md:gap-8 items-center">
+              <p>© 2025 Bioseta Research Lab.</p>
+              <p>Diseñado en Medellín, Colombia.</p>
+           </div>
+           
+           {/* ENLACE DE ACCESO ADMINISTRADOR (Discreto) */}
+           <Link 
+             href="/admin/login" 
+             className="mt-4 md:mt-0 text-stone-800 hover:text-amber-500 transition-colors"
+           >
+             Acceso Administrador
+           </Link>
         </div>
 
       </div>

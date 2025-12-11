@@ -1,0 +1,43 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// 1. EL ADMIN (TÚ)
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String   // Aquí guardaremos la contraseña encriptada
+  name      String?
+  createdAt DateTime @default(now())
+}
+
+// 2. TUS PRODUCTOS PREMIUM
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  subtitle    String?  // Ej: "Enfoque Cognitivo"
+  description String   @db.Text // Texto largo
+  price       Decimal  @db.Decimal(10, 2) // Para manejar precios exactos
+  
+  // Categoría (Usamos un String simple o un Enum)
+  category    String   // Ej: "mente", "calma", "energia"
+  
+  // Imágenes (URL que nos de Cloudinary)
+  imageUrl    String
+  
+  // Características "Tech" (Para los iconos de la sección de ciencia)
+  benefits    Json?    // Guardamos los beneficios como ["Focus", "Memoria"]
+  
+  stock       Int      @default(100)
+  isActive    Boolean  @default(true) // Para ocultarlo si se agota sin borrarlo
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
