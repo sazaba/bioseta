@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Montserrat, Cormorant_Garamond, Cinzel } from "next/font/google";
 import { Navbar } from "../components/layout/Navbar"; // <--- Importamos el Navbar aquí
 import "./globals.css";
+import { Footer } from "@/components/layout/Footer";
 
 // Configuración de fuentes
 const montserrat = Montserrat({ subsets: ["latin"], variable: "--font-montserrat", display: "swap" });
@@ -26,6 +27,7 @@ export default function RootLayout({
         <Navbar />
         
         {children}
+        <Footer />
       </body>
     </html>
   );
