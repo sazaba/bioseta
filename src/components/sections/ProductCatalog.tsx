@@ -114,11 +114,11 @@ export const ProductCatalog = ({ products }: { products: any[] }) => {
         </AnimatePresence>
       </div>
 
-      <div className="h-[20vh] bg-[#020202] flex items-end justify-center pb-10 text-white/10 relative z-10">
+      {/* <div className="h-[20vh] bg-[#020202] flex items-end justify-center pb-10 text-white/10 relative z-10">
         <p className="font-mono text-[10px] uppercase tracking-widest">
           End of Archive
         </p>
-      </div>
+      </div> */}
     </section>
   );
 };
