@@ -4,14 +4,15 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { LuxuryLogo } from "@/components/LuxuryLogo"; 
 
+// 1. ACTUALIZAMOS LOS LINKS CON LOS IDs (#id)
 const MENU_ITEMS = [
-  { title: "Collection", href: "#", subtitle: "Nuestros Extractos" },
-  { title: "Science", href: "#", subtitle: "Estudios & Evidencia" },
-  { title: "Philosophy", href: "#", subtitle: "Nuestra Historia" },
-  { title: "Shop", href: "#", subtitle: "Adquirir Ahora" },
+  { title: "Collection", href: "#collection", subtitle: "Nuestros Extractos" },
+  { title: "Science", href: "#science", subtitle: "Estudios & Evidencia" },
+  { title: "Philosophy", href: "#hero", subtitle: "Nuestra Historia" }, // "Philosophy" suele ir al inicio o a una sección 'About'
+  { title: "Shop", href: "#collection", subtitle: "Adquirir Ahora" }, // Shop también lleva al catálogo
 ];
 
-// --- TEXTURA ORGÁNICA (Esporas / Micelio) ---
+// --- TEXTURA ORGÁNICA ---
 const BioTexture = () => (
   <svg className="absolute inset-0 w-full h-full opacity-20 pointer-events-none mix-blend-overlay" xmlns="http://www.w3.org/2000/svg">
     <filter id="noiseFilter">
@@ -36,6 +37,23 @@ export const Navbar = () => {
     else document.body.style.overflow = "unset";
   }, [isOpen]);
 
+  // 2. FUNCIÓN PARA MANEJAR EL SCROLL SUAVE
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault(); // Evitamos el salto brusco predeterminado
+    setIsOpen(false); // Cerramos el menú primero
+
+    // Extraemos el ID (quitamos el #)
+    const targetId = href.replace('#', '');
+    const element = document.getElementById(targetId);
+
+    if (element) {
+      // Hacemos el scroll suave después de un pequeño delay para permitir que el menú cierre
+      setTimeout(() => {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 500); // 500ms coincide con la duración de tu animación de salida
+    }
+  };
+
   return (
     <>
       <motion.nav
@@ -48,34 +66,26 @@ export const Navbar = () => {
             : "py-6 bg-transparent"
         }`}
       >
-        {/* --- FONDO CON TEXTURA Y BORDE GLOW (Solo visible al scroll) --- */}
+        {/* FONDO Y BORDE */}
         <div className={`absolute inset-0 transition-opacity duration-700 pointer-events-none overflow-hidden ${scrolled || isOpen ? 'opacity-100' : 'opacity-0'}`}>
-            {/* Textura de Micelio/Ruido */}
             <BioTexture />
-            
-            {/* Borde Inferior Premium (Gradiente Dorado Sutil) */}
             <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
         </div>
 
-        {/* 1. LOGO (Protegido por el fondo oscuro al hacer scroll) */}
-        <Link href="/" className="relative z-50 group flex items-center">
-            {/* Glow detrás del logo para asegurar legibilidad extra */}
+        {/* LOGO */}
+        <Link href="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="relative z-50 group flex items-center">
             {scrolled && <div className="absolute inset-0 bg-black/50 blur-xl scale-150 rounded-full -z-10" />}
-            
             <LuxuryLogo className={`text-white transition-all duration-500 ${scrolled ? 'w-10 h-10' : 'w-12 h-12'} group-hover:scale-110 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]`} />
         </Link>
 
-        {/* 2. BOTÓN MENÚ (Tu diseño original conservado) */}
+        {/* BOTÓN MENÚ */}
         <button 
           onClick={() => setIsOpen(!isOpen)}
           className="relative z-50 flex items-center gap-4 text-white hover:text-amber-400 transition-colors group"
         >
-          {/* Texto alineado ópticamente con el icono */}
           <span className="hidden md:block text-[10px] font-sans font-bold tracking-[0.3em] uppercase opacity-80 group-hover:opacity-100 transition-opacity pt-[2px]">
             {isOpen ? "Close" : "Menu"}
           </span>
-
-          {/* Icono Hamburguesa Premium */}
           <div className="flex flex-col gap-[6px] w-8 items-end p-1">
             <motion.span 
               animate={isOpen ? { rotate: 45, y: 8 } : { rotate: 0, y: 0 }}
@@ -93,7 +103,7 @@ export const Navbar = () => {
         </button>
       </motion.nav>
 
-      {/* 3. OVERLAY MENÚ (Tu código original intacto) */}
+      {/* OVERLAY MENÚ */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -103,7 +113,6 @@ export const Navbar = () => {
             transition={{ duration: 0.5 }}
             className="fixed inset-0 z-40 bg-[#050505]/95 backdrop-blur-3xl flex flex-col items-center justify-center supports-[backdrop-filter]:bg-[#050505]/90"
           >
-            {/* Reutilizamos la Textura Bio en el Menú también */}
             <div className="absolute inset-0 opacity-10">
                 <BioTexture />
             </div>
@@ -119,10 +128,10 @@ export const Navbar = () => {
                   >
                     <Link 
                       href={item.href} 
-                      onClick={() => setIsOpen(false)}
+                      // 3. APLICAMOS EL MANEJADOR DE CLICK AQUÍ 👇
+                      onClick={(e) => handleNavClick(e, item.href)}
                       className="group block relative"
                     >
-                      {/* Subtítulo y Número */}
                       <div className="flex items-center justify-center gap-3 mb-1 opacity-50 group-hover:opacity-100 transition-opacity">
                           <span className="text-[9px] font-mono text-amber-500">0{index + 1}</span>
                           <span className="w-8 h-[1px] bg-white/20"></span>
@@ -131,7 +140,6 @@ export const Navbar = () => {
                           </span>
                       </div>
 
-                      {/* TÍTULO GIGANTE */}
                       <span 
                         className="text-5xl md:text-8xl text-white font-sans font-black uppercase tracking-tighter group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-amber-200 group-hover:to-amber-600 transition-all duration-500 block leading-[0.9]"
                       >

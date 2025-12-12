@@ -2,13 +2,10 @@ import { Hero } from "@/components/sections/Hero";
 import { PaymentSection } from "@/components/sections/PaymentSection";
 import { ProductCatalog } from "@/components/sections/ProductCatalog";
 import { ScienceSection } from "@/components/sections/ScienceSection";
-import { prisma } from "@/lib/prisma"; // 1. Importamos Prisma
+import { prisma } from "@/lib/prisma"; 
 
-// Hacemos el componente async para poder pedir datos
 export default async function Home() {
   
-  // 2. Pedimos solo los productos ACTIVOS a la base de datos
-  // Los ordenamos para que los nuevos salgan primero
   const products = await prisma.product.findMany({
     where: { isActive: true },
     orderBy: { createdAt: 'desc' }
@@ -26,13 +23,23 @@ export default async function Home() {
            }}>
       </div>
       
-      <Hero />
-      <ScienceSection />
+      {/* AGREGAMOS LOS IDs AQUÍ 👇 */}
       
-      {/* 3. Le pasamos los productos reales al catálogo */}
-      <ProductCatalog products={products} />
+      <section id="hero">
+        <Hero />
+      </section>
+
+      <section id="science">
+        <ScienceSection />
+      </section>
       
-      <PaymentSection />
+      <section id="collection">
+        <ProductCatalog products={products} />
+      </section>
+      
+      <section id="payment">
+        <PaymentSection />
+      </section>
 
     </main>
   );
