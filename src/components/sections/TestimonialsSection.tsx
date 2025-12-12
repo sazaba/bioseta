@@ -22,7 +22,7 @@ const TESTIMONIALS = [
   },
   {
     id: 3,
-    name: "Doña Gloria",
+    name: "Manuela G.",
     role: "Jubilada",
     message: "Estaba sufriendo de insomnio. El Ashwagandha me ayudó a dormir como un bebé. 100% recomendado mijo.",
     // IMAGEN NUEVA Y ESTABLE: Señora mayor con expresión amable
