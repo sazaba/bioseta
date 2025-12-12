@@ -305,7 +305,6 @@
 //   );
 // };
 
-
 "use client";
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -324,11 +323,11 @@ const CATEGORIES = [
 
 const getAccentColor = (category: string) => {
   switch (category?.toLowerCase()) {
-    case "mente": return "#fbbf24"; // Amber
-    case "calma": return "#f87171"; // Red
-    case "energia": return "#f97316"; // Orange
-    case "cuerpo": return "#8b5cf6"; // Violet
-    case "inmunidad": return "#10b981"; // Emerald
+    case "mente": return "#fbbf24"; 
+    case "calma": return "#f87171"; 
+    case "energia": return "#f97316"; 
+    case "cuerpo": return "#8b5cf6"; 
+    case "inmunidad": return "#10b981"; 
     default: return "#ffffff";
   }
 };
@@ -351,8 +350,6 @@ export const ProductCatalog = ({ products }: { products: any[] }) => {
 
       {/* --- HEADER DE SECCIÓN + FILTROS --- */}
       <div className="relative z-20 pt-20 md:pt-32 pb-4 px-4 md:px-12 max-w-[1800px] mx-auto">
-        
-        {/* Título */}
         <div className="mb-6 md:mb-10">
             <span className="text-white/40 font-mono text-[9px] uppercase tracking-[0.4em] block mb-2">
                 Bioseta Lab Series
@@ -362,34 +359,26 @@ export const ProductCatalog = ({ products }: { products: any[] }) => {
             </h2>
         </div>
 
-        {/* BARRA DE FILTROS STICKY (Neón) */}
+        {/* BARRA DE FILTROS STICKY */}
         <div className="sticky top-20 z-30 py-2 -mx-4 px-4 md:mx-0 md:px-0 bg-[#020202]/90 backdrop-blur-xl border-b border-white/5 md:border-none md:bg-transparent md:backdrop-blur-none transition-all">
           <div className="flex flex-wrap gap-2 overflow-x-auto no-scrollbar items-center pb-2">
             {CATEGORIES.map((cat) => {
                 const isActive = activeCategory === cat.id;
                 const catColor = cat.id === 'all' ? '#ffffff' : getAccentColor(cat.id);
-                
                 return (
                   <button
                     key={cat.id}
                     onClick={() => setActiveCategory(cat.id)}
                     className="relative group px-4 py-1.5 md:px-5 md:py-2 rounded-sm transition-all duration-300 overflow-hidden flex-shrink-0"
                   >
-                    {/* Fondo Activo */}
                     <div 
                         className={`absolute inset-0 transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-10'}`}
                         style={{ backgroundColor: catColor }}
                     />
-                    
-                    {/* Borde Neón */}
                     <div 
                         className={`absolute inset-0 border transition-all duration-300 ${isActive ? 'opacity-100' : 'opacity-30 group-hover:opacity-60'}`}
-                        style={{ 
-                            borderColor: catColor,
-                            boxShadow: isActive ? `0 0 10px ${catColor}40, inset 0 0 5px ${catColor}20` : 'none'
-                        }}
+                        style={{ borderColor: catColor, boxShadow: isActive ? `0 0 10px ${catColor}40` : 'none' }}
                     />
-
                     <span 
                         className={`relative z-10 text-[9px] md:text-xs font-mono font-bold tracking-[0.15em] uppercase transition-colors duration-300 ${
                             isActive ? 'text-black mix-blend-hard-light' : 'text-white'
@@ -402,15 +391,14 @@ export const ProductCatalog = ({ products }: { products: any[] }) => {
             })}
           </div>
         </div>
-
       </div>
 
-      {/* --- GRID DE PRODUCTOS (Compacto) --- */}
-      {/* Cambié el gap a gap-2 en móvil para aprovechar espacio */}
+      {/* --- GRID DE PRODUCTOS --- */}
+      {/* SOLUCIÓN: Agregamos 'items-stretch' para que todas las cartas midan lo mismo de alto en la fila */}
       <div className="relative z-10 px-3 md:px-12 max-w-[1800px] mx-auto min-h-[50vh]">
         <motion.div 
             layout 
-            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-6"
+            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-6 items-stretch"
         >
           <AnimatePresence mode="popLayout">
             {filteredProducts.length > 0 ? (
@@ -437,7 +425,7 @@ export const ProductCatalog = ({ products }: { products: any[] }) => {
   );
 };
 
-// --- COMPONENTE CARTA GRID (ULTRA COMPACTO) ---
+// --- CARTA GRID AUTOMÁTICA (NO CORTA CONTENIDO) ---
 const GridCard = ({ product, index }: { product: any; index: number }) => {
   const accentColor = getAccentColor(product.category);
 
@@ -454,86 +442,79 @@ const GridCard = ({ product, index }: { product: any; index: number }) => {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.3 }}
-      // Aspect ratio ajustado para que no sea tan alto, y border sutil
-      className="group relative w-full aspect-[4/6] md:aspect-[3/5] overflow-hidden rounded-sm bg-[#080808] border border-white/10 hover:border-white/30 transition-colors duration-500 flex flex-col"
+      // CAMBIO CLAVE: Eliminamos 'aspect-ratio' y usamos 'h-full flex flex-col'.
+      // Esto permite que la carta se estire si el texto es largo, pero se alinee con las demás.
+      className="group relative w-full h-full min-h-[320px] rounded-sm bg-[#080808] border border-white/10 hover:border-white/30 transition-colors duration-500 flex flex-col justify-between overflow-hidden"
     >
-      {/* 1. FONDO GLOW (Brilla al Hover) */}
+      {/* FONDO GLOW */}
       <div
         className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-700 pointer-events-none"
-        style={{
-          background: `radial-gradient(circle at 50% 40%, ${accentColor} 0%, transparent 60%)`,
-        }}
+        style={{ background: `radial-gradient(circle at 50% 40%, ${accentColor} 0%, transparent 60%)` }}
       />
-      
-      {/* 2. TEXTURA DE RUIDO */}
       <div className="absolute inset-0 opacity-[0.08] pointer-events-none" style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }}></div>
 
-      {/* 3. RADAR SUTIL (Fondo) */}
-      <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[140%] h-[40%] pointer-events-none opacity-30">
-          <div className="absolute inset-0 border border-white/10 rounded-full animate-[spin_12s_linear_infinite]" style={{ borderTopColor: `${accentColor}60` }} />
-      </div>
-
-      {/* --- CONTENIDO INTERNO --- */}
-      {/* Usamos flex-col para distribuir el espacio verticalmente */}
-      
-      {/* A. HEADER (Index & Tag) */}
-      <div className="relative z-10 flex justify-between items-start p-2 md:p-4 shrink-0">
-        <span className="text-[8px] md:text-[10px] font-mono text-white/30">
-            0{index + 1}
-        </span>
+      {/* --- A. HEADER --- */}
+      <div className="relative z-10 flex justify-between items-start p-3 shrink-0">
+        <span className="text-[9px] md:text-[10px] font-mono text-white/30">0{index + 1}</span>
         <span 
-            className="text-[7px] md:text-[9px] font-bold font-mono uppercase tracking-wider px-1.5 py-0.5 border rounded-[2px]"
+            className="text-[8px] md:text-[9px] font-bold font-mono uppercase tracking-widest px-1.5 py-0.5 border rounded-[2px]"
             style={{ color: accentColor, borderColor: `${accentColor}30`, backgroundColor: `${accentColor}08` }}
         >
             {product.category}
         </span>
       </div>
 
-      {/* B. IMAGEN (Flex Grow para ocupar espacio central) */}
-      <div className="relative z-10 flex-1 flex items-center justify-center p-2">
-         {/* Letra de fondo muy sutil */}
+      {/* --- B. IMAGEN (Tamaño controlado) --- */}
+      {/* CAMBIO CLAVE: height fija o aspect-square para la imagen, asegurando espacio para texto abajo */}
+      <div className="relative z-10 w-full aspect-square p-4 flex items-center justify-center">
+         {/* Letra Fondo */}
         <span 
             className="absolute text-[20vw] font-black text-transparent opacity-5 pointer-events-none select-none top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
             style={{ WebkitTextStroke: "1px rgba(255,255,255,0.8)" }}
         >
             {product.name?.charAt(0)}
         </span>
+        
+        {/* Radar Detrás */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] h-[90%] pointer-events-none opacity-30">
+            <div className="absolute inset-0 border border-white/10 rounded-full animate-[spin_12s_linear_infinite]" style={{ borderTopColor: `${accentColor}60` }} />
+        </div>
 
         <motion.img 
             whileHover={{ scale: 1.05, y: -5 }}
             transition={{ type: "spring", stiffness: 200, damping: 20 }}
             src={product.imageUrl} 
             alt={product.name}
-            className="w-full h-full object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.4)] z-10"
+            className="w-full h-full object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.4)] z-10 relative"
         />
       </div>
 
-      {/* C. INFO (Footer compacto) */}
-      <div className="relative z-10 shrink-0 bg-black/40 backdrop-blur-sm p-2 md:p-4 border-t border-white/5">
-        
-        {/* Títulos */}
-        <div className="mb-2">
-            <h3 className="text-sm md:text-xl font-sans font-black text-white leading-none uppercase tracking-tighter truncate">
+      {/* --- C. INFO FOOTER (Siempre abajo) --- */}
+      {/* mt-auto empuja este bloque al final si sobra espacio arriba */}
+      <div className="relative z-10 mt-auto bg-black/40 backdrop-blur-sm p-3 border-t border-white/5">
+        <div className="mb-3">
+            <h3 className="text-sm md:text-lg font-sans font-black text-white leading-tight uppercase tracking-tighter line-clamp-2">
                 {product.name}
             </h3>
-            <p className="text-[9px] md:text-[11px] text-stone-500 font-mono mt-1 truncate">
+            <p className="text-[10px] text-stone-500 font-mono mt-1 line-clamp-1">
                 {product.subtitle}
             </p>
         </div>
 
-        {/* Precio + Botón */}
         <div className="flex items-center justify-between gap-1">
-            <span className="text-xs md:text-base font-bold text-white tracking-tight">
-                ${Number(product.price).toLocaleString()}
-            </span>
+            <div className="flex flex-col">
+                <span className="text-[8px] text-white/30 uppercase tracking-widest">COP</span>
+                <span className="text-xs md:text-sm font-bold text-white tracking-tight">
+                    ${Number(product.price).toLocaleString()}
+                </span>
+            </div>
 
             <button 
                 onClick={handleWhatsApp}
-                className="w-6 h-6 md:w-9 md:h-9 rounded-full text-black flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-[0_0_10px_rgba(255,255,255,0.1)]"
+                className="w-7 h-7 md:w-9 md:h-9 rounded-full text-black flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-[0_0_10px_rgba(255,255,255,0.1)] shrink-0"
                 style={{ backgroundColor: accentColor }}
             >
-                {/* Icono + */}
-                <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
                 </svg>
             </button>
