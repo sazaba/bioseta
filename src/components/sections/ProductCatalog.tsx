@@ -304,12 +304,13 @@
 //     </motion.div>
 //   );
 // };
+
+
 "use client";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
 
 // --- CONFIGURACIÓN ---
-// Enlace proporcionado para WhatsApp
 const WHATSAPP_LINK = "https://wa.link/gas7d2";
 
 const CATEGORIES = [
@@ -452,15 +453,11 @@ export const ProductCatalog = ({ products }: { products: any[] }) => {
   );
 };
 
-// --- CARTA GRID ---
+// --- CARTA GRID (Botón '+' abre modal) ---
 const GridCard = ({ product, index, onOpen }: { product: any; index: number, onOpen: () => void }) => {
   const accentColor = getAccentColor(product.category);
 
-  // Redirección con tu link específico
-  const handleWhatsApp = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Evita que se abra el modal al dar click al botón pequeño
-    window.open(WHATSAPP_LINK, "_blank");
-  };
+  // NOTA: Eliminamos la función handleWhatsApp de aquí para que todo abra el modal
 
   return (
     <motion.div
@@ -508,9 +505,13 @@ const GridCard = ({ product, index, onOpen }: { product: any; index: number, onO
                 <span className="text-[8px] text-white/30 uppercase tracking-widest">COP</span>
                 <span className="text-xs md:text-sm font-bold text-white tracking-tight">${Number(product.price).toLocaleString()}</span>
             </div>
-            {/* BOTÓN + (Usa el link de wa.link) */}
+            
+            {/* BOTÓN + (AHORA EJECUTA onOpen) */}
             <button 
-                onClick={handleWhatsApp}
+                onClick={(e) => {
+                    e.stopPropagation(); // Evitamos doble click
+                    onOpen(); // Abrimos modal explícitamente
+                }}
                 className="w-7 h-7 md:w-9 md:h-9 rounded-full text-black flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-[0_0_10px_rgba(255,255,255,0.1)] shrink-0"
                 style={{ backgroundColor: accentColor }}
             >
@@ -528,8 +529,8 @@ const GridCard = ({ product, index, onOpen }: { product: any; index: number, onO
 const ProductModal = ({ product, onClose }: { product: any; onClose: () => void }) => {
   const accentColor = getAccentColor(product.category);
 
+  // AQUÍ ES DONDE OCURRE LA MAGIA DE WHATSAPP AHORA
   const handleWhatsApp = () => {
-    // Redirección con tu link específico
     window.open(WHATSAPP_LINK, "_blank");
   };
 
@@ -607,6 +608,7 @@ const ProductModal = ({ product, onClose }: { product: any; onClose: () => void 
                   <span className="text-3xl font-black text-white tracking-tighter">${Number(product.price).toLocaleString()}</span>
               </div>
 
+              {/* BOTÓN DE WHATSAPP REAL */}
               <button 
                 onClick={handleWhatsApp}
                 className="w-full py-4 rounded-sm font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg text-black"
