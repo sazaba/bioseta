@@ -9,6 +9,7 @@ const MENU_ITEMS = [
   { title: "Inicio", href: "#hero", subtitle: "Bienvenido a Bioseta" },
   { title: "Beneficios", href: "#science", subtitle: "¿Por qué funcionan?" },
   { title: "Productos", href: "#collection", subtitle: "Ver Catálogo Completo" },
+  { title: "Testimonios", href: "#testimonials", subtitle: "Historias Reales" }, // NUEVO ENLACE
   { title: "Pagos", href: "#payment", subtitle: "Medios de Pago y Envíos" },
 ];
 
@@ -37,16 +38,15 @@ export const Navbar = () => {
     else document.body.style.overflow = "unset";
   }, [isOpen]);
 
-  // FUNCIÓN SCROLL SUAVE (Mejorada)
+  // FUNCIÓN SCROLL SUAVE
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
-    setIsOpen(false); // 1. Cerrar menú
+    setIsOpen(false); 
 
     const targetId = href.replace('#', '');
     const element = document.getElementById(targetId);
 
     if (element) {
-      // 2. Esperar un poco a que la animación de cierre termine (opcional, se ve más fluido)
       setTimeout(() => {
         element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 300); 
@@ -71,7 +71,7 @@ export const Navbar = () => {
             <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
         </div>
 
-        {/* LOGO (Clic lleva al inicio #hero) */}
+        {/* LOGO */}
         <Link 
             href="#hero" 
             onClick={(e) => handleNavClick(e, '#hero')} 

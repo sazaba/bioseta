@@ -2,6 +2,7 @@ import { Hero } from "@/components/sections/Hero";
 import { PaymentSection } from "@/components/sections/PaymentSection";
 import { ProductCatalog } from "@/components/sections/ProductCatalog";
 import { ScienceSection } from "@/components/sections/ScienceSection";
+import { TestimonialsSection } from "@/components/sections/TestimonialsSection"; // 1. Importamos
 import { prisma } from "@/lib/prisma"; 
 
 export default async function Home() {
@@ -23,8 +24,6 @@ export default async function Home() {
            }}>
       </div>
       
-      {/* AGREGAMOS LOS IDs AQUÍ 👇 */}
-      
       <section id="hero">
         <Hero />
       </section>
@@ -35,6 +34,11 @@ export default async function Home() {
       
       <section id="collection">
         <ProductCatalog products={products} />
+      </section>
+
+      {/* 2. NUEVA SECCIÓN TESTIMONIOS (ID opcional si no la enlazas en el menú) */}
+      <section id="testimonials">
+        <TestimonialsSection />
       </section>
       
       <section id="payment">
