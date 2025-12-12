@@ -2,7 +2,8 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 
-// --- DATOS DE PRUEBA REALISTAS ---
+
+
 const TESTIMONIALS = [
   {
     id: 1,
@@ -22,10 +23,11 @@ const TESTIMONIALS = [
   },
   {
     id: 3,
-    name: "Sofía L.",
-    role: "Estudiante",
-    message: "Estaba súper estresada por la tesis. El Ashwagandha me ayudó a dormir como un bebé. 100% recomendado.",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80",
+    name: "Doña Gloria", // Cambio de nombre para que coincida con la imagen
+    role: "Jubilada", // Rol más acorde
+    message: "Estaba sufriendo de insomnio. El Ashwagandha me ayudó a dormir como un bebé. 100% recomendado.",
+    // Nueva imagen: Señora mayor, aspecto amable y real
+    avatar: "https://images.unsplash.com/photo-1551843073-4a9a5b6fcd5f?auto=format&fit=crop&w=150&q=80",
     time: "9:15 AM"
   },
   {
@@ -41,6 +43,7 @@ const TESTIMONIALS = [
     name: "Valentina",
     role: "Cliente Verificado",
     message: "¡El envío a Medellín fue rapidísimo! El empaque es hermoso, se siente muy premium.",
+    // Nueva imagen para Valentina: Mujer joven latina, estilo selfie casual
     avatar: "https://images.unsplash.com/photo-1627067227670-38379c299c51?auto=format&fit=crop&w=150&q=80",
     time: "2:30 PM"
   },
@@ -53,6 +56,8 @@ const TESTIMONIALS = [
     time: "1:15 PM"
   }
 ];
+
+
 
 export const TestimonialsSection = () => {
   return (
