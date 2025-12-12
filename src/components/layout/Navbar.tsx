@@ -4,12 +4,12 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { LuxuryLogo } from "@/components/LuxuryLogo"; 
 
-// 1. ACTUALIZAMOS LOS LINKS CON LOS IDs (#id)
+// --- MAPEO EXACTO CON TUS SECCIONES ---
 const MENU_ITEMS = [
-  { title: "Collection", href: "#collection", subtitle: "Nuestros Extractos" },
-  { title: "Science", href: "#science", subtitle: "Estudios & Evidencia" },
-  { title: "Philosophy", href: "#hero", subtitle: "Nuestra Historia" }, // "Philosophy" suele ir al inicio o a una sección 'About'
-  { title: "Shop", href: "#collection", subtitle: "Adquirir Ahora" }, // Shop también lleva al catálogo
+  { title: "Inicio", href: "#hero", subtitle: "Bienvenido a Bioseta" },
+  { title: "Beneficios", href: "#science", subtitle: "¿Por qué funcionan?" },
+  { title: "Productos", href: "#collection", subtitle: "Ver Catálogo Completo" },
+  { title: "Pagos", href: "#payment", subtitle: "Medios de Pago y Envíos" },
 ];
 
 // --- TEXTURA ORGÁNICA ---
@@ -37,20 +37,19 @@ export const Navbar = () => {
     else document.body.style.overflow = "unset";
   }, [isOpen]);
 
-  // 2. FUNCIÓN PARA MANEJAR EL SCROLL SUAVE
+  // FUNCIÓN SCROLL SUAVE (Mejorada)
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault(); // Evitamos el salto brusco predeterminado
-    setIsOpen(false); // Cerramos el menú primero
+    e.preventDefault();
+    setIsOpen(false); // 1. Cerrar menú
 
-    // Extraemos el ID (quitamos el #)
     const targetId = href.replace('#', '');
     const element = document.getElementById(targetId);
 
     if (element) {
-      // Hacemos el scroll suave después de un pequeño delay para permitir que el menú cierre
+      // 2. Esperar un poco a que la animación de cierre termine (opcional, se ve más fluido)
       setTimeout(() => {
         element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 500); // 500ms coincide con la duración de tu animación de salida
+      }, 300); 
     }
   };
 
@@ -72,8 +71,12 @@ export const Navbar = () => {
             <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
         </div>
 
-        {/* LOGO */}
-        <Link href="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="relative z-50 group flex items-center">
+        {/* LOGO (Clic lleva al inicio #hero) */}
+        <Link 
+            href="#hero" 
+            onClick={(e) => handleNavClick(e, '#hero')} 
+            className="relative z-50 group flex items-center"
+        >
             {scrolled && <div className="absolute inset-0 bg-black/50 blur-xl scale-150 rounded-full -z-10" />}
             <LuxuryLogo className={`text-white transition-all duration-500 ${scrolled ? 'w-10 h-10' : 'w-12 h-12'} group-hover:scale-110 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]`} />
         </Link>
@@ -84,7 +87,7 @@ export const Navbar = () => {
           className="relative z-50 flex items-center gap-4 text-white hover:text-amber-400 transition-colors group"
         >
           <span className="hidden md:block text-[10px] font-sans font-bold tracking-[0.3em] uppercase opacity-80 group-hover:opacity-100 transition-opacity pt-[2px]">
-            {isOpen ? "Close" : "Menu"}
+            {isOpen ? "Cerrar" : "Menú"}
           </span>
           <div className="flex flex-col gap-[6px] w-8 items-end p-1">
             <motion.span 
@@ -128,7 +131,6 @@ export const Navbar = () => {
                   >
                     <Link 
                       href={item.href} 
-                      // 3. APLICAMOS EL MANEJADOR DE CLICK AQUÍ 👇
                       onClick={(e) => handleNavClick(e, item.href)}
                       className="group block relative"
                     >
