@@ -25,8 +25,8 @@ const TESTIMONIALS = [
     name: "Doña Gloria",
     role: "Jubilada",
     message: "Estaba sufriendo de insomnio. El Ashwagandha me ayudó a dormir como un bebé. 100% recomendado mijo.",
-    // IMAGEN NUEVA: Señora mayor amable
-    avatar: "https://images.unsplash.com/photo-1505682614962-ce66ce63b519?auto=format&fit=crop&w=150&q=80",
+    // IMAGEN NUEVA Y ESTABLE: Señora mayor con expresión amable
+    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80",
     time: "9:15 AM"
   },
   {
@@ -42,7 +42,7 @@ const TESTIMONIALS = [
     name: "Valentina",
     role: "Cliente Verificado",
     message: "¡El envío a Medellín fue rapidísimo! El empaque es hermoso, se siente muy premium.",
-    // IMAGEN NUEVA Y ESTABLE: Mujer joven estilo selfie natural
+    // IMAGEN ESTABLE: Mujer joven estilo selfie
     avatar: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=150&q=80",
     time: "2:30 PM"
   },
