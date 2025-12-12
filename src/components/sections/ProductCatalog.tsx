@@ -304,13 +304,13 @@
 //     </motion.div>
 //   );
 // };
-
 "use client";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
 
 // --- CONFIGURACIÓN ---
-const PHONE_NUMBER = "573000000000";
+// Enlace proporcionado para WhatsApp
+const WHATSAPP_LINK = "https://wa.link/gas7d2";
 
 const CATEGORIES = [
   { id: "all", label: "TODO" },
@@ -335,10 +335,9 @@ const getAccentColor = (category: string) => {
 export const ProductCatalog = ({ products }: { products: any[] }) => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<any | null>(null); // ESTADO PARA EL MODAL
+  const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
 
-  // Bloquear scroll cuando el modal está abierto
   useEffect(() => {
     if (selectedProduct) document.body.style.overflow = "hidden";
     else document.body.style.overflow = "unset";
@@ -424,7 +423,7 @@ export const ProductCatalog = ({ products }: { products: any[] }) => {
                   key={product.id || index}
                   product={product}
                   index={index}
-                  onOpen={() => setSelectedProduct(product)} // ABRIR MODAL
+                  onOpen={() => setSelectedProduct(product)}
                 />
               ))
             ) : (
@@ -453,14 +452,20 @@ export const ProductCatalog = ({ products }: { products: any[] }) => {
   );
 };
 
-// --- CARTA GRID (Botón '+' abre modal) ---
+// --- CARTA GRID ---
 const GridCard = ({ product, index, onOpen }: { product: any; index: number, onOpen: () => void }) => {
   const accentColor = getAccentColor(product.category);
+
+  // Redirección con tu link específico
+  const handleWhatsApp = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Evita que se abra el modal al dar click al botón pequeño
+    window.open(WHATSAPP_LINK, "_blank");
+  };
 
   return (
     <motion.div
       layout
-      onClick={onOpen} // Hacer click en toda la carta también abre el modal (mejor UX en móvil)
+      onClick={onOpen}
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
@@ -503,9 +508,12 @@ const GridCard = ({ product, index, onOpen }: { product: any; index: number, onO
                 <span className="text-[8px] text-white/30 uppercase tracking-widest">COP</span>
                 <span className="text-xs md:text-sm font-bold text-white tracking-tight">${Number(product.price).toLocaleString()}</span>
             </div>
-            {/* BOTÓN + (Solo visual ahora, abre modal por el onClick padre) */}
-            <button className="w-7 h-7 md:w-9 md:h-9 rounded-full text-black flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-[0_0_10px_rgba(255,255,255,0.1)] shrink-0"
-                style={{ backgroundColor: accentColor }}>
+            {/* BOTÓN + (Usa el link de wa.link) */}
+            <button 
+                onClick={handleWhatsApp}
+                className="w-7 h-7 md:w-9 md:h-9 rounded-full text-black flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-[0_0_10px_rgba(255,255,255,0.1)] shrink-0"
+                style={{ backgroundColor: accentColor }}
+            >
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
                 </svg>
@@ -516,14 +524,13 @@ const GridCard = ({ product, index, onOpen }: { product: any; index: number, onO
   );
 };
 
-// --- NUEVO COMPONENTE: MODAL DE PRODUCTO COMPLETO ---
+// --- MODAL DE PRODUCTO COMPLETO ---
 const ProductModal = ({ product, onClose }: { product: any; onClose: () => void }) => {
   const accentColor = getAccentColor(product.category);
 
   const handleWhatsApp = () => {
-    const message = `Hola Bioseta, estoy interesado en *${product.name}* (${product.subtitle}). ¿Me das más info para comprarlo?`;
-    const url = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`;
-    window.open(url, "_blank");
+    // Redirección con tu link específico
+    window.open(WHATSAPP_LINK, "_blank");
   };
 
   return (
@@ -531,10 +538,8 @@ const ProductModal = ({ product, onClose }: { product: any; onClose: () => void 
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-[100] flex items-center justify-center px-4 md:px-0"
     >
-      {/* BACKDROP BLUR OSCURO */}
       <div className="absolute inset-0 bg-[#000000]/90 backdrop-blur-md" onClick={onClose} />
       
-      {/* CONTENIDO MODAL */}
       <motion.div
         initial={{ scale: 0.9, y: 20, opacity: 0 }}
         animate={{ scale: 1, y: 0, opacity: 1 }}
@@ -543,7 +548,6 @@ const ProductModal = ({ product, onClose }: { product: any; onClose: () => void 
         className="relative w-full max-w-4xl bg-[#080808] border border-white/10 rounded-2xl overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh] md:max-h-[80vh]"
         style={{ boxShadow: `0 0 50px -10px ${accentColor}20` }}
       >
-        {/* BOTÓN CERRAR */}
         <button 
           onClick={onClose}
           className="absolute top-4 right-4 z-50 w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white text-white hover:text-black transition-all"
@@ -553,9 +557,7 @@ const ProductModal = ({ product, onClose }: { product: any; onClose: () => void 
 
         {/* COLUMNA IZQUIERDA: IMAGEN */}
         <div className="w-full md:w-1/2 bg-[#050505] relative flex items-center justify-center p-8 md:p-12 border-b md:border-b-0 md:border-r border-white/5">
-           {/* Glow de fondo */}
            <div className="absolute inset-0 opacity-30" style={{ background: `radial-gradient(circle at center, ${accentColor} 0%, transparent 70%)`, filter: 'blur(80px)' }} />
-           {/* Radar animado */}
            <div className="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none">
               <div className="w-[80%] aspect-square border border-white/10 rounded-full animate-[spin_20s_linear_infinite]" />
            </div>
@@ -567,7 +569,7 @@ const ProductModal = ({ product, onClose }: { product: any; onClose: () => void 
            />
         </div>
 
-        {/* COLUMNA DERECHA: INFO COMPLETA */}
+        {/* COLUMNA DERECHA: INFO */}
         <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col overflow-y-auto no-scrollbar relative">
            
            <div className="flex items-center gap-3 mb-2">
@@ -589,7 +591,6 @@ const ProductModal = ({ product, onClose }: { product: any; onClose: () => void 
               </p>
            </div>
 
-           {/* TAGS DE BENEFICIOS (Renderizados completos) */}
            {product.benefits && (
              <div className="flex flex-wrap gap-2 mb-8">
                {product.benefits.map((benefit: string, i: number) => (
@@ -600,7 +601,6 @@ const ProductModal = ({ product, onClose }: { product: any; onClose: () => void 
              </div>
            )}
 
-           {/* FOOTER DEL MODAL (PRECIO + CTA) */}
            <div className="mt-auto pt-6 border-t border-white/10 flex flex-col gap-4">
               <div className="flex justify-between items-end">
                   <span className="text-xs text-stone-500 uppercase tracking-widest">Precio Final</span>
