@@ -1,9 +1,8 @@
 "use client";
 import { motion } from "framer-motion";
-import Image from "next/image";
+// Nota: Ya no importamos Image de next/image para evitar bloqueos, usaremos <img> normal.
 
-
-
+// --- DATOS DE PRUEBA ACTUALIZADOS ---
 const TESTIMONIALS = [
   {
     id: 1,
@@ -23,11 +22,11 @@ const TESTIMONIALS = [
   },
   {
     id: 3,
-    name: "Doña Gloria", // Cambio de nombre para que coincida con la imagen
-    role: "Jubilada", // Rol más acorde
-    message: "Estaba sufriendo de insomnio. El Ashwagandha me ayudó a dormir como un bebé. 100% recomendado.",
-    // Nueva imagen: Señora mayor, aspecto amable y real
-    avatar: "https://images.unsplash.com/photo-1551843073-4a9a5b6fcd5f?auto=format&fit=crop&w=150&q=80",
+    name: "Doña Gloria",
+    role: "Jubilada",
+    message: "Estaba sufriendo de insomnio. El Ashwagandha me ayudó a dormir como un bebé. 100% recomendado mijo.",
+    // IMAGEN NUEVA: Señora mayor amable
+    avatar: "https://images.unsplash.com/photo-1505682614962-ce66ce63b519?auto=format&fit=crop&w=150&q=80",
     time: "9:15 AM"
   },
   {
@@ -43,8 +42,8 @@ const TESTIMONIALS = [
     name: "Valentina",
     role: "Cliente Verificado",
     message: "¡El envío a Medellín fue rapidísimo! El empaque es hermoso, se siente muy premium.",
-    // Nueva imagen para Valentina: Mujer joven latina, estilo selfie casual
-    avatar: "https://images.unsplash.com/photo-1627067227670-38379c299c51?auto=format&fit=crop&w=150&q=80",
+    // IMAGEN NUEVA Y ESTABLE: Mujer joven estilo selfie natural
+    avatar: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=150&q=80",
     time: "2:30 PM"
   },
   {
@@ -56,8 +55,6 @@ const TESTIMONIALS = [
     time: "1:15 PM"
   }
 ];
-
-
 
 export const TestimonialsSection = () => {
   return (
@@ -114,7 +111,14 @@ const ChatBubble = ({ data }: { data: typeof TESTIMONIALS[0] }) => (
     <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3">
             <div className="relative w-8 h-8 rounded-full overflow-hidden border border-white/10">
-                <Image src={data.avatar} alt={data.name} fill className="object-cover" />
+                {/* SOLUCIÓN: Usamos <img> estándar para asegurar que cargue sin config de Next.js */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img 
+                    src={data.avatar} 
+                    alt={data.name} 
+                    className="w-full h-full object-cover" 
+                    loading="lazy"
+                />
             </div>
             <div>
                 <h4 className="text-xs font-bold text-white leading-none">{data.name}</h4>
@@ -141,7 +145,7 @@ const Marquee = ({ children, direction = "left", speed = 40 }: { children: React
                 animate={{ x: direction === "left" ? "-50%" : 0 }}
                 transition={{ 
                     repeat: Infinity, 
-                    duration: speed, // Velocidad configurable
+                    duration: speed, 
                     ease: "linear" 
                 }}
                 className="flex gap-4 md:gap-6 flex-shrink-0 px-2 md:px-3"
