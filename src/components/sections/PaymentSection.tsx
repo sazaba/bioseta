@@ -1,4 +1,5 @@
 "use client";
+import { memo } from "react";
 import { motion, Variants } from "framer-motion";
 
 const TRUST_FEATURES = [
@@ -25,17 +26,33 @@ const TRUST_FEATURES = [
   }
 ];
 
+// --- TEXTURA STATIC (Base64 ligero, sin peticiones http) ---
+const StaticNoise = memo(() => (
+  <div 
+    className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay"
+    style={{
+      backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E")`,
+      backgroundSize: '120px 120px'
+    }}
+  />
+));
+StaticNoise.displayName = "StaticNoise";
+
 export const PaymentSection = () => {
   return (
     <section className="relative bg-[#080a0c] py-24 px-4 overflow-hidden border-t border-white/5">
       
-      {/* FONDO SUTIL (Luz Fría para diferenciar del resto) */}
-      <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-cyan-900/10 rounded-full blur-[120px] pointer-events-none" />
+      {/* 1. FONDO SUTIL OPTIMIZADO (Gradiente vs Blur) */}
+      {/* Antes: blur-[120px] (Costoso) -> Ahora: radial-gradient (Gratis para la GPU) */}
+      <div 
+        className="absolute bottom-[-100px] right-[-100px] w-[600px] h-[600px] pointer-events-none opacity-40"
+        style={{
+            background: 'radial-gradient(circle, rgba(22, 78, 99, 0.4) 0%, rgba(8, 10, 12, 0) 70%)'
+        }}
+      />
       
-      {/* TEXTURA DE RUIDO (Consistencia) */}
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
-           style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }}>
-      </div>
+      {/* 2. TEXTURA OPTIMIZADA */}
+      <StaticNoise />
 
       <div className="max-w-7xl mx-auto relative z-10">
         
@@ -44,7 +61,7 @@ export const PaymentSection = () => {
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-100px" }} // Margin ayuda a que cargue un poco antes
             className="text-3xl md:text-5xl text-white font-sans font-black uppercase tracking-tight"
           >
             COMPRA <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-200 to-blue-500">SEGURA</span>
@@ -64,19 +81,20 @@ export const PaymentSection = () => {
   );
 };
 
-const TrustCard = ({ item, index }: { item: any, index: number }) => {
+// Componente separado para evitar re-renders
+const TrustCard = memo(({ item, index }: { item: any, index: number }) => {
   return (
     <motion.div 
       initial={{ opacity: 0, x: -20 }}
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true }}
-      transition={{ delay: index * 0.2, duration: 0.8 }}
-      className="flex flex-col items-center text-center group"
+      transition={{ delay: index * 0.1, duration: 0.6 }} // Tiempos ajustados para sentirlo más "snappy"
+      className="flex flex-col items-center text-center group will-change-transform"
     >
       {/* VISUAL VECTORIAL ANIMADO */}
-      <div className="w-40 h-40 mb-6 relative flex items-center justify-center">
-         {/* Glow Frío */}
-         <div className="absolute inset-0 bg-cyan-500/5 rounded-full blur-xl group-hover:bg-cyan-500/20 transition-colors duration-500" />
+      <div className="w-40 h-40 mb-6 relative flex items-center justify-center transform-gpu">
+         {/* Glow Frío Optimizado (sin blur exagerado) */}
+         <div className="absolute inset-0 bg-cyan-500/10 rounded-full blur-xl group-hover:bg-cyan-500/20 transition-colors duration-500" />
          <TrustIcon type={item.type} />
       </div>
 
@@ -93,18 +111,21 @@ const TrustCard = ({ item, index }: { item: any, index: number }) => {
       </p>
     </motion.div>
   );
-};
+});
+TrustCard.displayName = "TrustCard";
 
 // --- ICONOS VECTORIALES "COLD TECH" ---
-const TrustIcon = ({ type }: { type: string }) => {
+// Usamos memo para que no se recalculen los paths en cada render del padre
+const TrustIcon = memo(({ type }: { type: string }) => {
   
+  // Variantes movidas fuera o memoizadas es mejor práctica
   const draw: Variants = {
     hidden: { pathLength: 0, opacity: 0 },
     visible: {
       pathLength: 1,
       opacity: 1,
       transition: {
-        pathLength: { duration: 1.5, ease: "easeInOut" },
+        pathLength: { duration: 1.2, ease: "easeInOut" }, // Un poco más rápido
         opacity: { duration: 0.5 }
       }
     }
@@ -118,69 +139,57 @@ const TrustIcon = ({ type }: { type: string }) => {
       whileInView="visible"
       viewport={{ once: true }}
     >
-      {/* 1. CONTRA ENTREGA (Mano recibiendo paquete) */}
+      {/* 1. CONTRA ENTREGA */}
       {type === "cash" && (
         <>
-           {/* La Caja */}
            <motion.rect x="35" y="20" width="30" height="30" rx="2" variants={draw} />
            <motion.line x1="35" y1="35" x2="65" y2="35" variants={draw} className="stroke-cyan-500/50" />
            <motion.line x1="50" y1="20" x2="50" y2="50" variants={draw} className="stroke-cyan-500/50" />
-           
-           {/* La Mano (Estilizada) */}
            <motion.path 
              d="M20 70 C 20 70, 30 60, 45 60 H 55 C 70 60, 80 70, 80 70 V 90 H 20 V 70 Z" 
              variants={draw} 
-             transition={{ delay: 0.5 }}
+             transition={{ delay: 0.3 }} // Delay reducido
            />
-           {/* Moneda flotando */}
-           <motion.circle cx="75" cy="45" r="5" variants={draw} transition={{ delay: 0.8 }} className="stroke-white fill-white/10 animate-bounce" />
+           <motion.circle cx="75" cy="45" r="5" variants={draw} transition={{ delay: 0.5 }} className="stroke-white fill-white/10 animate-bounce" />
         </>
       )}
 
-      {/* 2. ENVÍOS (Mapa de ruta) */}
+      {/* 2. ENVÍOS */}
       {type === "map" && (
         <>
-           {/* Ruta punteada */}
            <motion.path 
              d="M20 80 Q 40 20, 80 20" 
              variants={draw} 
              className="stroke-cyan-500 stroke-dashed"
              strokeDasharray="4 4"
            />
-           {/* Marker Inicio */}
            <motion.circle cx="20" cy="80" r="3" variants={draw} fill="white" />
-           
-           {/* Marker Fin (Pin de ubicación) */}
            <motion.path 
              d="M80 20 L 75 35 L 85 35 Z" 
              variants={draw} 
-             transition={{ delay: 0.8 }}
+             transition={{ delay: 0.5 }}
              className="fill-cyan-200 stroke-none"
            />
-           <motion.circle cx="80" cy="20" r="8" variants={draw} transition={{ delay: 0.5 }} />
-           
-           {/* Ondas de radar */}
-           <motion.circle cx="80" cy="20" r="15" variants={draw} transition={{ delay: 1 }} className="stroke-cyan-500/30" />
+           <motion.circle cx="80" cy="20" r="8" variants={draw} transition={{ delay: 0.3 }} />
+           <motion.circle cx="80" cy="20" r="15" variants={draw} transition={{ delay: 0.6 }} className="stroke-cyan-500/30" />
         </>
       )}
 
-      {/* 3. MERCADOPAGO (Tarjeta y Candado) */}
+      {/* 3. MERCADOPAGO */}
       {type === "card" && (
         <>
-           {/* Tarjeta de crédito */}
            <motion.rect x="15" y="30" width="70" height="45" rx="4" variants={draw} />
            <motion.line x1="15" y1="45" x2="85" y2="45" variants={draw} className="stroke-cyan-500 fill-cyan-500/20" strokeWidth="6" />
            <motion.rect x="25" y="55" width="15" height="10" rx="1" variants={draw} className="stroke-white/50" />
-           
-           {/* Candado de seguridad */}
            <motion.path 
              d="M65 60 V 55 A 5 5 0 0 1 75 55 V 60" 
              variants={draw} 
-             transition={{ delay: 0.6 }}
+             transition={{ delay: 0.4 }}
            />
-           <motion.rect x="62" y="60" width="16" height="12" rx="2" variants={draw} transition={{ delay: 0.7 }} fill="#000" className="stroke-cyan-200" />
+           <motion.rect x="62" y="60" width="16" height="12" rx="2" variants={draw} transition={{ delay: 0.5 }} fill="#000" className="stroke-cyan-200" />
         </>
       )}
     </motion.svg>
   );
-};
+});
+TrustIcon.displayName = "TrustIcon";
