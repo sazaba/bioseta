@@ -2,7 +2,7 @@
 import { memo } from "react";
 import { motion } from "framer-motion";
 
-// 1. COMPONENTE DE RUIDO OPTIMIZADO (Sin peticiones externas)
+// 1. COMPONENTE DE RUIDO (Sin cambios)
 const StaticNoise = memo(() => (
   <div 
     className="absolute inset-0 z-0 opacity-[0.05] pointer-events-none mix-blend-overlay"
@@ -12,15 +12,13 @@ const StaticNoise = memo(() => (
     }}
   />
 ));
-
 StaticNoise.displayName = "StaticNoise";
 
-// 2. VECTOR MEMOIZADO (El cambio más importante)
-// Usamos 'memo' para que React no recalcule los arrays internos nunca.
+// 2. VECTOR MEMOIZADO (Sin cambios)
 const FungiTopoColor = memo(({ color, duration, reverse = false }: { color: string, duration: number, reverse?: boolean }) => {
     return (
         <motion.div
-            className="w-full h-full will-change-transform" // <--- CLAVE: Avisa a la GPU
+            className="w-full h-full will-change-transform"
             animate={{ rotate: reverse ? -360 : 360 }}
             transition={{ duration: duration, repeat: Infinity, ease: "linear" }}
         >
@@ -32,7 +30,6 @@ const FungiTopoColor = memo(({ color, duration, reverse = false }: { color: stri
                         <stop offset="100%" stopColor={color} stopOpacity="0.05" />
                     </linearGradient>
                 </defs>
-                {/* Renderizamos los paths estáticamente para evitar bucles en tiempo de ejecución */}
                 <g>
                     {[0, 1, 2, 3, 4, 5].map((i) => (
                         <path
@@ -40,12 +37,11 @@ const FungiTopoColor = memo(({ color, duration, reverse = false }: { color: stri
                             d={`M250,250 m-${50 + i * 35},0 a${50 + i * 35},${50 + i * 35} 0 1,0 ${100 + i * 70},0 a${50 + i * 35},${50 + i * 35} 0 1,0 -${100 + i * 70},0`}
                             stroke={`url(#grad-${color})`}
                             strokeWidth={1.5}
-                            vectorEffect="non-scaling-stroke" // Mantiene la línea fina aunque escale
+                            vectorEffect="non-scaling-stroke"
                             opacity={1 - i * 0.1}
                         />
                     ))}
                 </g>
-                {/* Líneas decorativas simplificadas */}
                 <g opacity="0.3">
                     {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg, i) => (
                          <line
@@ -63,18 +59,15 @@ const FungiTopoColor = memo(({ color, duration, reverse = false }: { color: stri
         </motion.div>
     )
 });
-
 FungiTopoColor.displayName = "FungiTopoColor";
 
 export const Hero = () => {
   return (
     <section className="relative flex flex-col items-center justify-center min-h-[100dvh] text-center px-4 overflow-hidden bg-[#050505]">
       
-      {/* 1. TEXTURA (Instanciada como componente ligero) */}
       <StaticNoise />
 
-      {/* 2. VECTORES DE HONGOS */}
-      {/* Reduje un poco el tamaño en mobile de 150vw a 120vw para ahorrar batería */}
+      {/* VECTORES DE HONGOS */}
       <div className="absolute top-[-10%] left-[-20%] md:left-[-10%] w-[120vw] md:w-[60vw] h-[120vw] md:h-[60vw] pointer-events-none opacity-20 select-none">
           <FungiTopoColor color="#d97706" duration={60} />
       </div>
@@ -83,7 +76,7 @@ export const Hero = () => {
           <FungiTopoColor color="#fcd34d" duration={80} reverse />
       </div>
 
-      {/* 3. CONTENIDO CENTRAL */}
+      {/* CONTENIDO CENTRAL */}
       <div className="relative z-10 flex flex-col items-center mix-blend-normal transform-gpu"> 
         
         {/* Etiqueta Técnica */}
@@ -102,7 +95,7 @@ export const Hero = () => {
         {/* TÍTULO PRINCIPAL */}
         <div className="relative">
             <motion.h1 
-                initial={{ opacity: 0, scale: 0.9 }} // Scale 0.8 a veces pixelaba en Chrome mobile, 0.9 es más seguro
+                initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
                 className="font-sans font-black text-[3.5rem] leading-[0.9] md:text-[9rem] tracking-tighter text-white uppercase relative z-20"
@@ -113,8 +106,8 @@ export const Hero = () => {
                 </span>
             </motion.h1>
             
-            {/* Brillo inferior optimizado: Un gradiente simple es más rápido que un blur gigante */}
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-1/2 bg-gradient-to-t from-black via-black/90 to-transparent z-10 pointer-events-none"></div>
+            {/* --- SOLUCIÓN: ELIMINÉ EL DIV DE FONDO NEGRO AQUÍ --- */}
+            {/* Antes había un <div> con gradiente que causaba el recuadro negro feo. Ya no está. */}
         </div>
 
         {/* SUBTÍTULO */}
@@ -128,7 +121,7 @@ export const Hero = () => {
         </motion.p>
       </div>
 
-      {/* 4. SCROLL & DATA */}
+      {/* SCROLL & DATA */}
       <div className="absolute bottom-8 left-0 right-0 px-8 flex justify-between items-end text-white/20 font-mono text-[9px] uppercase tracking-widest pointer-events-none">
           <span className="hidden md:block">Lat: 6.2442° N</span>
           
