@@ -12,15 +12,13 @@ const MENU_ITEMS = [
   { title: "Pagos", href: "#payment", subtitle: "Medios de Pago y Envíos" },
 ];
 
-// --- SOLUCIÓN: TEXTURA ESTÁTICA (Cero consumo de CPU) ---
-// Usamos una imagen base64 pequeña que se repite. Mucho más rápido que SVG Filter.
 const BioTexture = () => (
   <div 
     className="absolute inset-0 w-full h-full opacity-[0.15] pointer-events-none mix-blend-overlay"
     style={{
       backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E")`,
       backgroundRepeat: 'repeat',
-      backgroundSize: '100px 100px' // Tamaño pequeño para repetir sin carga
+      backgroundSize: '100px 100px' 
     }}
   />
 );
@@ -30,7 +28,6 @@ export const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    // Pequeña optimización: no actualizar el estado si no cambia el valor booleano
     const handleScroll = () => {
       const isScrolled = window.scrollY > 20;
       if (isScrolled !== scrolled) {
@@ -38,10 +35,9 @@ export const Navbar = () => {
       }
     };
     
-    // Passive true mejora el rendimiento del scroll en móviles
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [scrolled]); // Añadimos dependencia para comparar
+  }, [scrolled]); 
 
   useEffect(() => {
     if (isOpen) document.body.style.overflow = "hidden";
@@ -68,18 +64,20 @@ export const Navbar = () => {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        // OPTIMIZACIÓN: Usamos will-change-transform para avisar al navegador
-        className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-12 transition-all duration-500 will-change-transform ${
+        // --- CAMBIO CLAVE AQUÍ ---
+        // 1. Quité 'backdrop-blur-md'
+        // 2. Cambié 'bg-[#050505]/85' a 'bg-[#050505]' (Sólido, sin transparencia)
+        className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-12 transition-all duration-300 will-change-transform ${
           scrolled || isOpen 
-            ? "py-4 bg-[#050505]/85 backdrop-blur-md shadow-2xl" // Bajé de blur-xl a blur-md para móviles
+            ? "py-4 bg-[#050505] shadow-xl border-b border-white/5" // Sólido y rápido
             : "py-6 bg-transparent"
         }`}
       >
-        {/* FONDO Y BORDE */}
-        {/* Renderizado condicional para evitar pintar elementos invisibles */}
-        <div className={`absolute inset-0 transition-opacity duration-700 pointer-events-none overflow-hidden ${scrolled || isOpen ? 'opacity-100' : 'opacity-0'}`}>
+        {/* FONDO Y TEXTURA */}
+        <div className={`absolute inset-0 transition-opacity duration-300 pointer-events-none overflow-hidden ${scrolled || isOpen ? 'opacity-100' : 'opacity-0'}`}>
             <BioTexture />
-            <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
+            {/* Línea dorada sutil en el borde inferior */}
+            <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-amber-500/20 to-transparent" />
         </div>
 
         {/* LOGO */}
@@ -88,9 +86,8 @@ export const Navbar = () => {
             onClick={(e) => handleNavClick(e, '#hero')} 
             className="relative z-50 group flex items-center"
         >
-            {/* Solo renderizar el glow si está scrolleado para ahorrar GPU */}
-            {scrolled && <div className="absolute inset-0 bg-black/50 blur-xl scale-150 rounded-full -z-10" />}
-            <LuxuryLogo className={`text-white transition-all duration-500 ${scrolled ? 'w-10 h-10' : 'w-12 h-12'} group-hover:scale-110 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]`} />
+            {/* Quitamos el glow de fondo al hacer scroll para máxima velocidad */}
+            <LuxuryLogo className={`text-white transition-all duration-300 ${scrolled ? 'w-10 h-10' : 'w-12 h-12'} group-hover:scale-110`} />
         </Link>
 
         {/* BOTÓN MENÚ */}
@@ -126,11 +123,11 @@ export const Navbar = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.4 }} // Duración un poco más rápida para sensación de agilidad
-            // backdrop-blur-3xl es MUY pesado. Lo bajé a xl o lg.
-            className="fixed inset-0 z-40 bg-[#050505]/95 backdrop-blur-xl flex flex-col items-center justify-center supports-[backdrop-filter]:bg-[#050505]/90"
+            transition={{ duration: 0.3 }}
+            // --- CAMBIO CLAVE EN MENÚ TAMBIÉN ---
+            // Quité el backdrop-blur y lo hice sólido para que abrir el menú sea instantáneo
+            className="fixed inset-0 z-40 bg-[#050505] flex flex-col items-center justify-center"
           >
-            {/* Textura estática en lugar del filtro SVG directo */}
             <div className="absolute inset-0 opacity-10">
                 <BioTexture />
             </div>
@@ -139,10 +136,10 @@ export const Navbar = () => {
               {MENU_ITEMS.map((item, index) => (
                 <div key={item.title} className="overflow-hidden">
                   <motion.div
-                    initial={{ y: 50, opacity: 0 }} // Quitamos skewY para mejorar rendimiento en móvil
+                    initial={{ y: 30, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: 50, opacity: 0 }}
-                    transition={{ delay: 0.1 + index * 0.05, duration: 0.5, ease: "easeOut" }}
+                    exit={{ y: 30, opacity: 0 }}
+                    transition={{ delay: 0.05 + index * 0.05, duration: 0.4, ease: "easeOut" }}
                   >
                     <Link 
                       href={item.href} 
@@ -158,9 +155,8 @@ export const Navbar = () => {
                       </div>
 
                       <span 
-                        className="text-5xl md:text-8xl text-white font-sans font-black uppercase tracking-tighter group-hover:text-amber-400 transition-colors duration-300 block leading-[0.9]"
+                        className="text-5xl md:text-8xl text-white font-sans font-black uppercase tracking-tighter group-hover:text-amber-400 transition-colors duration-200 block leading-[0.9]"
                       >
-                        {/* Eliminé el bg-clip-text en hover móvil para evitar repintados costosos, puedes dejarlo si es crítico */}
                         {item.title}
                       </span>
                     </Link>
@@ -172,7 +168,7 @@ export const Navbar = () => {
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
+              transition={{ delay: 0.3 }}
               className="absolute bottom-12 left-0 right-0 text-center"
             >
               <p className="text-[9px] font-sans text-white/20 tracking-[0.4em] uppercase">

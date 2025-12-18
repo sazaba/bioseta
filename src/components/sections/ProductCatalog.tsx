@@ -307,7 +307,7 @@
 
 
 "use client";
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, memo } from "react";
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
 
 // --- CONFIGURACIÓN ---
@@ -333,6 +333,18 @@ const getAccentColor = (category: string) => {
   }
 };
 
+// --- TEXTURA STATIC OPTIMIZADA (Base64) ---
+const StaticNoise = memo(() => (
+  <div 
+    className="absolute inset-0 opacity-[0.05] pointer-events-none mix-blend-overlay"
+    style={{
+      backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E")`,
+      backgroundSize: '100px 100px'
+    }}
+  />
+));
+StaticNoise.displayName = "StaticNoise";
+
 export const ProductCatalog = ({ products }: { products: any[] }) => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
@@ -350,7 +362,9 @@ export const ProductCatalog = ({ products }: { products: any[] }) => {
   });
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    setShowFilters(latest > 0 && latest < 1);
+    // Pequeña optimización para evitar updates excesivos
+    const shouldShow = latest > 0 && latest < 1;
+    if (shouldShow !== showFilters) setShowFilters(shouldShow);
   });
 
   const filteredProducts = useMemo(() => {
@@ -364,7 +378,7 @@ export const ProductCatalog = ({ products }: { products: any[] }) => {
       
       {/* FONDO AMBIENTAL */}
       <div className="absolute top-0 left-0 w-full h-[50vh] bg-gradient-to-b from-black via-[#050505] to-transparent z-0 pointer-events-none" />
-      <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }}></div>
+      <StaticNoise />
 
       {/* --- HEADER DE SECCIÓN + FILTROS --- */}
       <div className="relative z-20 pt-20 md:pt-32 pb-4 px-4 md:px-12 max-w-[1800px] mx-auto">
@@ -377,8 +391,9 @@ export const ProductCatalog = ({ products }: { products: any[] }) => {
             </h2>
         </div>
 
-        {/* BARRA DE FILTROS STICKY */}
-        <div className="sticky top-20 z-30 py-2 -mx-4 px-4 md:mx-0 md:px-0 bg-[#020202]/90 backdrop-blur-xl border-b border-white/5 md:border-none md:bg-transparent md:backdrop-blur-none transition-all">
+        {/* BARRA DE FILTROS */}
+        {/* Eliminé el backdrop-blur-xl del sticky bar, cambiado a color sólido semi-transparente */}
+        <div className="sticky top-20 z-30 py-2 -mx-4 px-4 md:mx-0 md:px-0 bg-[#020202]/95 border-b border-white/5 md:border-none md:bg-transparent transition-all">
           <div className="flex flex-wrap gap-2 overflow-x-auto no-scrollbar items-center pb-2">
             {CATEGORIES.map((cat) => {
                 const isActive = activeCategory === cat.id;
@@ -411,33 +426,9 @@ export const ProductCatalog = ({ products }: { products: any[] }) => {
         </div>
       </div>
 
-      {/* --- GRID DE PRODUCTOS --- */}
-      <div className="relative z-10 px-3 md:px-12 max-w-[1800px] mx-auto min-h-[50vh]">
-        <motion.div 
-            layout 
-            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-6 items-stretch"
-        >
-          <AnimatePresence mode="popLayout">
-            {filteredProducts.length > 0 ? (
-              filteredProducts.map((product, index) => (
-                <GridCard
-                  key={product.id || index}
-                  product={product}
-                  index={index}
-                  onOpen={() => setSelectedProduct(product)}
-                />
-              ))
-            ) : (
-              <motion.div 
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                className="col-span-full py-20 flex flex-col items-center justify-center text-white/30 font-mono text-xs uppercase gap-4"
-              >
-                <span>Sin especímenes en esta categoría</span>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
-      </div>
+      {/* --- GRID DE PRODUCTOS (AISLADO) --- */}
+      {/* Pasamos filteredProducts a un componente memoizado para que NO se re-renderice al abrir el modal */}
+      <ProductGrid products={filteredProducts} onSelect={setSelectedProduct} />
 
       {/* --- MODAL DE PRODUCTO --- */}
       <AnimatePresence>
@@ -453,11 +444,43 @@ export const ProductCatalog = ({ products }: { products: any[] }) => {
   );
 };
 
-// --- CARTA GRID (Botón '+' abre modal) ---
-const GridCard = ({ product, index, onOpen }: { product: any; index: number, onOpen: () => void }) => {
-  const accentColor = getAccentColor(product.category);
+// --- COMPONENTE GRID MEMOIZADO (OPTIMIZACIÓN CRÍTICA) ---
+// Esto evita que las 20 tarjetas se re-calculen cuando se abre el modal
+const ProductGrid = memo(({ products, onSelect }: { products: any[], onSelect: (p: any) => void }) => {
+    return (
+      <div className="relative z-10 px-3 md:px-12 max-w-[1800px] mx-auto min-h-[50vh]">
+        <motion.div 
+            layout 
+            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-6 items-stretch"
+        >
+          <AnimatePresence mode="popLayout">
+            {products.length > 0 ? (
+              products.map((product, index) => (
+                <GridCard
+                  key={product.id || index}
+                  product={product}
+                  index={index}
+                  onOpen={() => onSelect(product)}
+                />
+              ))
+            ) : (
+              <motion.div 
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                className="col-span-full py-20 flex flex-col items-center justify-center text-white/30 font-mono text-xs uppercase gap-4"
+              >
+                <span>Sin especímenes en esta categoría</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      </div>
+    );
+});
+ProductGrid.displayName = "ProductGrid";
 
-  // NOTA: Eliminamos la función handleWhatsApp de aquí para que todo abra el modal
+// --- CARTA GRID ---
+const GridCard = memo(({ product, index, onOpen }: { product: any; index: number, onOpen: () => void }) => {
+  const accentColor = getAccentColor(product.category);
 
   return (
     <motion.div
@@ -471,9 +494,8 @@ const GridCard = ({ product, index, onOpen }: { product: any; index: number, onO
     >
       <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-700 pointer-events-none"
         style={{ background: `radial-gradient(circle at 50% 40%, ${accentColor} 0%, transparent 60%)` }} />
-      <div className="absolute inset-0 opacity-[0.08] pointer-events-none" style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }}></div>
+      <StaticNoise />
 
-      {/* HEADER */}
       <div className="relative z-10 flex justify-between items-start p-3 shrink-0">
         <span className="text-[9px] md:text-[10px] font-mono text-white/30">0{index + 1}</span>
         <span className="text-[8px] md:text-[9px] font-bold font-mono uppercase tracking-widest px-1.5 py-0.5 border rounded-[2px]"
@@ -482,20 +504,21 @@ const GridCard = ({ product, index, onOpen }: { product: any; index: number, onO
         </span>
       </div>
 
-      {/* IMAGEN */}
       <div className="relative z-10 w-full aspect-square p-4 flex items-center justify-center">
          <span className="absolute text-[20vw] font-black text-transparent opacity-5 pointer-events-none select-none top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
             style={{ WebkitTextStroke: "1px rgba(255,255,255,0.8)" }}>{product.name?.charAt(0)}</span>
+        {/* Optimización: Quitamos la animación de spin constante si no es necesaria, o la hacemos con CSS puro sin layouts */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] h-[90%] pointer-events-none opacity-30">
-            <div className="absolute inset-0 border border-white/10 rounded-full animate-[spin_12s_linear_infinite]" style={{ borderTopColor: `${accentColor}60` }} />
+            <div className="absolute inset-0 border border-white/10 rounded-full" style={{ borderTopColor: `${accentColor}60` }} />
         </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <motion.img whileHover={{ scale: 1.05, y: -5 }} transition={{ type: "spring", stiffness: 200, damping: 20 }}
             src={product.imageUrl} alt={product.name}
+            loading="lazy"
             className="w-full h-full object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.4)] z-10 relative" />
       </div>
 
-      {/* FOOTER */}
-      <div className="relative z-10 mt-auto bg-black/40 backdrop-blur-sm p-3 border-t border-white/5">
+      <div className="relative z-10 mt-auto bg-black/40 p-3 border-t border-white/5">
         <div className="mb-3">
             <h3 className="text-sm md:text-lg font-sans font-black text-white leading-tight uppercase tracking-tighter line-clamp-2">{product.name}</h3>
             <p className="text-[10px] text-stone-500 font-mono mt-1 line-clamp-1">{product.subtitle}</p>
@@ -506,12 +529,8 @@ const GridCard = ({ product, index, onOpen }: { product: any; index: number, onO
                 <span className="text-xs md:text-sm font-bold text-white tracking-tight">${Number(product.price).toLocaleString()}</span>
             </div>
             
-            {/* BOTÓN + (AHORA EJECUTA onOpen) */}
             <button 
-                onClick={(e) => {
-                    e.stopPropagation(); // Evitamos doble click
-                    onOpen(); // Abrimos modal explícitamente
-                }}
+                onClick={(e) => { e.stopPropagation(); onOpen(); }}
                 className="w-7 h-7 md:w-9 md:h-9 rounded-full text-black flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-[0_0_10px_rgba(255,255,255,0.1)] shrink-0"
                 style={{ backgroundColor: accentColor }}
             >
@@ -523,13 +542,13 @@ const GridCard = ({ product, index, onOpen }: { product: any; index: number, onO
       </div>
     </motion.div>
   );
-};
+});
+GridCard.displayName = "GridCard";
 
-// --- MODAL DE PRODUCTO COMPLETO ---
+// --- MODAL DE PRODUCTO (OPTIMIZADO) ---
 const ProductModal = ({ product, onClose }: { product: any; onClose: () => void }) => {
   const accentColor = getAccentColor(product.category);
 
-  // AQUÍ ES DONDE OCURRE LA MAGIA DE WHATSAPP AHORA
   const handleWhatsApp = () => {
     window.open(WHATSAPP_LINK, "_blank");
   };
@@ -537,17 +556,19 @@ const ProductModal = ({ product, onClose }: { product: any; onClose: () => void 
   return (
     <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] flex items-center justify-center px-4 md:px-0"
+      // Optimización: will-change-opacity
+      className="fixed inset-0 z-[100] flex items-center justify-center px-4 md:px-0 will-change-[opacity]"
     >
-      <div className="absolute inset-0 bg-[#000000]/90 backdrop-blur-md" onClick={onClose} />
+      {/* 1. ELIMINADO BACKDROP-BLUR: Usamos bg-black/90 sólido. Esto salva la GPU. */}
+      <div className="absolute inset-0 bg-[#000000]/95" onClick={onClose} />
       
       <motion.div
-        initial={{ scale: 0.9, y: 20, opacity: 0 }}
+        initial={{ scale: 0.95, y: 20, opacity: 0 }}
         animate={{ scale: 1, y: 0, opacity: 1 }}
-        exit={{ scale: 0.9, y: 20, opacity: 0 }}
+        exit={{ scale: 0.95, y: 20, opacity: 0 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className="relative w-full max-w-4xl bg-[#080808] border border-white/10 rounded-2xl overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh] md:max-h-[80vh]"
-        style={{ boxShadow: `0 0 50px -10px ${accentColor}20` }}
+        // Optimización: Quitamos shadow masivo animado
+        className="relative w-full max-w-4xl bg-[#080808] border border-white/10 rounded-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh] md:max-h-[80vh] shadow-2xl"
       >
         <button 
           onClick={onClose}
@@ -556,21 +577,25 @@ const ProductModal = ({ product, onClose }: { product: any; onClose: () => void 
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
 
-        {/* COLUMNA IZQUIERDA: IMAGEN */}
+        {/* COLUMNA IZQUIERDA */}
         <div className="w-full md:w-1/2 bg-[#050505] relative flex items-center justify-center p-8 md:p-12 border-b md:border-b-0 md:border-r border-white/5">
-           <div className="absolute inset-0 opacity-30" style={{ background: `radial-gradient(circle at center, ${accentColor} 0%, transparent 70%)`, filter: 'blur(80px)' }} />
+           {/* 2. OPTIMIZACIÓN GLOW: Radial Gradient simple en lugar de CSS filter: blur() */}
+           <div className="absolute inset-0 opacity-20 pointer-events-none" 
+                style={{ background: `radial-gradient(circle at center, ${accentColor} 0%, transparent 70%)` }} />
+           
            <div className="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none">
-              <div className="w-[80%] aspect-square border border-white/10 rounded-full animate-[spin_20s_linear_infinite]" />
+              <div className="w-[80%] aspect-square border border-white/10 rounded-full" />
            </div>
            
+           {/* eslint-disable-next-line @next/next/no-img-element */}
            <motion.img 
-             initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}
+             initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }}
              src={product.imageUrl} alt={product.name}
              className="w-full h-full object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.5)] relative z-10 max-h-[300px] md:max-h-full"
            />
         </div>
 
-        {/* COLUMNA DERECHA: INFO */}
+        {/* COLUMNA DERECHA */}
         <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col overflow-y-auto no-scrollbar relative">
            
            <div className="flex items-center gap-3 mb-2">
@@ -608,11 +633,10 @@ const ProductModal = ({ product, onClose }: { product: any; onClose: () => void 
                   <span className="text-3xl font-black text-white tracking-tighter">${Number(product.price).toLocaleString()}</span>
               </div>
 
-              {/* BOTÓN DE WHATSAPP REAL */}
               <button 
                 onClick={handleWhatsApp}
                 className="w-full py-4 rounded-sm font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg text-black"
-                style={{ backgroundColor: accentColor, boxShadow: `0 0 20px ${accentColor}40` }}
+                style={{ backgroundColor: accentColor }}
               >
                 <span>Comprar en WhatsApp</span>
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
