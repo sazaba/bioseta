@@ -64,19 +64,20 @@ export const Navbar = () => {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        // --- CAMBIO CLAVE AQUÍ ---
-        // 1. Quité 'backdrop-blur-md'
-        // 2. Cambié 'bg-[#050505]/85' a 'bg-[#050505]' (Sólido, sin transparencia)
         className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-12 transition-all duration-300 will-change-transform ${
           scrolled || isOpen 
-            ? "py-4 bg-[#050505] shadow-xl border-b border-white/5" // Sólido y rápido
+            // --- CAMBIO 1: bg-black (Negro Puro) y quitamos border-white/5 que añadía la línea gris ---
+            ? "py-4 bg-black shadow-md" 
             : "py-6 bg-transparent"
         }`}
       >
         {/* FONDO Y TEXTURA */}
-        <div className={`absolute inset-0 transition-opacity duration-300 pointer-events-none overflow-hidden ${scrolled || isOpen ? 'opacity-100' : 'opacity-0'}`}>
+        {/* --- CAMBIO 2: Lógica de Opacidad --- */}
+        {/* Antes: scrolled || isOpen ? 'opacity-100' ... */}
+        {/* Ahora: isOpen ? 'opacity-100' ... */}
+        {/* Esto hace que la textura (que causa el gris) SOLO aparezca en el menú grande, no en la barrita de scroll */}
+        <div className={`absolute inset-0 transition-opacity duration-300 pointer-events-none overflow-hidden ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
             <BioTexture />
-            {/* Línea dorada sutil en el borde inferior */}
             <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-amber-500/20 to-transparent" />
         </div>
 
@@ -86,7 +87,6 @@ export const Navbar = () => {
             onClick={(e) => handleNavClick(e, '#hero')} 
             className="relative z-50 group flex items-center"
         >
-            {/* Quitamos el glow de fondo al hacer scroll para máxima velocidad */}
             <LuxuryLogo className={`text-white transition-all duration-300 ${scrolled ? 'w-10 h-10' : 'w-12 h-12'} group-hover:scale-110`} />
         </Link>
 
@@ -124,9 +124,7 @@ export const Navbar = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            // --- CAMBIO CLAVE EN MENÚ TAMBIÉN ---
-            // Quité el backdrop-blur y lo hice sólido para que abrir el menú sea instantáneo
-            className="fixed inset-0 z-40 bg-[#050505] flex flex-col items-center justify-center"
+            className="fixed inset-0 z-40 bg-black flex flex-col items-center justify-center"
           >
             <div className="absolute inset-0 opacity-10">
                 <BioTexture />
