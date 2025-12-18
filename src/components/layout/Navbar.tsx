@@ -12,17 +12,6 @@ const MENU_ITEMS = [
   { title: "Pagos", href: "#payment", subtitle: "Medios de Pago y Envíos" },
 ];
 
-const BioTexture = () => (
-  <div 
-    className="absolute inset-0 w-full h-full opacity-[0.15] pointer-events-none mix-blend-overlay"
-    style={{
-      backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E")`,
-      backgroundRepeat: 'repeat',
-      backgroundSize: '100px 100px' 
-    }}
-  />
-);
-
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -66,21 +55,15 @@ export const Navbar = () => {
         transition={{ duration: 0.8, ease: "easeOut" }}
         className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-12 transition-all duration-300 will-change-transform ${
           scrolled || isOpen 
-            // --- CAMBIO 1: bg-black (Negro Puro) y quitamos border-white/5 que añadía la línea gris ---
-            ? "py-4 bg-black shadow-md" 
+            // --- CAMBIO CLAVE 1: SEMI-TRANSPARENCIA ---
+            // Usamos bg-black/90 (90% opaco) para que se vea lo de atrás muy sutilmente.
+            // backdrop-blur-sm: Desenfoque muy ligero para que el texto de atrás no moleste, sin matar la CPU.
+            ? "py-4 bg-[#050505]/90 backdrop-blur-sm border-b border-white/5" 
             : "py-6 bg-transparent"
         }`}
       >
-        {/* FONDO Y TEXTURA */}
-        {/* --- CAMBIO 2: Lógica de Opacidad --- */}
-        {/* Antes: scrolled || isOpen ? 'opacity-100' ... */}
-        {/* Ahora: isOpen ? 'opacity-100' ... */}
-        {/* Esto hace que la textura (que causa el gris) SOLO aparezca en el menú grande, no en la barrita de scroll */}
-        <div className={`absolute inset-0 transition-opacity duration-300 pointer-events-none overflow-hidden ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
-            <BioTexture />
-            <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-amber-500/20 to-transparent" />
-        </div>
-
+        {/* Eliminé el BioTexture de aquí para que sea cristal limpio */}
+        
         {/* LOGO */}
         <Link 
             href="#hero" 
@@ -124,12 +107,12 @@ export const Navbar = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-40 bg-black flex flex-col items-center justify-center"
+            // --- CAMBIO CLAVE 2: SIN TEXTURA Y COLOR PROFUNDO ---
+            // bg-[#050505] sólido (o /95 si quieres un pelín de transparencia)
+            // Eliminamos el div de <BioTexture /> que estaba aquí dentro.
+            className="fixed inset-0 z-40 bg-[#050505]/95 backdrop-blur-sm flex flex-col items-center justify-center"
           >
-            <div className="absolute inset-0 opacity-10">
-                <BioTexture />
-            </div>
-
+            
             <div className="flex flex-col gap-8 md:gap-10 text-center relative z-10 w-full max-w-screen-xl px-4">
               {MENU_ITEMS.map((item, index) => (
                 <div key={item.title} className="overflow-hidden">
