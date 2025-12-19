@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, memo } from "react";
 import { motion, useScroll, useTransform, AnimatePresence, useMotionValueEvent } from "framer-motion";
 
 // --- CONFIGURACIÓN ---
@@ -25,19 +25,32 @@ const getAccentColor = (category: string) => {
   }
 };
 
+// --- TEXTURA STATIC (Base64 para evitar peticiones de red) ---
+const StaticNoise = memo(() => (
+  <div 
+    className="absolute inset-0 opacity-[0.06] pointer-events-none mix-blend-overlay z-0"
+    style={{
+      backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E")`,
+      backgroundSize: '100px 100px'
+    }}
+  />
+));
+StaticNoise.displayName = "StaticNoise";
+
 export const ProductCatalog = ({ products }: { products: any[] }) => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
 
-  // Lógica para mostrar filtros solo al llegar a la sección
+  // Lógica de scroll optimizada
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start 0.8", "end start"],
   });
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    setShowFilters(latest > 0 && latest < 1);
+    const shouldShow = latest > 0 && latest < 1;
+    if (shouldShow !== showFilters) setShowFilters(shouldShow);
   });
 
   const filteredProducts = useMemo(() => {
@@ -48,12 +61,10 @@ export const ProductCatalog = ({ products }: { products: any[] }) => {
 
   return (
     <section ref={sectionRef} className="bg-[#020202] relative min-h-screen">
-      {/* DIFUMINADO DE CONEXIÓN SUPERIOR */}
-      <div className="absolute top-0 left-0 w-full h-[30vh] bg-gradient-to-b from-[#020202] via-[#020202]/90 to-transparent z-20 pointer-events-none" />
-
+      
       {/* HEADER FLOTANTE (FILTROS) */}
       <div
-        className={`fixed top-[110px] md:top-[140px] left-0 w-full z-[30] pointer-events-none flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all duration-500 ${
+        className={`fixed top-[100px] md:top-[120px] left-0 w-full z-[30] pointer-events-none flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all duration-500 will-change-transform ${
           showFilters
             ? "opacity-100 translate-y-0 pointer-events-auto"
             : "opacity-0 -translate-y-10 pointer-events-none"
@@ -79,10 +90,10 @@ export const ProductCatalog = ({ products }: { products: any[] }) => {
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`flex-shrink-0 px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all duration-300 whitespace-nowrap shadow-lg backdrop-blur-xl ${
+                className={`flex-shrink-0 px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all duration-300 whitespace-nowrap shadow-lg ${
                   activeCategory === cat.id
                     ? "bg-white text-black border-white scale-105"
-                    : "bg-[#0a0a0a]/60 text-stone-400 border-white/10 hover:border-white/30 hover:text-white"
+                    : "bg-[#0a0a0a]/80 text-stone-400 border-white/10 hover:border-white/30 hover:text-white backdrop-blur-md"
                 }`}
               >
                 {cat.label}
@@ -113,13 +124,12 @@ export const ProductCatalog = ({ products }: { products: any[] }) => {
           )}
         </AnimatePresence>
       </div>
-
-   
     </section>
   );
 };
 
-const Card = ({
+// Componente Memoizado para evitar re-renders innecesarios al filtrar
+const Card = memo(({
   product,
   index,
   total,
@@ -138,8 +148,6 @@ const Card = ({
   const imageScale = useTransform(scrollYProgress, [0, 1], [1.3, 1]);
   const textParallax = useTransform(scrollYProgress, [0, 1], [200, -100]);
   
-  // NOTA: Se ha eliminado la variable 'opacity' para que sea visible siempre.
-
   const accentColor = getAccentColor(product.category);
 
   const handleWhatsApp = () => {
@@ -149,37 +157,31 @@ const Card = ({
   };
 
   return (
-    <motion.div
+    <div
       ref={containerRef}
-      // Eliminado style={{ opacity }}
-      className="sticky top-0 min-h-[100dvh] w-full flex items-center justify-center overflow-y-auto bg-[#050505]"
+      className="sticky top-0 min-h-[100dvh] w-full flex items-center justify-center overflow-hidden bg-[#050505] border-t border-white/5"
     >
-      {/* Fondo Glow */}
+      {/* Fondo Glow Optimizado (Sin filter blur costoso) */}
       <div
-        className="absolute inset-0 opacity-20 pointer-events-none transition-colors duration-700"
+        className="absolute inset-0 opacity-20 pointer-events-none"
         style={{
-          background: `radial-gradient(circle at center, ${accentColor} 0%, transparent 70%)`,
-          filter: "blur(120px)",
+          background: `radial-gradient(circle at center, ${accentColor} 0%, transparent 60%)`,
         }}
       />
       
-      {/* Textura Noise */}
-      <div
-        className="absolute inset-0 opacity-[0.06]"
-        style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }}
-      ></div>
+      <StaticNoise />
 
       {/* Contenedor Principal */}
-      <div className="relative w-full max-w-[1600px] min-h-[100dvh] px-6 md:px-12 flex flex-col md:flex-row items-center justify-center md:justify-between pt-24 md:pt-0 pb-20 md:pb-0">
+      <div className="relative w-full max-w-[1600px] min-h-[100dvh] px-6 md:px-12 flex flex-col md:flex-row items-center justify-center md:justify-between pt-24 md:pt-0 pb-20 md:pb-0 z-10">
         
         {/* TEXTO DE FONDO (Outline) */}
         <div className="absolute inset-0 flex items-center justify-center overflow-hidden pointer-events-none z-0">
           <motion.h2
             style={{
                 y: textParallax,
-                WebkitTextStroke: "1px rgba(255,255,255,0.8)",
-            } as any}
-            className="text-[25vw] font-sans font-black uppercase text-transparent leading-none whitespace-nowrap opacity-[0.08]"
+                WebkitTextStroke: "1px rgba(255,255,255,0.1)", // Color directo, menos opacidad calculation
+            }}
+            className="text-[25vw] font-sans font-black uppercase text-transparent leading-none whitespace-nowrap will-change-transform"
           >
             {product.name?.split(" ")[0]}
           </motion.h2>
@@ -193,7 +195,7 @@ const Card = ({
             </span>
             <span className="h-[1px] w-8 bg-white/10" />
             <span
-              className="text-[10px] font-mono font-bold uppercase tracking-widest px-2 py-1 bg-white/5 border border-white/10 rounded-md backdrop-blur-sm"
+              className="text-[10px] font-mono font-bold uppercase tracking-widest px-2 py-1 bg-white/5 border border-white/10 rounded-md"
               style={{ color: accentColor, borderColor: `${accentColor}40` }}
             >
               {product.category}
@@ -225,9 +227,9 @@ const Card = ({
 
             <button
               onClick={handleWhatsApp}
-              className="group relative overflow-hidden w-full md:w-fit bg-white text-black px-8 py-4 rounded-sm transition-transform active:scale-95 shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_50px_rgba(255,255,255,0.3)]"
+              className="group relative overflow-hidden w-full md:w-fit bg-white text-black px-8 py-4 rounded-sm transition-transform active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_40px_rgba(255,255,255,0.2)]"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-stone-200/50 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" />
               <div className="flex items-center justify-between gap-6 relative z-10">
                 <span className="text-[11px] font-black uppercase tracking-[0.2em]">
                   ¡Quiero este producto!
@@ -252,6 +254,7 @@ const Card = ({
 
         {/* IMAGEN CENTRAL (Radar) */}
         <div className="relative z-10 w-full md:w-1/3 h-[40vh] md:h-[60vh] flex items-center justify-center order-1 md:order-2">
+          {/* Círculos animados con CSS puro (menos carga de JS) */}
           <div
             className="absolute w-[280px] h-[280px] md:w-[500px] md:h-[500px] border border-white/5 rounded-full animate-[spin_12s_linear_infinite]"
             style={{ borderTopColor: accentColor }}
@@ -260,12 +263,15 @@ const Card = ({
 
           <motion.div
             style={{ scale: imageScale }}
-            className="relative w-[70%] h-[70%] flex items-center justify-center"
+            className="relative w-[70%] h-[70%] flex items-center justify-center will-change-transform"
           >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={product.imageUrl}
               alt={product.name}
-              className="w-full h-full object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.6)]"
+              loading="lazy"
+              decoding="async"
+              className="w-full h-full object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.5)]"
             />
           </motion.div>
         </div>
@@ -291,20 +297,21 @@ const Card = ({
       </div>
 
       {/* BARRA PROGRESO INFERIOR */}
-      <div className="absolute bottom-0 left-0 h-[2px] w-full bg-white/5">
+      <div className="absolute bottom-0 left-0 h-[2px] w-full bg-white/5 z-20">
         <motion.div
           style={{
             scaleX: scrollYProgress,
             transformOrigin: "left",
             backgroundColor: accentColor,
           }}
-          className="h-full w-full shadow-[0_0_10px_currentColor]"
+          className="h-full w-full shadow-[0_0_10px_currentColor] will-change-transform"
         />
       </div>
-    </motion.div>
+    </div>
   );
-};
+});
 
+Card.displayName = "Card";
 
 
 // "use client";
