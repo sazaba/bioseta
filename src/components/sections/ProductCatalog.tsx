@@ -306,6 +306,7 @@
 // };
 
 
+
 "use client";
 import { useState, useMemo, useEffect, useRef, memo } from "react";
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
@@ -362,7 +363,6 @@ export const ProductCatalog = ({ products }: { products: any[] }) => {
   });
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    // Pequeña optimización para evitar updates excesivos
     const shouldShow = latest > 0 && latest < 1;
     if (shouldShow !== showFilters) setShowFilters(shouldShow);
   });
@@ -392,7 +392,6 @@ export const ProductCatalog = ({ products }: { products: any[] }) => {
         </div>
 
         {/* BARRA DE FILTROS */}
-        {/* Eliminé el backdrop-blur-xl del sticky bar, cambiado a color sólido semi-transparente */}
         <div className="sticky top-20 z-30 py-2 -mx-4 px-4 md:mx-0 md:px-0 bg-[#020202]/95 border-b border-white/5 md:border-none md:bg-transparent transition-all">
           <div className="flex flex-wrap gap-2 overflow-x-auto no-scrollbar items-center pb-2">
             {CATEGORIES.map((cat) => {
@@ -426,8 +425,7 @@ export const ProductCatalog = ({ products }: { products: any[] }) => {
         </div>
       </div>
 
-      {/* --- GRID DE PRODUCTOS (AISLADO) --- */}
-      {/* Pasamos filteredProducts a un componente memoizado para que NO se re-renderice al abrir el modal */}
+      {/* --- GRID DE PRODUCTOS --- */}
       <ProductGrid products={filteredProducts} onSelect={setSelectedProduct} />
 
       {/* --- MODAL DE PRODUCTO --- */}
@@ -444,8 +442,7 @@ export const ProductCatalog = ({ products }: { products: any[] }) => {
   );
 };
 
-// --- COMPONENTE GRID MEMOIZADO (OPTIMIZACIÓN CRÍTICA) ---
-// Esto evita que las 20 tarjetas se re-calculen cuando se abre el modal
+// --- COMPONENTE GRID MEMOIZADO ---
 const ProductGrid = memo(({ products, onSelect }: { products: any[], onSelect: (p: any) => void }) => {
     return (
       <div className="relative z-10 px-3 md:px-12 max-w-[1800px] mx-auto min-h-[50vh]">
@@ -478,7 +475,7 @@ const ProductGrid = memo(({ products, onSelect }: { products: any[], onSelect: (
 });
 ProductGrid.displayName = "ProductGrid";
 
-// --- CARTA GRID ---
+// --- CARTA GRID (OPTIMIZADA PARA PROPORCIÓN PERFECTA) ---
 const GridCard = memo(({ product, index, onOpen }: { product: any; index: number, onOpen: () => void }) => {
   const accentColor = getAccentColor(product.category);
 
@@ -490,12 +487,14 @@ const GridCard = memo(({ product, index, onOpen }: { product: any; index: number
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.3 }}
-      className="group relative w-full h-full min-h-[320px] cursor-pointer rounded-sm bg-[#080808] border border-white/10 hover:border-white/30 transition-colors duration-500 flex flex-col justify-between overflow-hidden"
+      // CAMBIO: Quitamos min-h fija. Usamos h-full para que todas las cartas en una fila tengan la misma altura.
+      className="group relative w-full h-full cursor-pointer rounded-sm bg-[#080808] border border-white/10 hover:border-white/30 transition-colors duration-500 flex flex-col justify-between overflow-hidden"
     >
       <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-700 pointer-events-none"
         style={{ background: `radial-gradient(circle at 50% 40%, ${accentColor} 0%, transparent 60%)` }} />
       <StaticNoise />
 
+      {/* HEADER CARD */}
       <div className="relative z-10 flex justify-between items-start p-3 shrink-0">
         <span className="text-[9px] md:text-[10px] font-mono text-white/30">0{index + 1}</span>
         <span className="text-[8px] md:text-[9px] font-bold font-mono uppercase tracking-widest px-1.5 py-0.5 border rounded-[2px]"
@@ -504,23 +503,34 @@ const GridCard = memo(({ product, index, onOpen }: { product: any; index: number
         </span>
       </div>
 
-      <div className="relative z-10 w-full aspect-square p-4 flex items-center justify-center">
+      {/* IMAGEN: CONTENEDOR CUADRADO PERFECTO */}
+      {/* CAMBIO CLAVE: 'aspect-square' fuerza a que sea siempre 1:1. 
+          Usamos padding (p-6) para dar aire.
+          La imagen tiene 'object-contain' para no cortarse nunca. */}
+      <div className="relative z-10 w-full aspect-square p-6 flex items-center justify-center overflow-hidden">
          <span className="absolute text-[20vw] font-black text-transparent opacity-5 pointer-events-none select-none top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
             style={{ WebkitTextStroke: "1px rgba(255,255,255,0.8)" }}>{product.name?.charAt(0)}</span>
-        {/* Optimización: Quitamos la animación de spin constante si no es necesaria, o la hacemos con CSS puro sin layouts */}
+        
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] h-[90%] pointer-events-none opacity-30">
             <div className="absolute inset-0 border border-white/10 rounded-full" style={{ borderTopColor: `${accentColor}60` }} />
         </div>
+        
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <motion.img whileHover={{ scale: 1.05, y: -5 }} transition={{ type: "spring", stiffness: 200, damping: 20 }}
-            src={product.imageUrl} alt={product.name}
+        <motion.img 
+            whileHover={{ scale: 1.1, y: -5 }} 
+            transition={{ type: "spring", stiffness: 200, damping: 20 }}
+            src={product.imageUrl} 
+            alt={product.name}
             loading="lazy"
-            className="w-full h-full object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.4)] z-10 relative" />
+            // CAMBIO: La imagen llena el contenedor cuadrado con object-contain
+            className="w-full h-full object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.4)] z-10 relative" 
+        />
       </div>
 
+      {/* FOOTER CARD */}
       <div className="relative z-10 mt-auto bg-black/40 p-3 border-t border-white/5">
         <div className="mb-3">
-            <h3 className="text-sm md:text-lg font-sans font-black text-white leading-tight uppercase tracking-tighter line-clamp-2">{product.name}</h3>
+            <h3 className="text-sm md:text-base font-sans font-black text-white leading-tight uppercase tracking-tighter line-clamp-1">{product.name}</h3>
             <p className="text-[10px] text-stone-500 font-mono mt-1 line-clamp-1">{product.subtitle}</p>
         </div>
         <div className="flex items-center justify-between gap-1">
@@ -545,7 +555,7 @@ const GridCard = memo(({ product, index, onOpen }: { product: any; index: number
 });
 GridCard.displayName = "GridCard";
 
-// --- MODAL DE PRODUCTO (OPTIMIZADO) ---
+// --- MODAL DE PRODUCTO ---
 const ProductModal = ({ product, onClose }: { product: any; onClose: () => void }) => {
   const accentColor = getAccentColor(product.category);
 
@@ -556,10 +566,8 @@ const ProductModal = ({ product, onClose }: { product: any; onClose: () => void 
   return (
     <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      // Optimización: will-change-opacity
       className="fixed inset-0 z-[100] flex items-center justify-center px-4 md:px-0 will-change-[opacity]"
     >
-      {/* 1. ELIMINADO BACKDROP-BLUR: Usamos bg-black/90 sólido. Esto salva la GPU. */}
       <div className="absolute inset-0 bg-[#000000]/95" onClick={onClose} />
       
       <motion.div
@@ -567,7 +575,6 @@ const ProductModal = ({ product, onClose }: { product: any; onClose: () => void 
         animate={{ scale: 1, y: 0, opacity: 1 }}
         exit={{ scale: 0.95, y: 20, opacity: 0 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        // Optimización: Quitamos shadow masivo animado
         className="relative w-full max-w-4xl bg-[#080808] border border-white/10 rounded-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh] md:max-h-[80vh] shadow-2xl"
       >
         <button 
@@ -577,9 +584,8 @@ const ProductModal = ({ product, onClose }: { product: any; onClose: () => void 
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
 
-        {/* COLUMNA IZQUIERDA */}
-        <div className="w-full md:w-1/2 bg-[#050505] relative flex items-center justify-center p-8 md:p-12 border-b md:border-b-0 md:border-r border-white/5">
-           {/* 2. OPTIMIZACIÓN GLOW: Radial Gradient simple en lugar de CSS filter: blur() */}
+        {/* COLUMNA IZQUIERDA: IMAGEN EN MODAL */}
+        <div className="w-full md:w-1/2 bg-[#050505] relative flex items-center justify-center p-8 md:p-12 border-b md:border-b-0 md:border-r border-white/5 overflow-hidden">
            <div className="absolute inset-0 opacity-20 pointer-events-none" 
                 style={{ background: `radial-gradient(circle at center, ${accentColor} 0%, transparent 70%)` }} />
            
@@ -591,7 +597,8 @@ const ProductModal = ({ product, onClose }: { product: any; onClose: () => void 
            <motion.img 
              initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }}
              src={product.imageUrl} alt={product.name}
-             className="w-full h-full object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.5)] relative z-10 max-h-[300px] md:max-h-full"
+             // CAMBIO: Ajuste de max-height para responsive perfecto
+             className="w-full h-full object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.5)] relative z-10 max-h-[250px] md:max-h-[400px]"
            />
         </div>
 
