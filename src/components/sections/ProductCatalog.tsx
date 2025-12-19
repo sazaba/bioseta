@@ -25,7 +25,7 @@ const getAccentColor = (category: string) => {
   }
 };
 
-// --- TEXTURA STATIC (Base64 para evitar peticiones de red) ---
+// --- TEXTURA STATIC ---
 const StaticNoise = memo(() => (
   <div 
     className="absolute inset-0 opacity-[0.06] pointer-events-none mix-blend-overlay z-0"
@@ -42,7 +42,6 @@ export const ProductCatalog = ({ products }: { products: any[] }) => {
   const [showFilters, setShowFilters] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
 
-  // Lógica de scroll optimizada
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start 0.8", "end start"],
@@ -58,6 +57,16 @@ export const ProductCatalog = ({ products }: { products: any[] }) => {
       activeCategory === "all" ? true : p.category === activeCategory
     );
   }, [products, activeCategory]);
+
+  // --- NUEVA FUNCIÓN: CAMBIO DE CATEGORÍA CON SCROLL TOP ---
+  const handleCategoryChange = (categoryId: string) => {
+    setActiveCategory(categoryId);
+    
+    if (sectionRef.current) {
+        // Hace scroll suave al inicio de la sección para ver el primer producto
+        sectionRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
 
   return (
     <section ref={sectionRef} className="bg-[#020202] relative min-h-screen">
@@ -89,7 +98,8 @@ export const ProductCatalog = ({ products }: { products: any[] }) => {
             {CATEGORIES.map((cat) => (
               <button
                 key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
+                // AQUÍ USAMOS LA NUEVA FUNCIÓN
+                onClick={() => handleCategoryChange(cat.id)}
                 className={`flex-shrink-0 px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all duration-300 whitespace-nowrap shadow-lg ${
                   activeCategory === cat.id
                     ? "bg-white text-black border-white scale-105"
@@ -128,7 +138,7 @@ export const ProductCatalog = ({ products }: { products: any[] }) => {
   );
 };
 
-// Componente Memoizado para evitar re-renders innecesarios al filtrar
+// Componente Memoizado Card (Igual que antes)
 const Card = memo(({
   product,
   index,
@@ -161,7 +171,6 @@ const Card = memo(({
       ref={containerRef}
       className="sticky top-0 min-h-[100dvh] w-full flex items-center justify-center overflow-hidden bg-[#050505] border-t border-white/5"
     >
-      {/* Fondo Glow Optimizado (Sin filter blur costoso) */}
       <div
         className="absolute inset-0 opacity-20 pointer-events-none"
         style={{
@@ -171,15 +180,14 @@ const Card = memo(({
       
       <StaticNoise />
 
-      {/* Contenedor Principal */}
       <div className="relative w-full max-w-[1600px] min-h-[100dvh] px-6 md:px-12 flex flex-col md:flex-row items-center justify-center md:justify-between pt-24 md:pt-0 pb-20 md:pb-0 z-10">
         
-        {/* TEXTO DE FONDO (Outline) */}
+        {/* TEXTO FONDO */}
         <div className="absolute inset-0 flex items-center justify-center overflow-hidden pointer-events-none z-0">
           <motion.h2
             style={{
                 y: textParallax,
-                WebkitTextStroke: "1px rgba(255,255,255,0.1)", // Color directo, menos opacidad calculation
+                WebkitTextStroke: "1px rgba(255,255,255,0.1)",
             }}
             className="text-[25vw] font-sans font-black uppercase text-transparent leading-none whitespace-nowrap will-change-transform"
           >
@@ -252,9 +260,8 @@ const Card = memo(({
           </div>
         </div>
 
-        {/* IMAGEN CENTRAL (Radar) */}
+        {/* IMAGEN CENTRAL */}
         <div className="relative z-10 w-full md:w-1/3 h-[40vh] md:h-[60vh] flex items-center justify-center order-1 md:order-2">
-          {/* Círculos animados con CSS puro (menos carga de JS) */}
           <div
             className="absolute w-[280px] h-[280px] md:w-[500px] md:h-[500px] border border-white/5 rounded-full animate-[spin_12s_linear_infinite]"
             style={{ borderTopColor: accentColor }}
@@ -276,7 +283,7 @@ const Card = memo(({
           </motion.div>
         </div>
 
-        {/* DATA DERECHA (Desktop) */}
+        {/* DATA DERECHA */}
         <div className="hidden md:flex flex-col gap-8 w-1/3 items-end order-3 z-10 text-right opacity-60">
           {product.benefits && (
             <div className="flex flex-col gap-2 items-end">
@@ -296,7 +303,6 @@ const Card = memo(({
         </div>
       </div>
 
-      {/* BARRA PROGRESO INFERIOR */}
       <div className="absolute bottom-0 left-0 h-[2px] w-full bg-white/5 z-20">
         <motion.div
           style={{
@@ -312,7 +318,6 @@ const Card = memo(({
 });
 
 Card.displayName = "Card";
-
 
 // "use client";
 // import { useState, useMemo, useEffect, useRef, memo } from "react";
