@@ -25,19 +25,74 @@ model Product {
   subtitle    String?  // Ej: "Enfoque Cognitivo"
   description String   @db.Text // Texto largo
   price       Decimal  @db.Decimal(10, 2) // Para manejar precios exactos
-  
+
   // Categoría (Usamos un String simple o un Enum)
   category    String   // Ej: "mente", "calma", "energia"
-  
+
   // Imágenes (URL que nos de Cloudinary)
   imageUrl    String
-  
+
   // Características "Tech" (Para los iconos de la sección de ciencia)
   benefits    Json?    // Guardamos los beneficios como ["Focus", "Memoria"]
-  
+
   stock       Int      @default(100)
   isActive    Boolean  @default(true) // Para ocultarlo si se agota sin borrarlo
-  
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  // Relación: un producto puede tener muchos pedidos
+  orders      Order[]
+}
+
+// ==============================
+// 3. PEDIDOS (para landing 1-producto)
+// ==============================
+
+enum OrderStatus {
+  nuevo
+  en_proceso
+  enviado
+  entregado
+  cancelado
+}
+
+model Order {
+  id        Int         @id @default(autoincrement())
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  status    OrderStatus @default(nuevo)
+
+  // Relación al producto
+  productId Int
+  product   Product     @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  // Cantidad / totales (manteniendo Decimal como en Product)
+  quantity  Int         @default(1)
+  unitPrice Decimal     @db.Decimal(10, 2)
+  total     Decimal     @db.Decimal(10, 2)
+
+  // Datos del comprador / envío
+  fullName     String
+  phone        String
+  email        String?
+  documentId   String?
+
+  country      String    @default("CO")
+  city         String
+  address      String
+  neighborhood String?
+  notes        String?
+
+  // Tracking marketing (Meta Ads)
+  fbclid     String?
+  fbp        String?
+  fbc        String?
+  userAgent  String?
+  ipAddress  String?
+
+  @@index([createdAt])
+  @@index([status])
+  @@index([productId])
 }
