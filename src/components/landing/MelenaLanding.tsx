@@ -288,12 +288,14 @@ useEffect(() => {
   ];
 
   return (
-<div className="min-h-screen w-full max-w-[100vw] bg-[#050505] text-white font-sans selection:bg-indigo-500/30 overflow-x-hidden sm:overflow-x-clip">
+<div className="min-h-screen w-full bg-[#050505] text-white font-sans selection:bg-indigo-500/30 overflow-x-hidden">
+
 
 
       
       {/* BACKGROUND WOW (más premium) */}
-<div aria-hidden className="pointer-events-none fixed inset-0 -z-10 w-full max-w-[100vw] overflow-x-clip">
+<div aria-hidden className="pointer-events-none fixed inset-0 -z-10 w-full overflow-hidden">
+
 
   {/* Base */}
   <div className="absolute inset-0 bg-[#050505]" />
@@ -407,7 +409,8 @@ useEffect(() => {
       </div>
 
       {/* HERO (super upgrade / fully responsive) */}
-      <section className="relative pt-10 sm:pt-12 md:pt-16 pb-14 px-4 overflow-x-clip">
+      <section className="relative pt-10 sm:pt-12 md:pt-16 pb-14 px-4 overflow-x-hidden">
+
 
     <motion.div
   aria-hidden
@@ -429,7 +432,8 @@ useEffect(() => {
               {lowStock && <BadgePill icon={<Package size={14} />} text={`quedan ${remainingStock} unidades`} tone="orange" />}
             </div>
 
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[1.05] mb-4">
+          <h1 className="text-[34px] sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[1.08] mb-4">
+
               Potencia tu{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
                 Enfoque Mental
@@ -437,7 +441,8 @@ useEffect(() => {
               <span className="text-zinc-200">sin bajones</span>
             </h1>
 
-            <p className="text-zinc-400 text-base sm:text-lg md:text-xl mb-6 leading-relaxed max-w-xl">
+            <p className="text-zinc-400 text-[14px] sm:text-lg md:text-xl mb-6 leading-relaxed max-w-xl">
+
               {product.subtitle ||
                 "Fórmula avanzada diseñada para quienes buscan maximizar su rendimiento diario con un ritmo más estable."}
             </p>
@@ -512,18 +517,21 @@ useEffect(() => {
 {/* Imagen (premium mockup + NO overflow en mobile) */}
 <motion.div
   variants={fadeUp}
-  className="relative w-full order-1 lg:order-2 min-w-0 overflow-x-clip max-w-[100vw] isolate"
+className="relative w-full order-1 lg:order-2 min-w-0 overflow-x-hidden"
+
 >
 
 
-  {/* Glow controlado (sin -inset que cause overflow horizontal) */}
- <div aria-hidden className="pointer-events-none absolute inset-0 flex items-center justify-center">
-  <div className="w-[88vw] max-w-[620px] h-[88vw] max-h-[620px] rounded-full blur-[90px] opacity-30 bg-gradient-to-r from-indigo-500/60 via-purple-500/40 to-fuchsia-500/50" />
+  {/* Glow interno (iOS-safe) */}
+<div aria-hidden className="pointer-events-none absolute inset-0">
+  <div className="absolute inset-6 rounded-[2.6rem] bg-gradient-to-br from-indigo-500/12 via-transparent to-purple-500/10 blur-2xl" />
 </div>
 
 
+
   {/* “Device / Mockup” */}
-  <div className="relative mx-auto w-full max-w-[520px] sm:max-w-[560px] md:max-w-[600px] px-2 sm:px-0 overflow-x-clip">
+ <div className="relative mx-auto w-full max-w-[520px] sm:max-w-[560px] md:max-w-[600px] px-2 sm:px-0 overflow-hidden">
+
 
     <div className="relative rounded-[2.6rem] border border-white/10 bg-zinc-950/40 backdrop-blur-xl shadow-[0_30px_120px_rgba(0,0,0,0.55)] overflow-hidden">
       {/* Borde premium */}
