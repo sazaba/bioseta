@@ -79,10 +79,11 @@ const shine: Variants = {
   hidden: { opacity: 0, x: -40 },
   show: {
     opacity: 1,
-    x: [ -60, 420 ],
+    x: [ -60, 260 ],
     transition: { duration: 2.8, repeat: Infinity, ease: "easeInOut", repeatDelay: 1.2 },
   },
 };
+
 
 function cx(...c: Array<string | false | null | undefined>) {
   return c.filter(Boolean).join(" ");
@@ -159,7 +160,8 @@ function CardShell({
           initial="hidden"
           animate="show"
           variants={shine}
-          className="pointer-events-none absolute top-0 -left-24 h-full w-24 rotate-12 bg-gradient-to-b from-white/0 via-white/10 to-white/0 blur-[2px]"
+      className="pointer-events-none absolute top-0 -left-16 h-full w-16 rotate-12 bg-gradient-to-b from-white/0 via-white/10 to-white/0 blur-[2px]"
+
         />
       )}
 
@@ -286,7 +288,8 @@ useEffect(() => {
   ];
 
   return (
-  <div className="min-h-screen w-full max-w-[100vw] bg-[#050505] text-white font-sans selection:bg-indigo-500/30 overflow-x-clip">
+<div className="min-h-screen w-full max-w-[100vw] bg-[#050505] text-white font-sans selection:bg-indigo-500/30 overflow-x-hidden sm:overflow-x-clip">
+
 
       
       {/* BACKGROUND WOW (más premium) */}
@@ -311,14 +314,15 @@ useEffect(() => {
       <div className="sticky top-0 z-[250] border-b border-white/10 bg-zinc-950/70 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 min-w-0">
-            <motion.div
+    <motion.div
   aria-hidden
   initial="hidden"
   animate="show"
   variants={glowPulse}
   className="
     pointer-events-none absolute -z-10
-    left-1/2 -translate-x-1/2 top-[-4rem]
+    inset-x-0 top-[-4rem]
+    mx-auto
     w-[92vw] max-w-[720px]
     h-[360px] sm:h-[460px]
     bg-indigo-600/20 blur-[110px] rounded-full
