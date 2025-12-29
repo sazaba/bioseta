@@ -286,10 +286,12 @@ useEffect(() => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-indigo-500/30 overflow-x-hidden">
+  <div className="min-h-screen w-full max-w-[100vw] bg-[#050505] text-white font-sans selection:bg-indigo-500/30 overflow-x-clip">
+
       
       {/* BACKGROUND WOW (más premium) */}
-<div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
+<div aria-hidden className="pointer-events-none fixed inset-0 -z-10 w-full max-w-[100vw] overflow-x-clip">
+
   {/* Base */}
   <div className="absolute inset-0 bg-[#050505]" />
 
@@ -361,29 +363,42 @@ useEffect(() => {
           </AnimatePresence>
         </div>
 
-        {/* CINTA MOVIÉNDOSE - SIN DEPENDER DE APIs, FULL MOBILE SAFE */}
-        <div className="border-t border-white/5 bg-black/20">
-          <div className="max-w-6xl mx-auto px-4 py-2 overflow-hidden">
-            <motion.div
-              initial={{ x: 0 }}
-              animate={{ x: "-50%" }}
-              transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
-              className="flex gap-8 whitespace-nowrap text-[11px] font-black tracking-widest uppercase text-zinc-300/80 will-change-transform"
-            >
-              <MarqueePill icon={<Truck size={14} className="text-indigo-300" />} text="Envío gratis hoy" />
-              <MarqueePill icon={<Lock size={14} className="text-indigo-300" />} text="Pago contraentrega" />
-              <MarqueePill icon={<Package size={14} className="text-indigo-300" />} text="Stock limitado" />
-              <MarqueePill icon={<Timer size={14} className="text-indigo-300" />} text="Oferta por tiempo limitado" />
-              <MarqueePill icon={<ShieldCheck size={14} className="text-indigo-300" />} text="Compra segura" />
-              {/* Repetición para loop fluido */}
-              <MarqueePill icon={<Truck size={14} className="text-indigo-300" />} text="Envío gratis hoy" />
-              <MarqueePill icon={<Lock size={14} className="text-indigo-300" />} text="Pago contraentrega" />
-              <MarqueePill icon={<Package size={14} className="text-indigo-300" />} text="Stock limitado" />
-              <MarqueePill icon={<Timer size={14} className="text-indigo-300" />} text="Oferta por tiempo limitado" />
-              <MarqueePill icon={<ShieldCheck size={14} className="text-indigo-300" />} text="Compra segura" />
-            </motion.div>
-          </div>
-        </div>
+       {/* CINTA (iOS SAFE): estática en mobile, animada desde sm */}
+<div className="border-t border-white/5 bg-black/20">
+  <div className="max-w-6xl mx-auto px-4 py-2 overflow-x-clip">
+    {/* Mobile: NO marquee (evita overflow/cortes en iOS) */}
+    <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[11px] font-black tracking-widest uppercase text-zinc-300/80 sm:hidden">
+      <MarqueePill icon={<Truck size={14} className="text-indigo-300" />} text="Envío gratis hoy" />
+      <MarqueePill icon={<Lock size={14} className="text-indigo-300" />} text="Pago contraentrega" />
+      <MarqueePill icon={<Package size={14} className="text-indigo-300" />} text="Stock limitado" />
+      <MarqueePill icon={<Timer size={14} className="text-indigo-300" />} text="Oferta limitada" />
+      <MarqueePill icon={<ShieldCheck size={14} className="text-indigo-300" />} text="Compra segura" />
+    </div>
+
+    {/* sm+: sí marquee */}
+    <div className="hidden sm:block overflow-hidden">
+      <motion.div
+        initial={{ x: 0 }}
+        animate={{ x: "-50%" }}
+        transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+        className="flex gap-8 whitespace-nowrap text-[11px] font-black tracking-widest uppercase text-zinc-300/80 will-change-transform"
+      >
+        <MarqueePill icon={<Truck size={14} className="text-indigo-300" />} text="Envío gratis hoy" />
+        <MarqueePill icon={<Lock size={14} className="text-indigo-300" />} text="Pago contraentrega" />
+        <MarqueePill icon={<Package size={14} className="text-indigo-300" />} text="Stock limitado" />
+        <MarqueePill icon={<Timer size={14} className="text-indigo-300" />} text="Oferta por tiempo limitado" />
+        <MarqueePill icon={<ShieldCheck size={14} className="text-indigo-300" />} text="Compra segura" />
+        {/* Repetición para loop fluido */}
+        <MarqueePill icon={<Truck size={14} className="text-indigo-300" />} text="Envío gratis hoy" />
+        <MarqueePill icon={<Lock size={14} className="text-indigo-300" />} text="Pago contraentrega" />
+        <MarqueePill icon={<Package size={14} className="text-indigo-300" />} text="Stock limitado" />
+        <MarqueePill icon={<Timer size={14} className="text-indigo-300" />} text="Oferta por tiempo limitado" />
+        <MarqueePill icon={<ShieldCheck size={14} className="text-indigo-300" />} text="Compra segura" />
+      </motion.div>
+    </div>
+  </div>
+</div>
+
       </div>
 
       {/* HERO (super upgrade / fully responsive) */}
