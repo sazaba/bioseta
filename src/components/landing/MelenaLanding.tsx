@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState, useTransition } from "react";
+import React, { useMemo, useState, useTransition } from "react";
 import { useSearchParams } from "next/navigation";
 import { createOrder } from "@/actions/orders";
 import { motion } from "framer-motion";
@@ -13,6 +13,11 @@ import {
   LuSparkles,
   LuCheck,
   LuCopy,
+  LuBrain,
+  LuFlame,
+  LuBadgeCheck,
+  LuLeaf,
+  LuChevronRight,
 } from "react-icons/lu";
 
 type ProductDTO = {
@@ -29,6 +34,10 @@ type ProductDTO = {
 const fadeUp = {
   hidden: { opacity: 0, y: 14 },
   show: { opacity: 1, y: 0 },
+};
+
+const stagger = {
+  show: { transition: { staggerChildren: 0.08 } },
 };
 
 export default function MelenaLanding({ product }: { product: ProductDTO }) {
@@ -62,7 +71,6 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
     return priceNumber * q;
   }, [priceNumber, qty]);
 
-  // Scarcity / urgency (sin mentir: usamos stock real)
   const stock = Number(product.stock || 0);
   const stockLabel =
     stock <= 0 ? "Agotado" : stock <= 10 ? "Últimas unidades" : "Stock disponible";
@@ -74,12 +82,11 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
 
   const heroSubtitle =
     product.subtitle ||
-    "Más claridad mental, enfoque y energía para tu día (sin complicarte).";
+    "Potencia tu enfoque, claridad y rendimiento diario con una rutina simple.";
 
   function submit() {
     setError(null);
 
-    // validación mínima, cero fricción pero sin basura
     if (!fullName.trim() || !phone.trim() || !city.trim() || !address.trim()) {
       setError("Por favor completa nombre, celular, ciudad y dirección.");
       return;
@@ -117,20 +124,25 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* BACKGROUND premium */}
+    <div className="min-h-screen bg-[#050505] text-white">
+      {/* BACKGROUND */}
       <div className="pointer-events-none fixed inset-0">
-        <div className="absolute inset-0 opacity-[0.08]" style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }} />
-        <div className="absolute -top-48 left-1/2 h-[620px] w-[620px] -translate-x-1/2 rounded-full bg-white/10 blur-3xl opacity-40" />
-        <div className="absolute top-[30%] left-[-160px] h-[520px] w-[520px] rounded-full bg-white/5 blur-3xl opacity-30" />
-        <div className="absolute bottom-[-140px] right-[-160px] h-[520px] w-[520px] rounded-full bg-white/5 blur-3xl opacity-35" />
+        <div
+          className="absolute inset-0 opacity-[0.10]"
+          style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }}
+        />
+        <div className="absolute -top-56 left-1/2 h-[760px] w-[760px] -translate-x-1/2 rounded-full bg-violet-500/12 blur-3xl" />
+        <div className="absolute top-[20%] left-[-220px] h-[620px] w-[620px] rounded-full bg-emerald-400/10 blur-3xl" />
+        <div className="absolute bottom-[-220px] right-[-220px] h-[680px] w-[680px] rounded-full bg-indigo-500/10 blur-3xl" />
       </div>
 
-      {/* Sticky top bar (mobile-first CTA) */}
-      <div className="sticky top-0 z-50 border-b border-white/10 bg-black/70 backdrop-blur">
+      {/* Sticky top bar */}
+      <div className="sticky top-0 z-50 border-b border-white/10 bg-black/35 backdrop-blur-xl">
         <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <div className="text-xs text-white/60">BIOSERTA</div>
+            <div className="text-[11px] text-white/55 font-mono uppercase tracking-widest">
+              BIOSERTA • Landing
+            </div>
             <div className="text-sm font-semibold truncate">{product.name}</div>
           </div>
 
@@ -138,7 +150,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
             <button
               onClick={copyLink}
               type="button"
-              className="hidden sm:flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-white/80 hover:bg-white/10"
+              className="hidden sm:flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.06] px-3 py-2 text-xs font-semibold text-white/80 hover:bg-white/[0.10]"
             >
               <LuCopy size={14} />
               Copiar link
@@ -146,7 +158,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
 
             <a
               href="#comprar"
-              className="rounded-xl bg-white text-black px-4 py-2 text-xs font-extrabold tracking-wide hover:opacity-90"
+              className="rounded-2xl bg-white text-black px-4 py-2 text-xs font-extrabold tracking-wide hover:opacity-90"
             >
               Comprar ahora
             </a>
@@ -156,14 +168,10 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
 
       {/* HERO */}
       <section className="relative mx-auto max-w-6xl px-4 pt-8 pb-8 md:pt-12">
-        <motion.div
-          initial="hidden"
-          animate="show"
-          variants={{ show: { transition: { staggerChildren: 0.08 } } }}
-          className="grid gap-8 md:grid-cols-2 md:items-center"
-        >
+        <motion.div initial="hidden" animate="show" variants={stagger} className="grid gap-8 md:grid-cols-2 md:items-center">
+          {/* LEFT */}
           <motion.div variants={fadeUp}>
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-xs text-white/80 backdrop-blur-xl">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
               {urgencyCopy}
             </div>
@@ -176,16 +184,16 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
               {heroSubtitle}
             </p>
 
-            {/* Micro proof */}
-            <div className="mt-5 grid grid-cols-2 gap-2">
-              <Badge icon={<LuTruck />} title="Envíos nacionales" desc="Pago contraentrega" />
-              <Badge icon={<LuShieldCheck />} title="Compra segura" desc="Confirmación WhatsApp" />
-              <Badge icon={<LuZap />} title="Uso simple" desc="Rutina diaria" />
-              <Badge icon={<LuClock />} title="Rápido de pedir" desc="En 30 segundos" />
+            {/* Glass KPI cards */}
+            <div className="mt-5 grid grid-cols-2 gap-3">
+              <GlassKPI icon={<LuTruck />} title="Envío nacional" desc="Pago contraentrega" />
+              <GlassKPI icon={<LuShieldCheck />} title="Compra segura" desc="Confirmación WhatsApp" />
+              <GlassKPI icon={<LuZap />} title="Rutina simple" desc="Fácil de usar" />
+              <GlassKPI icon={<LuClock />} title="Pedido rápido" desc="En 1 minuto" />
             </div>
 
-            {/* Price + CTA */}
-            <div className="mt-6 rounded-3xl border border-white/10 bg-white/5 p-5">
+            {/* Price card - glass */}
+            <div className="mt-6 glass-card p-5">
               <div className="flex items-end justify-between gap-4">
                 <div>
                   <div className="text-xs text-white/60">Precio hoy</div>
@@ -213,9 +221,10 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
 
               <a
                 href="#comprar"
-                className="mt-4 block w-full rounded-2xl bg-white text-black px-4 py-3 text-sm font-extrabold text-center hover:opacity-90"
+                className="mt-4 group inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-white text-black px-4 py-3 text-sm font-extrabold hover:opacity-90"
               >
                 Quiero pedir ahora
+                <LuChevronRight className="transition-transform group-hover:translate-x-0.5" />
               </a>
 
               <p className="mt-2 text-xs text-white/50 leading-relaxed">
@@ -224,10 +233,10 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
             </div>
           </motion.div>
 
-          {/* Image side */}
+          {/* RIGHT - IMAGE + floating glass */}
           <motion.div variants={fadeUp} className="relative">
-            <div className="relative overflow-hidden rounded-[32px] border border-white/10 bg-white/5 p-3">
-              <div className="relative aspect-[4/4] w-full overflow-hidden rounded-[24px] bg-black/40">
+            <div className="glass-card p-3">
+              <div className="relative aspect-square w-full overflow-hidden rounded-[24px] bg-black/40">
                 <Image
                   src={product.imageUrl}
                   alt={product.name}
@@ -235,43 +244,94 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                   className="object-cover"
                   priority
                 />
-                {/* subtle overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/5 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
               </div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.25 }}
-                className="mt-3 grid gap-2 sm:grid-cols-3"
-              >
-                <MiniPill icon={<LuSparkles />} text="Ultra premium" />
-                <MiniPill icon={<LuCheck />} text="Fácil de usar" />
-                <MiniPill icon={<LuShieldCheck />} text="Compra segura" />
-              </motion.div>
+              <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                <MiniPill icon={<LuSparkles />} text="Premium" />
+                <MiniPill icon={<LuBadgeCheck />} text="Seleccionado" />
+                <MiniPill icon={<LuShieldCheck />} text="Seguro" />
+              </div>
             </div>
 
-            {/* floating accent */}
+            {/* floating accent + glass mini card */}
             <motion.div
               aria-hidden
-              className="absolute -z-10 -top-8 right-6 h-20 w-20 rounded-3xl bg-white/10 blur-xl"
+              className="absolute -right-2 -top-6 hidden md:block"
               animate={{ y: [0, 10, 0] }}
-              transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
-            />
+              transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
+            >
+              <div className="glass-card px-4 py-3">
+                <div className="text-xs text-white/60 font-mono uppercase tracking-widest">
+                  Disponibilidad
+                </div>
+                <div className="mt-1 text-sm font-semibold">{stockLabel}</div>
+              </div>
+            </motion.div>
           </motion.div>
         </motion.div>
       </section>
 
-      {/* PROOF + BENEFITS */}
+      {/* SCIENCE / FEATURES (iconos + motion) */}
       <section className="relative mx-auto max-w-6xl px-4 pb-10">
         <motion.div
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, amount: 0.2 }}
-          variants={{ show: { transition: { staggerChildren: 0.08 } } }}
+          variants={stagger}
+          className="glass-card p-6 md:p-8"
+        >
+          <motion.div variants={fadeUp} className="flex items-start justify-between gap-6">
+            <div>
+              <div className="text-xs text-white/60 font-mono uppercase tracking-widest">
+                Enfoque premium
+              </div>
+              <h2 className="mt-2 text-2xl font-semibold">
+                Se siente como “claridad” cuando tienes constancia
+              </h2>
+              <p className="mt-2 text-sm text-white/70">
+                Diseño tipo “science section” para que se vea pro y aumente confianza.
+              </p>
+            </div>
+
+            <a
+              href="#comprar"
+              className="hidden md:inline-flex rounded-2xl bg-white text-black px-5 py-3 text-sm font-extrabold hover:opacity-90"
+            >
+              Comprar ahora
+            </a>
+          </motion.div>
+
+          <div className="mt-6 grid gap-3 md:grid-cols-3">
+            <ScienceTile
+              icon={<LuBrain size={20} />}
+              title="Enfoque"
+              desc="Ideal para trabajo, estudio y tareas largas."
+            />
+            <ScienceTile
+              icon={<LuFlame size={20} />}
+              title="Energía mental"
+              desc="Sensación de impulso para tu rutina diaria."
+            />
+            <ScienceTile
+              icon={<LuLeaf size={20} />}
+              title="Ritual simple"
+              desc="Lo integras sin complicarte."
+            />
+          </div>
+        </motion.div>
+      </section>
+
+      {/* BENEFITS + PROOF */}
+      <section className="relative mx-auto max-w-6xl px-4 pb-10">
+        <motion.div
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={stagger}
           className="grid gap-6 md:grid-cols-2"
         >
-          <motion.div variants={fadeUp} className="rounded-3xl border border-white/10 bg-white/5 p-6">
+          <motion.div variants={fadeUp} className="glass-card p-6">
             <div className="text-xs text-white/60 font-mono uppercase tracking-widest">
               ¿Para quién es?
             </div>
@@ -286,14 +346,14 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                 "Si no quieres procesos complicados: pedir, recibir, usar.",
               ].map((t) => (
                 <li key={t} className="flex gap-3">
-                  <span className="mt-1 h-1.5 w-1.5 rounded-full bg-white/60" />
+                  <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-white/60" />
                   <span>{t}</span>
                 </li>
               ))}
             </ul>
           </motion.div>
 
-          <motion.div variants={fadeUp} className="rounded-3xl border border-white/10 bg-white/5 p-6">
+          <motion.div variants={fadeUp} className="glass-card p-6">
             <div className="text-xs text-white/60 font-mono uppercase tracking-widest">
               Beneficios principales
             </div>
@@ -305,7 +365,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
               {(benefits.length ? benefits.slice(0, 6) : defaultBenefits).map((b, i) => (
                 <div
                   key={i}
-                  className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white/80"
+                  className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white/85 backdrop-blur-xl"
                 >
                   {String(b)}
                 </div>
@@ -325,8 +385,8 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, amount: 0.2 }}
-          variants={{ show: { transition: { staggerChildren: 0.08 } } }}
-          className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8"
+          variants={stagger}
+          className="glass-card p-6 md:p-8"
         >
           <motion.div variants={fadeUp} className="flex items-start justify-between gap-6">
             <div>
@@ -355,62 +415,16 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
         </motion.div>
       </section>
 
-      {/* FAQ */}
-      <section className="relative mx-auto max-w-6xl px-4 pb-10">
-        <motion.div
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={{ show: { transition: { staggerChildren: 0.06 } } }}
-          className="grid gap-4 md:grid-cols-2"
-        >
-          <motion.div variants={fadeUp} className="rounded-3xl border border-white/10 bg-white/5 p-6">
-            <h3 className="text-xl font-semibold">Preguntas frecuentes</h3>
-            <p className="mt-2 text-sm text-white/70">
-              Resolvimos lo típico para que tomes decisión rápido.
-            </p>
-
-            <div className="mt-5 space-y-3">
-              <FAQ q="¿Es pago contraentrega?" a="Sí. Confirmamos por WhatsApp y pagas al recibir el producto." />
-              <FAQ q="¿Envían a todo Colombia?" a="Sí. Envío nacional. El tiempo depende de tu ciudad." />
-              <FAQ q="¿Cómo hago seguimiento?" a="Una vez confirmemos, te compartimos la información necesaria por WhatsApp." />
-            </div>
-          </motion.div>
-
-          <motion.div variants={fadeUp} className="rounded-3xl border border-white/10 bg-white/5 p-6">
-            <h3 className="text-xl font-semibold">Última razón para no pensarlo tanto</h3>
-            <p className="mt-2 text-sm text-white/70">
-              Si te interesa, pídelo hoy: es la forma más fácil de probar sin fricción.
-            </p>
-
-            <div className="mt-5 rounded-2xl border border-white/10 bg-black/30 p-5">
-              <div className="text-sm text-white/70">Disponibilidad</div>
-              <div className="mt-1 text-lg font-semibold">{urgencyCopy}</div>
-              <div className="mt-3 text-xs text-white/50">
-                Nota: la disponibilidad cambia rápido por rotación de inventario.
-              </div>
-
-              <a
-                href="#comprar"
-                className="mt-4 block w-full rounded-2xl bg-white text-black px-4 py-3 text-sm font-extrabold text-center hover:opacity-90"
-              >
-                Sí, lo quiero
-              </a>
-            </div>
-          </motion.div>
-        </motion.div>
-      </section>
-
       {/* CHECKOUT */}
       <section id="comprar" className="relative mx-auto max-w-6xl px-4 pb-14">
         <motion.div
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, amount: 0.2 }}
-          variants={{ show: { transition: { staggerChildren: 0.08 } } }}
+          variants={stagger}
           className="grid gap-6 md:grid-cols-2"
         >
-          <motion.div variants={fadeUp} className="rounded-3xl border border-white/10 bg-white/5 p-6">
+          <motion.div variants={fadeUp} className="glass-card p-6">
             <div className="text-xs text-white/60 font-mono uppercase tracking-widest">
               Resumen
             </div>
@@ -420,7 +434,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
               {product.description?.length > 220 ? "…" : ""}
             </p>
 
-            <div className="mt-5 rounded-2xl border border-white/10 bg-black/30 p-4">
+            <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.04] p-4 backdrop-blur-xl">
               <div className="flex items-center justify-between">
                 <div className="text-sm text-white/70">Cantidad</div>
                 <div className="flex items-center gap-2">
@@ -439,19 +453,19 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
             </div>
 
             <div className="mt-5 grid grid-cols-3 gap-2 text-xs text-white/70">
-              <div className="rounded-2xl border border-white/10 bg-black/30 p-3 text-center">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-3 text-center backdrop-blur-xl">
                 Contraentrega
               </div>
-              <div className="rounded-2xl border border-white/10 bg-black/30 p-3 text-center">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-3 text-center backdrop-blur-xl">
                 Envío nacional
               </div>
-              <div className="rounded-2xl border border-white/10 bg-black/30 p-3 text-center">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-3 text-center backdrop-blur-xl">
                 Confirmación WA
               </div>
             </div>
           </motion.div>
 
-          <motion.div variants={fadeUp} className="rounded-3xl border border-white/10 bg-white/5 p-6">
+          <motion.div variants={fadeUp} className="glass-card p-6">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-xl font-semibold">Completa tus datos</h2>
@@ -468,7 +482,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
             </div>
 
             {ok ? (
-              <div className="mt-6 rounded-2xl border border-white/10 bg-black/40 p-5">
+              <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl">
                 <div className="text-lg font-semibold">✅ Pedido creado</div>
                 <p className="mt-2 text-sm text-white/70">
                   Tu pedido quedó registrado correctamente.
@@ -492,7 +506,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                     setNotes("");
                     setQty(1);
                   }}
-                  className="mt-4 w-full rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-sm font-medium hover:bg-white/15"
+                  className="mt-4 w-full rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 text-sm font-semibold hover:bg-white/[0.10]"
                 >
                   Hacer otro pedido
                 </button>
@@ -507,10 +521,19 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
 
                 <div className="mt-6 grid gap-3">
                   <Input label="Nombre completo" value={fullName} onChange={setFullName} />
-                  <Input label="Celular (WhatsApp)" value={phone} onChange={setPhone} inputMode="tel" />
+                  <Input
+                    label="Celular (WhatsApp)"
+                    value={phone}
+                    onChange={setPhone}
+                    inputMode="tel"
+                  />
                   <Input label="Ciudad" value={city} onChange={setCity} />
                   <Input label="Dirección" value={address} onChange={setAddress} />
-                  <Input label="Barrio (opcional)" value={neighborhood} onChange={setNeighborhood} />
+                  <Input
+                    label="Barrio (opcional)"
+                    value={neighborhood}
+                    onChange={setNeighborhood}
+                  />
 
                   <div>
                     <label className="text-xs text-white/60">Notas (opcional)</label>
@@ -518,7 +541,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
                       rows={3}
-                      className="mt-1 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm outline-none focus:border-white/20"
+                      className="mt-1 w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm outline-none focus:border-white/20 backdrop-blur-xl"
                       placeholder="Ej: Conjunto, torre, apartamento, referencias..."
                     />
                   </div>
@@ -526,10 +549,14 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                   <button
                     type="button"
                     onClick={submit}
-                    disabled={isPending}
+                    disabled={isPending || stock <= 0}
                     className="mt-2 w-full rounded-2xl bg-white text-black px-4 py-3 text-sm font-extrabold hover:opacity-90 disabled:opacity-60"
                   >
-                    {isPending ? "Creando pedido..." : "Finalizar pedido (contraentrega)"}
+                    {stock <= 0
+                      ? "Agotado por ahora"
+                      : isPending
+                      ? "Creando pedido..."
+                      : "Finalizar pedido (contraentrega)"}
                   </button>
 
                   <p className="text-xs text-white/50 leading-relaxed">
@@ -538,6 +565,13 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                 </div>
               </>
             )}
+
+            {/* micro trust row */}
+            <div className="mt-6 grid grid-cols-3 gap-2 text-[11px] text-white/70">
+              <TrustChip icon={<LuTruck />} text="Envío nacional" />
+              <TrustChip icon={<LuShieldCheck />} text="Seguro" />
+              <TrustChip icon={<LuCheck />} text="Confirmación WA" />
+            </div>
           </motion.div>
         </motion.div>
 
@@ -545,6 +579,20 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
           © {new Date().getFullYear()} BIOSERTA. Todos los derechos reservados.
         </div>
       </section>
+
+      {/* local styles via tailwind utility class (no extra file needed) */}
+      <style jsx global>{`
+        .glass-card {
+          border-radius: 28px;
+          border: 1px solid rgba(255, 255, 255, 0.10);
+          background: rgba(255, 255, 255, 0.06);
+          box-shadow:
+            0 20px 60px rgba(0, 0, 0, 0.45),
+            inset 0 1px 0 rgba(255, 255, 255, 0.08);
+          backdrop-filter: blur(18px);
+          -webkit-backdrop-filter: blur(18px);
+        }
+      `}</style>
     </div>
   );
 }
@@ -558,7 +606,7 @@ const defaultBenefits = [
   "Ideal para trabajo o estudio",
 ];
 
-function Badge({
+function GlassKPI({
   icon,
   title,
   desc,
@@ -568,22 +616,66 @@ function Badge({
   desc: string;
 }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
+    <motion.div
+      whileHover={{ y: -2 }}
+      transition={{ type: "spring", stiffness: 240, damping: 18 }}
+      className="glass-card px-4 py-3"
+    >
       <div className="flex items-start gap-3">
-        <div className="mt-0.5 text-white/70">{icon}</div>
-        <div>
+        <div className="mt-0.5 text-white/75">{icon}</div>
+        <div className="min-w-0">
           <div className="text-sm font-semibold text-white/90">{title}</div>
           <div className="text-xs text-white/60 mt-0.5">{desc}</div>
         </div>
       </div>
-    </div>
+    </motion.div>
+  );
+}
+
+function ScienceTile({
+  icon,
+  title,
+  desc,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  desc: string;
+}) {
+  return (
+    <motion.div
+      variants={fadeUp}
+      whileHover={{ y: -3 }}
+      transition={{ type: "spring", stiffness: 240, damping: 18 }}
+      className="glass-card p-5 relative overflow-hidden"
+    >
+      {/* shimmer */}
+      <motion.div
+        aria-hidden
+        className="absolute -inset-24 rotate-12 bg-white/10 blur-2xl opacity-0"
+        whileHover={{ opacity: 0.7 }}
+        transition={{ duration: 0.35 }}
+      />
+      <div className="relative flex items-start gap-3">
+        <motion.div
+          className="h-11 w-11 rounded-2xl border border-white/10 bg-black/25 flex items-center justify-center text-white/85"
+          animate={{ y: [0, -4, 0] }}
+          transition={{ repeat: Infinity, duration: 4.8, ease: "easeInOut" }}
+        >
+          {icon}
+        </motion.div>
+        <div>
+          <div className="text-sm font-semibold">{title}</div>
+          <div className="mt-1 text-sm text-white/70">{desc}</div>
+        </div>
+      </div>
+    </motion.div>
   );
 }
 
 function MiniPill({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-black/30 px-3 py-2 text-xs text-white/80 flex items-center gap-2">
-      <span className="text-white/70">{icon}</span>
+    <div className="rounded-2xl border border-white/10 bg-white/[0.05] px-3 py-2 text-xs text-white/80 flex items-center gap-2 backdrop-blur-xl">
+      <span className="text-white/75">{icon}</span>
       <span>{text}</span>
     </div>
   );
@@ -591,7 +683,7 @@ function MiniPill({ icon, text }: { icon: React.ReactNode; text: string }) {
 
 function StepCard({ n, title, desc }: { n: string; title: string; desc: string }) {
   return (
-    <div className="rounded-3xl border border-white/10 bg-black/30 p-5">
+    <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl">
       <div className="text-xs text-white/60 font-mono uppercase tracking-widest">
         Paso {n}
       </div>
@@ -601,11 +693,11 @@ function StepCard({ n, title, desc }: { n: string; title: string; desc: string }
   );
 }
 
-function FAQ({ q, a }: { q: string; a: string }) {
+function TrustChip({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-      <div className="text-sm font-semibold">{q}</div>
-      <div className="mt-1 text-sm text-white/70">{a}</div>
+    <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-3 text-center flex items-center justify-center gap-2 backdrop-blur-xl">
+      <span className="text-white/75">{icon}</span>
+      <span>{text}</span>
     </div>
   );
 }
@@ -621,7 +713,7 @@ function QtyButton({
     <button
       type="button"
       onClick={onClick}
-      className="h-10 w-10 rounded-xl border border-white/10 bg-black/30 text-white hover:bg-white/10"
+      className="h-10 w-10 rounded-xl border border-white/10 bg-white/[0.04] text-white hover:bg-white/[0.08] backdrop-blur-xl"
     >
       {children}
     </button>
@@ -646,7 +738,7 @@ function Input({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         inputMode={inputMode}
-        className="mt-1 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm outline-none focus:border-white/20"
+        className="mt-1 w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm outline-none focus:border-white/20 backdrop-blur-xl"
         placeholder={label}
       />
     </div>
