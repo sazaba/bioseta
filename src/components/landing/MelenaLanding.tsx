@@ -500,17 +500,22 @@ useEffect(() => {
         <div className="absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-purple-500/20 blur-[80px]" />
       </div>
 
-      {/* Área de imagen: ratio estable + no se sale */}
-      <div className="relative aspect-square sm:aspect-[4/5] w-full">
-        <Image
-          src={product.imageUrl}
-          alt={product.name || "Producto"}
-          fill
-          priority
-          sizes="(max-width: 640px) 92vw, (max-width: 1024px) 560px, 600px"
-          className="object-contain sm:object-cover"
-        />
-      </div>
+      
+      {/* Área de imagen: altura controlada en mobile (NO gigante) */}
+<div className="relative w-full">
+  {/* Mobile: max height + ratio compacto */}
+  <div className="relative w-full h-[320px] xs:h-[340px] sm:h-[460px] md:h-[520px]">
+    <Image
+      src={product.imageUrl}
+      alt={product.name || "Producto"}
+      fill
+      priority
+      sizes="(max-width: 640px) 92vw, (max-width: 1024px) 560px, 600px"
+      className="object-contain sm:object-cover p-4 sm:p-0"
+    />
+  </div>
+</div>
+
 
       {/* Base / “dock” */}
       <div className="px-5 py-4 border-t border-white/10 bg-black/25">
@@ -531,7 +536,8 @@ useEffect(() => {
       variants={floaty}
       initial="hidden"
       animate="show"
-      className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-[94%] sm:w-[92%]"
+      className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-16px)] sm:w-[92%]"
+
     >
       <div className="bg-zinc-950/70 backdrop-blur-xl border border-white/10 rounded-2xl px-4 py-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-xs text-zinc-300 min-w-0">
