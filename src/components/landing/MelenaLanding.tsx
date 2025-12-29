@@ -507,8 +507,9 @@ useEffect(() => {
 {/* Imagen (premium mockup + NO overflow en mobile) */}
 <motion.div
   variants={fadeUp}
-  className="relative w-full order-1 lg:order-2 min-w-0 overflow-x-clip"
+  className="relative w-full order-1 lg:order-2 min-w-0 overflow-x-clip max-w-[100vw] isolate"
 >
+
 
   {/* Glow controlado (sin -inset que cause overflow horizontal) */}
  <div aria-hidden className="pointer-events-none absolute inset-0 flex items-center justify-center">
@@ -517,7 +518,8 @@ useEffect(() => {
 
 
   {/* “Device / Mockup” */}
-  <div className="relative mx-auto w-full max-w-[520px] sm:max-w-[560px] md:max-w-[600px] px-2 sm:px-0">
+  <div className="relative mx-auto w-full max-w-[520px] sm:max-w-[560px] md:max-w-[600px] px-2 sm:px-0 overflow-x-clip">
+
     <div className="relative rounded-[2.6rem] border border-white/10 bg-zinc-950/40 backdrop-blur-xl shadow-[0_30px_120px_rgba(0,0,0,0.55)] overflow-hidden">
       {/* Borde premium */}
       <div aria-hidden className="absolute inset-0 pointer-events-none">
@@ -558,14 +560,15 @@ useEffect(() => {
       </div>
     </div>
 
-    {/* Barra flotante (queda dentro del contenedor, no se desborda) */}
-    <motion.div
-      variants={floaty}
-      initial="hidden"
-      animate="show"
-      className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-16px)] sm:w-[92%]"
+ 
+   {/* Barra flotante (iOS-safe, sin translate que genera overflow) */}
+<motion.div
+  variants={floaty}
+  initial="hidden"
+  animate="show"
+  className="absolute -bottom-4 left-2 right-2 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 w-auto sm:w-[92%] max-w-[560px] mx-auto"
+>
 
-    >
       <div className="bg-zinc-950/70 backdrop-blur-xl border border-white/10 rounded-2xl px-4 py-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-xs text-zinc-300 min-w-0">
           <Timer size={16} className="text-indigo-300" />
