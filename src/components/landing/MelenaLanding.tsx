@@ -311,7 +311,8 @@ useEffect(() => {
 
 
       {/* TOP OFFER BAR (wow + responsive) */}
-      <div className="sticky top-0 z-[250] border-b border-white/10 bg-zinc-950/70 backdrop-blur-xl">
+      <div className="sticky top-0 z-[250] border-b border-white/10 bg-zinc-950/70 backdrop-blur-xl relative overflow-x-hidden">
+
         <div className="max-w-6xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 min-w-0">
     <motion.div
@@ -408,13 +409,13 @@ useEffect(() => {
       {/* HERO (super upgrade / fully responsive) */}
       <section className="relative pt-10 sm:pt-12 md:pt-16 pb-14 px-4 overflow-x-clip">
 
-        <motion.div
-          aria-hidden
-          initial="hidden"
-          animate="show"
-          variants={glowPulse}
-          className="absolute -top-10 left-1/2 -translate-x-1/2 w-[1200px] max-w-[120%] h-[520px] bg-indigo-600/20 blur-[120px] rounded-full -z-10"
-        />
+    <motion.div
+  aria-hidden
+  initial="hidden"
+  animate="show"
+  variants={glowPulse}
+  className="absolute -top-10 inset-x-0 mx-auto w-[92vw] max-w-[720px] h-[420px] sm:h-[520px] bg-indigo-600/20 blur-[120px] rounded-full -z-10"
+/>
 
         <motion.div
           initial="hidden"
