@@ -287,12 +287,23 @@ useEffect(() => {
 
   return (
     <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-indigo-500/30 overflow-x-hidden">
-      {/* BACKGROUND WOW */}
-      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(99,102,241,0.16),transparent_55%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(168,85,247,0.14),transparent_55%)]" />
-        <div className="absolute inset-0 opacity-[0.06] [background-image:linear-gradient(to_right,white_1px,transparent_1px),linear-gradient(to_bottom,white_1px,transparent_1px)] [background-size:40px_40px]" />
-      </div>
+      
+      {/* BACKGROUND WOW (más premium) */}
+<div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
+  {/* Base */}
+  <div className="absolute inset-0 bg-[#050505]" />
+
+  {/* Aurora */}
+  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(99,102,241,0.18),transparent_55%)]" />
+  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(168,85,247,0.16),transparent_58%)]" />
+
+  {/* Vignette (sensación premium, enfoca el centro) */}
+  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_35%,rgba(0,0,0,0.75)_78%)]" />
+
+  {/* Grid ultra sutil */}
+  <div className="absolute inset-0 opacity-[0.045] [background-image:linear-gradient(to_right,white_1px,transparent_1px),linear-gradient(to_bottom,white_1px,transparent_1px)] [background-size:56px_56px]" />
+</div>
+
 
       {/* TOP OFFER BAR (wow + responsive) */}
       <div className="sticky top-0 z-[250] border-b border-white/10 bg-zinc-950/70 backdrop-blur-xl">
@@ -467,37 +478,75 @@ useEffect(() => {
             </motion.div>
           </motion.div>
 
+      
           {/* Imagen (no overflow + mobile perfect) */}
-          <motion.div variants={fadeUp} className="relative group w-full order-1 lg:order-2">
-            <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-[2.5rem] blur opacity-25 group-hover:opacity-50 transition duration-1000" />
-            <div className="relative w-full max-w-[560px] mx-auto aspect-square rounded-[2rem] overflow-hidden border border-white/10">
-              <Image
-                src={product.imageUrl}
-                alt={product.name || "Producto"}
-                fill
-                className="object-cover"
-                priority
-                sizes="(max-width: 640px) 92vw, (max-width: 1024px) 520px, 560px"
-              />
-            </div>
+{/* Imagen (premium mockup + NO overflow en mobile) */}
+<motion.div
+  variants={fadeUp}
+  className="relative w-full order-1 lg:order-2 min-w-0 overflow-hidden"
+>
+  {/* Glow controlado (sin -inset que cause overflow horizontal) */}
+  <div aria-hidden className="absolute inset-0 flex items-center justify-center">
+    <div className="w-[520px] sm:w-[620px] h-[520px] sm:h-[620px] rounded-full blur-[90px] opacity-30 bg-gradient-to-r from-indigo-500/60 via-purple-500/40 to-fuchsia-500/50" />
+  </div>
 
-            <motion.div
-              variants={floaty}
-              initial="hidden"
-              animate="show"
-              className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-[92%] max-w-[560px]"
-            >
-              <div className="bg-zinc-950/70 backdrop-blur-xl border border-white/10 rounded-2xl px-4 py-3 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2 text-xs text-zinc-300 min-w-0">
-                  <Timer size={16} className="text-indigo-300" />
-                  <span className="font-black truncate">Oferta activa • se agota pronto</span>
-                </div>
-                <div className="text-xs font-black tabular-nums shrink-0">
-                  {countdown.h}:{countdown.m}:{countdown.s}
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
+  {/* “Device / Mockup” */}
+  <div className="relative mx-auto w-full max-w-[520px] sm:max-w-[560px] md:max-w-[600px] px-2 sm:px-0">
+    <div className="relative rounded-[2.6rem] border border-white/10 bg-zinc-950/40 backdrop-blur-xl shadow-[0_30px_120px_rgba(0,0,0,0.55)] overflow-hidden">
+      {/* Borde premium */}
+      <div aria-hidden className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-white/0 opacity-60" />
+        <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-indigo-500/20 blur-[80px]" />
+        <div className="absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-purple-500/20 blur-[80px]" />
+      </div>
+
+      {/* Área de imagen: ratio estable + no se sale */}
+      <div className="relative aspect-square sm:aspect-[4/5] w-full">
+        <Image
+          src={product.imageUrl}
+          alt={product.name || "Producto"}
+          fill
+          priority
+          sizes="(max-width: 640px) 92vw, (max-width: 1024px) 560px, 600px"
+          className="object-contain sm:object-cover"
+        />
+      </div>
+
+      {/* Base / “dock” */}
+      <div className="px-5 py-4 border-t border-white/10 bg-black/25">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-xs text-zinc-300 min-w-0">
+            <ShieldCheck size={16} className="text-indigo-300 shrink-0" />
+            <span className="font-black truncate">Producto original • compra segura</span>
+          </div>
+          <span className="text-[11px] font-black text-zinc-200 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full shrink-0">
+            Envío gratis
+          </span>
+        </div>
+      </div>
+    </div>
+
+    {/* Barra flotante (queda dentro del contenedor, no se desborda) */}
+    <motion.div
+      variants={floaty}
+      initial="hidden"
+      animate="show"
+      className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-[94%] sm:w-[92%]"
+    >
+      <div className="bg-zinc-950/70 backdrop-blur-xl border border-white/10 rounded-2xl px-4 py-3 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2 text-xs text-zinc-300 min-w-0">
+          <Timer size={16} className="text-indigo-300" />
+          <span className="font-black truncate">Oferta activa • se agota pronto</span>
+        </div>
+        <div className="text-xs font-black tabular-nums shrink-0">
+          {countdown.h}:{countdown.m}:{countdown.s}
+        </div>
+      </div>
+    </motion.div>
+  </div>
+</motion.div>
+
+
         </motion.div>
       </section>
 
