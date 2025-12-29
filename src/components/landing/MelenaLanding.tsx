@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React, { useMemo, useState, useTransition } from "react";
+import React, { useEffect, useMemo, useState, useTransition } from "react";
 import { useSearchParams } from "next/navigation";
 import { createOrder } from "@/actions/orders";
 import { motion } from "framer-motion";
@@ -83,6 +83,35 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
   const heroSubtitle =
     product.subtitle ||
     "Potencia tu enfoque, claridad y rendimiento diario con una rutina simple.";
+
+  // ===== Contador promo (glass, animado) - "cierra" = fin del día local =====
+  const [now, setNow] = useState<Date>(() => new Date());
+  useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  const promoEnd = useMemo(() => {
+    const d = new Date(now);
+    d.setHours(23, 59, 59, 999);
+    return d;
+  }, [now]);
+
+  const msLeft = Math.max(0, promoEnd.getTime() - now.getTime());
+  const isOver = msLeft <= 0;
+
+  const hours = Math.floor(msLeft / 3_600_000);
+  const minutes = Math.floor((msLeft % 3_600_000) / 60_000);
+  const seconds = Math.floor((msLeft % 60_000) / 1000);
+
+  const timeParts = {
+    hh: String(hours).padStart(2, "0"),
+    mm: String(minutes).padStart(2, "0"),
+    ss: String(seconds).padStart(2, "0"),
+  };
+
+  const promoLabel =
+    stock > 0 && stock <= 12 ? "Últimas unidades hoy" : "Promo activa hoy (contraentrega)";
 
   function submit() {
     setError(null);
@@ -168,7 +197,12 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
 
       {/* HERO */}
       <section className="relative mx-auto max-w-6xl px-4 pt-8 pb-8 md:pt-12">
-        <motion.div initial="hidden" animate="show" variants={stagger} className="grid gap-8 md:grid-cols-2 md:items-center">
+        <motion.div
+          initial="hidden"
+          animate="show"
+          variants={stagger}
+          className="grid gap-8 md:grid-cols-2 md:items-center"
+        >
           {/* LEFT */}
           <motion.div variants={fadeUp}>
             <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-xs text-white/80 backdrop-blur-xl">
@@ -183,6 +217,15 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
             <p className="mt-3 text-white/70 text-base md:text-lg leading-relaxed">
               {heroSubtitle}
             </p>
+
+            {/* Contador glass */}
+            <PromoCountdown
+              label={promoLabel}
+              hh={timeParts.hh}
+              mm={timeParts.mm}
+              ss={timeParts.ss}
+              isOver={isOver}
+            />
 
             {/* Glass KPI cards */}
             <div className="mt-5 grid grid-cols-2 gap-3">
@@ -237,13 +280,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
           <motion.div variants={fadeUp} className="relative">
             <div className="glass-card p-3">
               <div className="relative aspect-square w-full overflow-hidden rounded-[24px] bg-black/40">
-                <Image
-                  src={product.imageUrl}
-                  alt={product.name}
-                  fill
-                  className="object-cover"
-                  priority
-                />
+                <Image src={product.imageUrl} alt={product.name} fill className="object-cover" priority />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
               </div>
 
@@ -606,6 +643,92 @@ const defaultBenefits = [
   "Ideal para trabajo o estudio",
 ];
 
+function PromoCountdown({
+  label,
+  hh,
+  mm,
+  ss,
+  isOver,
+}: {
+  label: string;
+  hh: string;
+  mm: string;
+  ss: string;
+  isOver: boolean;
+}) {
+  return (
+    <div className="mt-4">
+      <div className="glass-card px-4 py-3 overflow-hidden relative">
+        <motion.div
+          aria-hidden
+          className="absolute -inset-24 rotate-12 bg-white/10 blur-2xl opacity-40"
+          animate={{ x: [-40, 40, -40] }}
+          transition={{ repeat: Infinity, duration: 7.5, ease: "easeInOut" }}
+        />
+
+        <div className="relative flex items-center justify-between gap-4">
+          <div className="min-w-0">
+            <div className="text-[11px] text-white/60 font-mono uppercase tracking-widest">
+              Ventana de promoción
+            </div>
+            <div className="mt-1 text-sm font-semibold text-white/90 truncate">
+              {label}
+            </div>
+            <div className="mt-1 text-xs text-white/55">
+              {isOver ? "Finalizó por hoy" : "Cierra al final del día"}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <TimePill value={hh} unit="HRS" pulse={!isOver} />
+            <Colon />
+            <TimePill value={mm} unit="MIN" pulse={!isOver} />
+            <Colon />
+            <TimePill value={ss} unit="SEG" pulse={!isOver} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TimePill({
+  value,
+  unit,
+  pulse,
+}: {
+  value: string;
+  unit: string;
+  pulse?: boolean;
+}) {
+  return (
+    <motion.div
+      className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-xl px-3 py-2 text-center min-w-[68px]"
+      animate={
+        pulse
+          ? { y: [0, -1.5, 0], opacity: [1, 0.96, 1] }
+          : { opacity: 0.85 }
+      }
+      transition={
+        pulse
+          ? { repeat: Infinity, duration: 2.8, ease: "easeInOut" }
+          : { duration: 0.2 }
+      }
+    >
+      <div className="text-xl font-extrabold tabular-nums leading-none">{value}</div>
+      <div className="mt-1 text-[10px] text-white/60 font-mono uppercase tracking-widest">
+        {unit}
+      </div>
+    </motion.div>
+  );
+}
+
+function Colon() {
+  return (
+    <div className="text-white/40 font-extrabold tabular-nums select-none">:</div>
+  );
+}
+
 function GlassKPI({
   icon,
   title,
@@ -648,7 +771,6 @@ function ScienceTile({
       transition={{ type: "spring", stiffness: 240, damping: 18 }}
       className="glass-card p-5 relative overflow-hidden"
     >
-      {/* shimmer */}
       <motion.div
         aria-hidden
         className="absolute -inset-24 rotate-12 bg-white/10 blur-2xl opacity-0"
