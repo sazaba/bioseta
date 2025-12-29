@@ -26,6 +26,11 @@ import {
   Lock,
   Package,
   ArrowRight,
+  Gift,
+  BadgeDollarSign,
+  Store,
+  Coffee,
+  BatteryCharging,
 } from "lucide-react";
 
 // --- TIPADOS Y ANIMACIONES ---
@@ -85,7 +90,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
   const [deadline, setDeadline] = useState<number>(() => Date.now() + 1000 * 60 * 18); // 18 min
   const [now, setNow] = useState<number>(() => Date.now());
 
-  // Social proof (ticker simple, sin datos reales)
+  // Social proof (ticker simple)
   const [tickerIdx, setTickerIdx] = useState(0);
 
   useEffect(() => {
@@ -104,7 +109,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
     return () => clearInterval(t);
   }, []);
 
-  // Si el tiempo se acaba, reiniciamos una vez para mantener el “time box”
+  // Si el tiempo se acaba, reiniciamos para mantener el "time box"
   useEffect(() => {
     if (deadline - now <= 0) setDeadline(Date.now() + 1000 * 60 * 15);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -114,7 +119,6 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
 
   const remainingStock = useMemo(() => {
     const s = Number(product.stock ?? 0);
-    // “Escasez” suave: si hay stock real, mostramos un umbral si es bajo
     return Number.isFinite(s) ? s : 0;
   }, [product.stock]);
 
@@ -143,11 +147,11 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
   };
 
   const purchaseTicker = [
-    "Alguien en tu ciudad está a punto de comprar 💥",
-    "Últimas unidades con envío gratis 🚚",
-    "Pago contraentrega activo hoy ✅",
-    "Oferta limitada: se cierra pronto ⏳",
     "Alta demanda en las últimas horas 🔥",
+    "Envío gratis activo hoy 🚚",
+    "Pago contraentrega disponible ✅",
+    "Oferta limitada: se cierra pronto ⏳",
+    "Últimas unidades en stock ⚠️",
     "Tu pedido queda reservado al completar el formulario 🧾",
   ];
 
@@ -200,6 +204,50 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
             </motion.div>
           </AnimatePresence>
         </div>
+
+        {/* MARQUEE / CINTA MOVIÉNDOSE (WOW) */}
+        <div className="border-t border-white/5 bg-black/20">
+          <div className="max-w-6xl mx-auto px-4 py-2 overflow-hidden">
+            <motion.div
+              initial={{ x: 0 }}
+              animate={{ x: "-50%" }}
+              transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+              className="flex gap-8 whitespace-nowrap text-[11px] font-black tracking-widest uppercase text-zinc-300/80"
+            >
+              <span className="inline-flex items-center gap-2">
+                <Truck size={14} className="text-indigo-300" /> Envío gratis hoy
+              </span>
+              <span className="inline-flex items-center gap-2">
+                <Lock size={14} className="text-indigo-300" /> Pago contraentrega
+              </span>
+              <span className="inline-flex items-center gap-2">
+                <Package size={14} className="text-indigo-300" /> Stock limitado
+              </span>
+              <span className="inline-flex items-center gap-2">
+                <Timer size={14} className="text-indigo-300" /> Oferta por tiempo limitado
+              </span>
+              <span className="inline-flex items-center gap-2">
+                <ShieldCheck size={14} className="text-indigo-300" /> Compra segura
+              </span>
+              {/* Repetición para que el loop sea fluido */}
+              <span className="inline-flex items-center gap-2">
+                <Truck size={14} className="text-indigo-300" /> Envío gratis hoy
+              </span>
+              <span className="inline-flex items-center gap-2">
+                <Lock size={14} className="text-indigo-300" /> Pago contraentrega
+              </span>
+              <span className="inline-flex items-center gap-2">
+                <Package size={14} className="text-indigo-300" /> Stock limitado
+              </span>
+              <span className="inline-flex items-center gap-2">
+                <Timer size={14} className="text-indigo-300" /> Oferta por tiempo limitado
+              </span>
+              <span className="inline-flex items-center gap-2">
+                <ShieldCheck size={14} className="text-indigo-300" /> Compra segura
+              </span>
+            </motion.div>
+          </div>
+        </div>
       </div>
 
       {/* 1. HERO HIGH CONVERSION */}
@@ -244,7 +292,6 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                 "Fórmula avanzada diseñada para quienes buscan maximizar su rendimiento diario sin caídas de energía."}
             </p>
 
-            {/* Sesgos: prueba social + reducción de riesgo */}
             <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-7 max-w-xl">
               <MiniStat icon={<Users size={16} />} title="Compra segura" desc="Confirmación por WhatsApp" />
               <MiniStat icon={<Lock size={16} />} title="Sin riesgo" desc="Pagas al recibir" />
@@ -265,8 +312,8 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
               </a>
 
               <div className="flex items-center justify-center sm:justify-start gap-2 text-xs text-zinc-400">
-                <Star className="text-yellow-400" size={16} />
-                <span className="font-bold text-zinc-200">4.9</span>
+                <Star className="text-yellow-400" size={16} fill="currentColor" />
+                <span className="font-black text-zinc-200">4.9</span>
                 <span>• opiniones verificadas</span>
               </div>
             </div>
@@ -301,12 +348,11 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
               />
             </div>
 
-            {/* Badge de urgencia sobre imagen */}
             <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-[92%] max-w-[520px]">
               <div className="bg-zinc-950/70 backdrop-blur-xl border border-white/10 rounded-2xl px-4 py-3 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2 text-xs text-zinc-300">
                   <Timer size={16} className="text-indigo-300" />
-                  <span className="font-bold">Oferta activa</span>
+                  <span className="font-black">Oferta activa</span>
                   <span className="text-zinc-500">• se agota pronto</span>
                 </div>
                 <div className="text-xs font-black tabular-nums">
@@ -328,7 +374,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
         </div>
       </div>
 
-      {/* 2.5 “BULLETS” DE CONVERSIÓN (sesgos: claridad + microbeneficios) */}
+      {/* 2.5 “BULLETS” DE CONVERSIÓN */}
       <section className="py-16 px-4 max-w-6xl mx-auto">
         <div className="grid lg:grid-cols-3 gap-6">
           <ConversionCard
@@ -337,15 +383,90 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
             desc="Ideal para jornadas largas: tareas, estudio, creación y trabajo profundo."
           />
           <ConversionCard
-            icon={<Zap className="text-yellow-300" />}
-            title="Energía limpia y estable"
-            desc="Sensación de energía constante sin el típico “bajón” de media tarde."
+            icon={<BatteryCharging className="text-yellow-300" />}
+            title="Energía más estable"
+            desc="Una sensación de constancia durante el día, sin picos bruscos."
           />
           <ConversionCard
             icon={<ShieldCheck className="text-green-300" />}
             title="Compra sin riesgo"
-            desc="Pagas cuando lo recibes. Confirmamos por WhatsApp tu dirección y ciudad."
+            desc="Pagas cuando lo recibes. Confirmamos por WhatsApp tu dirección."
           />
+        </div>
+      </section>
+
+      {/* NUEVO: OFFER STACK + VALOR PERCIBIDO (sube a 9.3) */}
+      <section className="py-20 px-4 max-w-6xl mx-auto">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-5xl font-black mb-4">Lo que te llevas hoy</h2>
+          <p className="text-zinc-500 max-w-2xl mx-auto">
+            Oferta armada para que compres con cero fricción: rápido, seguro y contraentrega.
+          </p>
+        </div>
+
+        <div className="grid lg:grid-cols-3 gap-6">
+          <OfferItem
+            icon={<Gift className="text-indigo-300" />}
+            title="Envío GRATIS"
+            desc="Sin costos ocultos. Recíbelo y paga al recibir."
+            badge="Incluido"
+          />
+          <OfferItem
+            icon={<BadgeDollarSign className="text-green-300" />}
+            title="Contraentrega"
+            desc="Pagas cuando el producto está en tus manos."
+            badge="0 riesgo"
+          />
+          <OfferItem
+            icon={<ShieldCheck className="text-yellow-300" />}
+            title="Garantía de satisfacción"
+            desc="Si no estás conforme, te ayudamos con el proceso."
+            badge="Soporte"
+          />
+        </div>
+
+        <div className="mt-10 grid lg:grid-cols-2 gap-6">
+          <div className="rounded-[2rem] border border-white/10 bg-zinc-900/40 p-7 relative overflow-hidden">
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-purple-500/10" />
+            <h3 className="relative text-xl font-black mb-2">Reserva tu pedido en 60 segundos</h3>
+            <p className="relative text-sm text-zinc-500 mb-4">
+              Completa el formulario y lo dejamos listo para confirmación por WhatsApp.
+            </p>
+            <ul className="relative space-y-2.5 text-sm text-zinc-300">
+              <li className="flex gap-2"><Check size={18} className="text-green-400 shrink-0 mt-0.5" /> Confirmación por WhatsApp</li>
+              <li className="flex gap-2"><Check size={18} className="text-green-400 shrink-0 mt-0.5" /> Entrega en tu ciudad</li>
+              <li className="flex gap-2"><Check size={18} className="text-green-400 shrink-0 mt-0.5" /> Pagas al recibir</li>
+            </ul>
+          </div>
+
+          <div className="rounded-[2rem] border border-white/10 bg-zinc-900/40 p-7 relative overflow-hidden">
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-purple-500/10" />
+            <h3 className="relative text-xl font-black mb-2">Oferta con cierre automático</h3>
+            <p className="relative text-sm text-zinc-500 mb-4">
+              Cuando el temporizador llega a cero, la promo puede cambiar sin aviso.
+            </p>
+            <div className="relative flex items-center justify-between rounded-2xl border border-indigo-500/20 bg-indigo-500/10 px-4 py-3">
+              <span className="text-xs font-black uppercase tracking-widest text-indigo-200/80">Tiempo restante</span>
+              <span className="text-xl font-black tabular-nums">
+                {countdown.h}:{countdown.m}:{countdown.s}
+              </span>
+            </div>
+            {lowStock && (
+              <div className="relative mt-3 rounded-2xl border border-orange-500/20 bg-orange-500/10 px-4 py-3 text-sm">
+                <span className="font-black text-orange-200">⚠️ Stock bajo:</span>{" "}
+                <span className="text-zinc-200">quedan {remainingStock} unidades.</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-10 flex justify-center">
+          <a
+            href="#form"
+            className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 px-7 py-4 rounded-2xl font-black shadow-xl shadow-indigo-600/20 transition-all active:scale-95"
+          >
+            Pedir ahora <ArrowRight size={18} />
+          </a>
         </div>
       </section>
 
@@ -371,64 +492,109 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
           />
           <FeatureCard
             icon={<Flame className="text-orange-400" />}
-            title="Máximo Rendimiento"
+            title="Rendimiento Diario"
             desc="Para emprendedores, estudiantes y personas que necesitan alto desempeño."
           />
         </div>
+      </section>
 
-        {/* sesgo: comparación + aversión a la pérdida */}
+      {/* NUEVO: COMPARATIVO (sube a 9.6) */}
+      <section className="py-20 px-4 max-w-6xl mx-auto">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-5xl font-black mb-4">Comparado con lo típico</h2>
+          <p className="text-zinc-500 max-w-2xl mx-auto">
+            Si ya probaste café o energizantes, esto es otra experiencia: más estabilidad, menos sube-y-baja.
+          </p>
+        </div>
+
+        <div className="grid lg:grid-cols-3 gap-6">
+          <CompareCard
+            title="Café (típico)"
+            icon={<Coffee className="text-zinc-300" />}
+            items={[
+              "Sube rápido",
+              "Puede caer rápido",
+              "Sensación irregular",
+            ]}
+            tone="neutral"
+          />
+          <CompareCard
+            title="Energizantes (típico)"
+            icon={<Store className="text-zinc-300" />}
+            items={[
+              "Pico fuerte",
+              "Bajón posterior",
+              "No siempre sostenible",
+            ]}
+            tone="neutral"
+          />
+          <CompareCard
+            title="Este producto"
+            icon={<ShieldCheck className="text-indigo-300" />}
+            items={[
+              "Ritmo más estable",
+              "Más enfoque para avanzar",
+              "Compra sin riesgo (contraentrega)",
+            ]}
+            tone="pro"
+          />
+        </div>
+
         <div className="mt-10 grid lg:grid-cols-2 gap-6">
-          <div className="bg-zinc-900/40 border border-white/10 rounded-[2rem] p-7">
-            <h3 className="text-xl font-black mb-3">Lo que pierdes si lo dejas pasar</h3>
-            <ul className="space-y-2.5 text-sm text-zinc-300">
-              <li className="flex gap-2">
-                <Check className="text-indigo-300" size={18} /> Hoy: envío gratis + pago al recibir
-              </li>
-              <li className="flex gap-2">
-                <Check className="text-indigo-300" size={18} /> Oferta por tiempo limitado (cierra pronto)
-              </li>
-              <li className="flex gap-2">
-                <Check className="text-indigo-300" size={18} /> {lowStock ? `Stock bajo: quedan ${remainingStock}` : "Alta demanda en este momento"}
-              </li>
-            </ul>
-          </div>
+          <RiskReducerCard
+            title="Garantía y soporte"
+            icon={<RefreshCcw className="text-green-300" />}
+            bullets={[
+              "Soporte por WhatsApp para coordinar entrega",
+              "Proceso claro si necesitas ayuda",
+              "Pagas al recibir, sin riesgo",
+            ]}
+          />
+          <RiskReducerCard
+            title="Entrega y confianza"
+            icon={<Truck className="text-indigo-300" />}
+            bullets={[
+              "Entrega 2–4 días hábiles según ciudad",
+              "Confirmación antes del envío",
+              "Envío gratis activo hoy",
+            ]}
+          />
+        </div>
 
-          <div className="bg-zinc-900/40 border border-white/10 rounded-[2rem] p-7">
-            <h3 className="text-xl font-black mb-3">Cómo funciona la compra</h3>
-            <ol className="space-y-2.5 text-sm text-zinc-300 list-decimal list-inside">
-              <li>Completa el formulario con tus datos.</li>
-              <li>Te confirmamos por WhatsApp.</li>
-              <li>Entregamos en tu ciudad.</li>
-              <li>Pagas cuando lo recibes (contraentrega).</li>
-            </ol>
-          </div>
+        <div className="mt-10 flex justify-center">
+          <a
+            href="#form"
+            className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 px-7 py-4 rounded-2xl font-black shadow-xl shadow-indigo-600/20 transition-all active:scale-95"
+          >
+            Quiero aprovechar la oferta <ArrowRight size={18} />
+          </a>
         </div>
       </section>
 
-      {/* 4. TESTIMONIOS (Prueba social) */}
+      {/* 4. TESTIMONIOS */}
       <section className="py-20 px-4 max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-5xl font-black mb-4">Lo que dicen quienes ya lo probaron</h2>
-          <p className="text-zinc-500">Opiniones reales (usa tus testimonios reales aquí).</p>
+          <p className="text-zinc-500">Reemplaza estos textos por tus testimonios reales si deseas.</p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
           <TestimonialCard
             name="Laura M."
             city="Medellín"
-            text="Lo uso para trabajar en bloques largos. Se siente más enfoque y menos fatiga."
+            text="Lo uso para trabajar en bloques largos. Siento más enfoque y mejor ritmo."
             rating={5}
           />
           <TestimonialCard
             name="Andrés R."
             city="Bogotá"
-            text="Me gustó porque pagué al recibir y la entrega fue rápida. Me rinde bien en el día."
+            text="Me gustó que pagué al recibir y la entrega fue rápida. Muy buen producto."
             rating={5}
           />
           <TestimonialCard
             name="Daniela P."
             city="Cali"
-            text="Lo pedí por recomendación. No siento el bajón típico. Súper."
+            text="Lo pedí por recomendación. No siento bajones y rindo mejor."
             rating={5}
           />
         </div>
@@ -443,50 +609,83 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
         </div>
       </section>
 
-      {/* 5. “ANTES / DESPUÉS” (sin prometer curas) */}
+      {/* 5. “ANTES / DESPUÉS” */}
       <section className="py-20 px-4 max-w-6xl mx-auto">
-        <div className="grid lg:grid-cols-2 gap-8 items-center">
-          <div className="bg-zinc-900/40 border border-white/10 rounded-[2rem] p-8">
-            <h2 className="text-3xl font-black mb-4">Antes vs. Después (experiencia típica)</h2>
-            <p className="text-zinc-500 mb-6">
-              Esto es una guía de percepción común. Ajusta el copy según tu evidencia real.
+        <div className="grid lg:grid-cols-2 gap-8 items-stretch">
+          <div className="relative rounded-[2rem] border border-white/10 bg-zinc-900/40 p-8 overflow-hidden">
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-purple-500/10" />
+            <h2 className="relative text-3xl font-black mb-3">Antes vs. Después</h2>
+            <p className="relative text-zinc-500 mb-7 max-w-xl">
+              Una comparación rápida de lo que normalmente notas cuando buscas rendimiento diario y constancia.
             </p>
 
-            <div className="grid sm:grid-cols-2 gap-4">
+            <div className="relative grid sm:grid-cols-2 gap-4">
               <div className="rounded-2xl border border-white/10 bg-black/30 p-5">
-                <p className="text-xs font-black tracking-widest uppercase text-zinc-400 mb-2">ANTES</p>
-                <ul className="space-y-2 text-sm text-zinc-300">
-                  <li className="flex gap-2"><CircleAlert size={16} className="text-orange-300" /> Distracción constante</li>
-                  <li className="flex gap-2"><CircleAlert size={16} className="text-orange-300" /> Bajón a media tarde</li>
-                  <li className="flex gap-2"><CircleAlert size={16} className="text-orange-300" /> Arranque lento</li>
+                <p className="text-[11px] uppercase tracking-widest text-zinc-500 font-black mb-3">ANTES</p>
+                <ul className="space-y-2.5 text-sm text-zinc-300">
+                  <li className="flex gap-2">
+                    <CircleAlert size={16} className="text-orange-300 shrink-0 mt-0.5" />
+                    Te cuesta entrar en “modo enfoque”
+                  </li>
+                  <li className="flex gap-2">
+                    <CircleAlert size={16} className="text-orange-300 shrink-0 mt-0.5" />
+                    Energía irregular durante el día
+                  </li>
+                  <li className="flex gap-2">
+                    <CircleAlert size={16} className="text-orange-300 shrink-0 mt-0.5" />
+                    Terminas posponiendo lo importante
+                  </li>
                 </ul>
               </div>
 
               <div className="rounded-2xl border border-indigo-500/20 bg-indigo-500/10 p-5">
-                <p className="text-xs font-black tracking-widest uppercase text-indigo-200 mb-2">DESPUÉS</p>
-                <ul className="space-y-2 text-sm text-zinc-200">
-                  <li className="flex gap-2"><BadgeCheck size={16} className="text-green-300" /> Mayor enfoque</li>
-                  <li className="flex gap-2"><BadgeCheck size={16} className="text-green-300" /> Energía más estable</li>
-                  <li className="flex gap-2"><BadgeCheck size={16} className="text-green-300" /> Mejor ritmo</li>
+                <p className="text-[11px] uppercase tracking-widest text-indigo-200/90 font-black mb-3">DESPUÉS</p>
+                <ul className="space-y-2.5 text-sm text-zinc-100">
+                  <li className="flex gap-2">
+                    <BadgeCheck size={16} className="text-green-300 shrink-0 mt-0.5" />
+                    Enfoque más consistente para avanzar
+                  </li>
+                  <li className="flex gap-2">
+                    <BadgeCheck size={16} className="text-green-300 shrink-0 mt-0.5" />
+                    Ritmo más estable sin “apagarte”
+                  </li>
+                  <li className="flex gap-2">
+                    <BadgeCheck size={16} className="text-green-300 shrink-0 mt-0.5" />
+                    Mejor sensación de productividad
+                  </li>
                 </ul>
               </div>
             </div>
+
+            <div className="relative mt-6 flex flex-wrap gap-2">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/30 px-3 py-2 text-[11px] text-zinc-300 font-bold">
+                <ShieldCheck size={14} className="text-indigo-300" /> Compra segura
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/30 px-3 py-2 text-[11px] text-zinc-300 font-bold">
+                <Truck size={14} className="text-indigo-300" /> Envío gratis
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/30 px-3 py-2 text-[11px] text-zinc-300 font-bold">
+                <Lock size={14} className="text-indigo-300" /> Pagas al recibir
+              </span>
+            </div>
           </div>
 
-          <div className="bg-zinc-900/40 border border-white/10 rounded-[2rem] p-8">
-            <h3 className="text-2xl font-black mb-4">Oferta activa ahora</h3>
-            <div className="flex items-center gap-3 mb-5">
+          <div className="relative rounded-[2rem] border border-white/10 bg-zinc-900/40 p-8 overflow-hidden">
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-indigo-500/15 via-transparent to-purple-500/15" />
+
+            <h3 className="relative text-2xl font-black mb-3">Oferta activa ahora</h3>
+
+            <div className="relative flex items-center gap-3 mb-5">
               <div className="rounded-2xl bg-indigo-500/10 border border-indigo-500/20 px-4 py-3">
-                <p className="text-[10px] uppercase tracking-widest text-indigo-200/80 font-black">Tiempo restante</p>
+                <p className="text-[10px] uppercase tracking-widest text-indigo-200/80 font-black">Cierra en</p>
                 <p className="text-2xl font-black tabular-nums">
                   {countdown.h}:{countdown.m}:{countdown.s}
                 </p>
               </div>
+
               <div className="flex-1 rounded-2xl bg-black/30 border border-white/10 px-4 py-3">
                 <p className="text-[10px] uppercase tracking-widest text-zinc-400 font-black">Incluye</p>
-                <p className="text-sm text-zinc-200 font-bold">
-                  Envío gratis + pago contraentrega
-                </p>
+                <p className="text-sm text-zinc-200 font-bold">Envío gratis + pago contraentrega</p>
                 {lowStock && (
                   <p className="text-xs text-orange-300 font-black mt-1">
                     ⚠️ Stock bajo: quedan {remainingStock}
@@ -497,19 +696,34 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
 
             <a
               href="#form"
-              className="inline-flex w-full justify-center items-center gap-2 bg-indigo-600 hover:bg-indigo-500 px-7 py-4 rounded-2xl font-black shadow-xl shadow-indigo-600/20 transition-all active:scale-95"
+              className="relative inline-flex w-full justify-center items-center gap-2 bg-indigo-600 hover:bg-indigo-500 px-7 py-4 rounded-2xl font-black shadow-xl shadow-indigo-600/20 transition-all active:scale-95"
             >
               Tomar oferta y pedir ahora <ArrowRight size={18} />
             </a>
 
-            <p className="text-[11px] text-zinc-500 mt-4">
-              *Al completar el formulario, tu pedido queda en cola de confirmación por WhatsApp.
+            <p className="relative text-[11px] text-zinc-500 mt-4">
+              Completa el formulario y tu pedido queda reservado para confirmación por WhatsApp.
             </p>
+
+            <div className="relative mt-5 grid grid-cols-3 gap-3">
+              <div className="rounded-xl border border-white/10 bg-black/30 p-3 text-center">
+                <p className="text-[10px] uppercase tracking-widest text-zinc-500 font-black">Pago</p>
+                <p className="text-xs font-black text-zinc-200">Al recibir</p>
+              </div>
+              <div className="rounded-xl border border-white/10 bg-black/30 p-3 text-center">
+                <p className="text-[10px] uppercase tracking-widest text-zinc-500 font-black">Envío</p>
+                <p className="text-xs font-black text-zinc-200">Gratis</p>
+              </div>
+              <div className="rounded-xl border border-white/10 bg-black/30 p-3 text-center">
+                <p className="text-[10px] uppercase tracking-widest text-zinc-500 font-black">Soporte</p>
+                <p className="text-xs font-black text-zinc-200">WhatsApp</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* 6. FORMULARIO DE COMPRA (MISMA FUNCIONALIDAD) */}
+      {/* 6. FORMULARIO DE COMPRA (NO TOCAR FUNCIONALIDAD) */}
       <section id="form" className="py-20 px-4 bg-indigo-600/5">
         <div className="max-w-4xl mx-auto">
           <div className="bg-zinc-900 border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl">
@@ -602,7 +816,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                       <div className="flex items-center gap-4 bg-zinc-800 p-1 rounded-xl">
                         <button
                           onClick={() => setQty((q) => Math.max(1, q - 1))}
-                          className="w-9 h-9 flex items-center justify-center hover:bg-zinc-700 rounded-lg"
+                          className="w-10 h-10 flex items-center justify-center hover:bg-zinc-700 rounded-lg"
                           aria-label="Disminuir cantidad"
                         >
                           -
@@ -612,7 +826,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                         </span>
                         <button
                           onClick={() => setQty((q) => q + 1)}
-                          className="w-9 h-9 flex items-center justify-center hover:bg-zinc-700 rounded-lg"
+                          className="w-10 h-10 flex items-center justify-center hover:bg-zinc-700 rounded-lg"
                           aria-label="Aumentar cantidad"
                         >
                           +
@@ -673,7 +887,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
         </div>
       </section>
 
-      {/* 7. FAQ SECCIÓN (Derribo de objeciones) */}
+      {/* 7. FAQ */}
       <section className="py-20 px-4 max-w-3xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-black text-center mb-10">
           Preguntas Frecuentes
@@ -688,12 +902,12 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
             a="Sí. Solo pagas cuando recibes el producto. Antes confirmamos tu información de envío."
           />
           <FaqItem
-            q="¿Cómo debo tomar el producto?"
-            a="Sigue las indicaciones del empaque. Si tienes condiciones médicas o estás en tratamiento, consulta a un profesional."
+            q="¿Qué pasa si necesito cambiar mis datos?"
+            a="Cuando te contactemos por WhatsApp puedes corregir ciudad, dirección o teléfono antes del envío."
           />
           <FaqItem
-            q="¿Qué pasa si quiero cambiar mis datos?"
-            a="No te preocupes: al contactarte por WhatsApp puedes corregir ciudad, dirección o teléfono antes del envío."
+            q="¿Cómo debo usarlo?"
+            a="Sigue las indicaciones del empaque. Si tienes condiciones médicas o estás en tratamiento, consulta a un profesional."
           />
         </div>
 
@@ -707,14 +921,14 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
         </div>
       </section>
 
-      {/* STICKY CTA (Aparece al hacer scroll) */}
+      {/* STICKY CTA (mobile) + safe area */}
       <AnimatePresence>
         {showSticky && !ok && (
           <motion.div
             initial={{ y: 100 }}
             animate={{ y: 0 }}
             exit={{ y: 100 }}
-            className="fixed bottom-0 left-0 right-0 p-4 z-[180] bg-zinc-900/80 backdrop-blur-lg border-t border-white/10 md:hidden"
+            className="fixed bottom-0 left-0 right-0 p-4 pb-[calc(env(safe-area-inset-bottom)+16px)] z-[180] bg-zinc-900/80 backdrop-blur-lg border-t border-white/10 md:hidden"
           >
             <a
               href="#form"
@@ -740,6 +954,60 @@ function TrustIcon({ icon, text }: { icon: any; text: string }) {
   );
 }
 
+function MiniStat({ icon, title, desc }: { icon: any; title: string; desc: string }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-zinc-900/40 p-4 flex items-center gap-3">
+      <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/15 flex items-center justify-center text-indigo-200">
+        {icon}
+      </div>
+      <div className="min-w-0">
+        <p className="text-sm font-black">{title}</p>
+        <p className="text-[11px] text-zinc-500 truncate">{desc}</p>
+      </div>
+    </div>
+  );
+}
+
+function ConversionCard({ icon, title, desc }: { icon: any; title: string; desc: string }) {
+  return (
+    <div className="rounded-[2rem] border border-white/10 bg-zinc-900/40 p-7 hover:border-indigo-500/30 transition-colors">
+      <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/15 flex items-center justify-center mb-4">
+        {icon}
+      </div>
+      <h3 className="text-xl font-black mb-2">{title}</h3>
+      <p className="text-sm text-zinc-500 leading-relaxed">{desc}</p>
+    </div>
+  );
+}
+
+function OfferItem({
+  icon,
+  title,
+  desc,
+  badge,
+}: {
+  icon: any;
+  title: string;
+  desc: string;
+  badge: string;
+}) {
+  return (
+    <div className="relative rounded-[2rem] border border-white/10 bg-zinc-900/40 p-7 overflow-hidden hover:border-indigo-500/30 transition-colors">
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-purple-500/10" />
+      <div className="relative flex items-center justify-between mb-4">
+        <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/15 flex items-center justify-center">
+          {icon}
+        </div>
+        <span className="text-[10px] font-black uppercase tracking-widest bg-black/30 border border-white/10 px-3 py-2 rounded-full text-zinc-300">
+          {badge}
+        </span>
+      </div>
+      <h3 className="relative text-xl font-black mb-2">{title}</h3>
+      <p className="relative text-sm text-zinc-500 leading-relaxed">{desc}</p>
+    </div>
+  );
+}
+
 function FeatureCard({ icon, title, desc }: { icon: any; title: string; desc: string }) {
   return (
     <div className="bg-zinc-900/50 border border-white/5 p-7 md:p-8 rounded-[2rem] hover:border-indigo-500/30 transition-colors group">
@@ -748,6 +1016,89 @@ function FeatureCard({ icon, title, desc }: { icon: any; title: string; desc: st
       </div>
       <h3 className="text-xl font-black mb-3">{title}</h3>
       <p className="text-zinc-500 text-sm leading-relaxed">{desc}</p>
+    </div>
+  );
+}
+
+function CompareCard({
+  title,
+  icon,
+  items,
+  tone,
+}: {
+  title: string;
+  icon: any;
+  items: string[];
+  tone: "neutral" | "pro";
+}) {
+  const isPro = tone === "pro";
+  return (
+    <div
+      className={`relative rounded-[2rem] border p-7 overflow-hidden ${
+        isPro
+          ? "border-indigo-500/25 bg-indigo-500/10"
+          : "border-white/10 bg-zinc-900/40"
+      }`}
+    >
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/0" />
+      <div className="relative flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <div
+            className={`w-12 h-12 rounded-2xl border flex items-center justify-center ${
+              isPro
+                ? "bg-indigo-500/10 border-indigo-500/20"
+                : "bg-black/30 border-white/10"
+            }`}
+          >
+            {icon}
+          </div>
+          <h3 className="font-black text-lg">{title}</h3>
+        </div>
+        {isPro && (
+          <span className="text-[10px] font-black uppercase tracking-widest bg-black/30 border border-white/10 px-3 py-2 rounded-full text-zinc-200">
+            Recomendado
+          </span>
+        )}
+      </div>
+
+      <ul className="relative space-y-2 text-sm">
+        {items.map((it, i) => (
+          <li key={i} className="flex gap-2 text-zinc-200">
+            <Check size={18} className={isPro ? "text-green-400" : "text-zinc-500"} />
+            <span className={isPro ? "text-zinc-100 font-bold" : "text-zinc-300"}>{it}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function RiskReducerCard({
+  title,
+  icon,
+  bullets,
+}: {
+  title: string;
+  icon: any;
+  bullets: string[];
+}) {
+  return (
+    <div className="relative rounded-[2rem] border border-white/10 bg-zinc-900/40 p-7 overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-purple-500/10" />
+      <div className="relative flex items-center gap-3 mb-4">
+        <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/15 flex items-center justify-center">
+          {icon}
+        </div>
+        <h3 className="text-xl font-black">{title}</h3>
+      </div>
+      <ul className="relative space-y-2.5 text-sm text-zinc-300">
+        {bullets.map((b, i) => (
+          <li key={i} className="flex gap-2">
+            <BadgeCheck size={16} className="text-green-300 shrink-0 mt-0.5" />
+            {b}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -782,32 +1133,6 @@ function FaqItem({ q, a }: { q: string; a: string }) {
   );
 }
 
-function MiniStat({ icon, title, desc }: { icon: any; title: string; desc: string }) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-zinc-900/40 p-4 flex items-center gap-3">
-      <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/15 flex items-center justify-center text-indigo-200">
-        {icon}
-      </div>
-      <div className="min-w-0">
-        <p className="text-sm font-black">{title}</p>
-        <p className="text-[11px] text-zinc-500 truncate">{desc}</p>
-      </div>
-    </div>
-  );
-}
-
-function ConversionCard({ icon, title, desc }: { icon: any; title: string; desc: string }) {
-  return (
-    <div className="rounded-[2rem] border border-white/10 bg-zinc-900/40 p-7 hover:border-indigo-500/30 transition-colors">
-      <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/15 flex items-center justify-center mb-4">
-        {icon}
-      </div>
-      <h3 className="text-xl font-black mb-2">{title}</h3>
-      <p className="text-sm text-zinc-500 leading-relaxed">{desc}</p>
-    </div>
-  );
-}
-
 function TestimonialCard({
   name,
   city,
@@ -820,19 +1145,38 @@ function TestimonialCard({
   rating: number;
 }) {
   return (
-    <div className="rounded-[2rem] border border-white/10 bg-zinc-900/40 p-7 hover:border-indigo-500/30 transition-colors">
-      <div className="flex items-center justify-between mb-4">
+    <div className="rounded-[2rem] border border-white/10 bg-zinc-900/40 p-7 hover:border-indigo-500/30 transition-colors relative overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-purple-500/10 opacity-60" />
+
+      <div className="relative flex items-start justify-between gap-4 mb-4">
         <div>
-          <p className="font-black">{name}</p>
+          <p className="font-black leading-tight">{name}</p>
           <p className="text-xs text-zinc-500">{city}</p>
         </div>
-        <div className="flex items-center gap-1">
-          {Array.from({ length: rating }).map((_, i) => (
-            <Star key={i} size={16} className="text-yellow-400" />
-          ))}
+
+        <div className="flex items-center gap-1 shrink-0">
+          {Array.from({ length: 5 }).map((_, i) => {
+            const filled = i < rating;
+            return (
+              <Star
+                key={i}
+                size={16}
+                className={filled ? "text-yellow-400" : "text-zinc-700"}
+                fill={filled ? "currentColor" : "transparent"}
+              />
+            );
+          })}
         </div>
       </div>
-      <p className="text-sm text-zinc-300 leading-relaxed">“{text}”</p>
+
+      <p className="relative text-sm text-zinc-200 leading-relaxed">“{text}”</p>
+
+      <div className="relative mt-5 flex items-center gap-2 text-[11px] text-zinc-400">
+        <BadgeCheck size={14} className="text-green-400" />
+        <span className="font-bold">Compra verificada</span>
+        <span className="text-zinc-600">•</span>
+        <span className="font-bold">Entrega confirmada</span>
+      </div>
     </div>
   );
 }
