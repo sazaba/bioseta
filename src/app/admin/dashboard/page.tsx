@@ -2,7 +2,8 @@ import Link from "next/link";
 import { getSession } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { LuArrowLeft, LuPackage, LuShoppingBag } from "react-icons/lu";
+import { LuArrowLeft, LuPackage, LuShoppingBag, LuExternalLink } from "react-icons/lu";
+
 
 export default async function Dashboard() {
   const session = await getSession();
@@ -93,6 +94,29 @@ export default async function Dashboard() {
               </div>
             </div>
           </Link>
+<Link
+  href="/admin/dashboard/landings"
+  className="group rounded-3xl border border-white/10 bg-white/5 p-6 hover:bg-white/10 transition"
+>
+  <div className="flex items-center justify-between">
+    <div>
+      <div className="text-xs text-white/60 font-mono uppercase tracking-widest">
+        Marketing
+      </div>
+      <h2 className="mt-2 text-xl font-semibold text-white">
+        Landings activas
+      </h2>
+      <p className="mt-2 text-sm text-white/70">
+        Visualiza y copia los enlaces de las landings publicadas.
+      </p>
+    </div>
+    <div className="h-12 w-12 rounded-2xl border border-white/10 bg-black/30 flex items-center justify-center text-white/80 group-hover:bg-black/50">
+      <LuExternalLink size={22} />
+    </div>
+  </div>
+</Link>
+
+
         </section>
       </div>
     </main>
