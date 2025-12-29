@@ -288,7 +288,8 @@ useEffect(() => {
   ];
 
   return (
-<div className="min-h-screen w-full bg-[#050505] text-white font-sans selection:bg-indigo-500/30 overflow-x-hidden">
+<div className="min-h-screen w-full bg-[#050505] text-white font-sans selection:bg-indigo-500/30 overflow-hidden [contain:paint]">
+
 
 
 
@@ -317,20 +318,20 @@ useEffect(() => {
 
         <div className="max-w-6xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 min-w-0">
-    <motion.div
+   <motion.div
   aria-hidden
   initial="hidden"
   animate="show"
   variants={glowPulse}
   className="
     pointer-events-none absolute -z-10
-    inset-x-0 top-[-4rem]
-    mx-auto
-    w-[92vw] max-w-[720px]
-    h-[360px] sm:h-[460px]
-    bg-indigo-600/20 blur-[110px] rounded-full
+    left-1/2 -translate-x-1/2 top-[-3.25rem]
+    w-[70vw] max-w-[520px]
+    h-[300px] sm:h-[420px]
+    bg-indigo-600/16 blur-[70px] rounded-full
   "
 />
+
 
             <span className="text-[10px] sm:text-[11px] md:text-xs font-extrabold tracking-widest uppercase text-indigo-200/90 truncate">
               Oferta por tiempo limitado • envío gratis • pago al recibir
@@ -409,7 +410,8 @@ useEffect(() => {
       </div>
 
       {/* HERO (super upgrade / fully responsive) */}
-      <section className="relative pt-10 sm:pt-12 md:pt-16 pb-14 px-4 overflow-x-hidden">
+      <section className="relative pt-10 sm:pt-12 md:pt-16 pb-14 px-4 overflow-hidden [contain:paint]">
+
 
 
     <motion.div
@@ -417,8 +419,9 @@ useEffect(() => {
   initial="hidden"
   animate="show"
   variants={glowPulse}
-  className="absolute -top-10 inset-x-0 mx-auto w-[92vw] max-w-[720px] h-[420px] sm:h-[520px] bg-indigo-600/20 blur-[120px] rounded-full -z-10"
+  className="absolute -top-8 left-1/2 -translate-x-1/2 w-[70vw] max-w-[560px] h-[360px] sm:h-[480px] bg-indigo-600/16 blur-[70px] rounded-full -z-10"
 />
+
 
         <motion.div
           initial="hidden"
@@ -517,9 +520,9 @@ useEffect(() => {
 {/* Imagen (premium mockup + NO overflow en mobile) */}
 <motion.div
   variants={fadeUp}
-className="relative w-full order-1 lg:order-2 min-w-0 overflow-x-hidden"
-
+  className="relative w-full order-1 lg:order-2 min-w-0 overflow-hidden [contain:paint]"
 >
+
 
 
   {/* Glow interno (iOS-safe) */}
@@ -544,19 +547,18 @@ className="relative w-full order-1 lg:order-2 min-w-0 overflow-x-hidden"
 
       
       {/* Área de imagen: altura controlada en mobile (NO gigante) */}
-<div className="relative w-full">
-  {/* Mobile: max height + ratio compacto */}
-  <div className="relative w-full h-[320px] xs:h-[340px] sm:h-[460px] md:h-[520px]">
-    <Image
-      src={product.imageUrl}
-      alt={product.name || "Producto"}
-      fill
-      priority
-      sizes="(max-width: 640px) 92vw, (max-width: 1024px) 560px, 600px"
-      className="object-contain sm:object-cover p-4 sm:p-0"
-    />
-  </div>
+<div className="w-full overflow-hidden">
+  <Image
+    src={product.imageUrl}
+    alt={product.name || "Producto"}
+    width={1200}
+    height={1200}
+    priority
+    sizes="(max-width: 640px) 92vw, (max-width: 1024px) 560px, 600px"
+    className="w-full h-auto max-w-full object-contain block p-4 sm:p-0"
+  />
 </div>
+
 
 
       {/* Base / “dock” */}
