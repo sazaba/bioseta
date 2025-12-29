@@ -6,7 +6,7 @@ import { LuExternalLink, LuCopy } from "react-icons/lu";
 type LandingItem = {
   id: number;
   name: string;
-  url: string; // path relativo: /melena-de-leon
+  url: string;
 };
 
 export default function LandingsList({ items }: { items: LandingItem[] }) {
@@ -17,9 +17,7 @@ export default function LandingsList({ items }: { items: LandingItem[] }) {
   async function copy(text: string) {
     try {
       await navigator.clipboard.writeText(text);
-    } catch {
-      // fallback simple: no hacemos nada, pero no crashea
-    }
+    } catch {}
   }
 
   if (!items.length) {
