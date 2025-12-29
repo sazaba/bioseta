@@ -76,6 +76,101 @@ const floaty: Variants = {
   },
 };
 
+const shine: Variants = {
+  hidden: { opacity: 0, x: -40 },
+  show: {
+    opacity: 1,
+    x: [ -60, 420 ],
+    transition: { duration: 2.8, repeat: Infinity, ease: "easeInOut", repeatDelay: 1.2 },
+  },
+};
+
+function cx(...c: Array<string | false | null | undefined>) {
+  return c.filter(Boolean).join(" ");
+}
+
+type CardVariant =
+  | "glass"
+  | "glow"
+  | "gradientBorder"
+  | "outlineDashed"
+  | "solid"
+  | "split";
+
+function CardShell({
+  children,
+  variant = "glass",
+  className,
+  accent = "indigo",
+}: {
+  children: React.ReactNode;
+  variant?: CardVariant;
+  className?: string;
+  accent?: "indigo" | "purple" | "emerald" | "amber";
+}) {
+  const accentMap = {
+    indigo: "from-indigo-500/18 via-transparent to-purple-500/18",
+    purple: "from-purple-500/18 via-transparent to-fuchsia-500/18",
+    emerald: "from-emerald-500/18 via-transparent to-teal-500/18",
+    amber: "from-amber-500/18 via-transparent to-orange-500/18",
+  };
+
+  // Variantes visuales para evitar repetición
+  const base =
+    "relative rounded-[2rem] overflow-hidden transition-all will-change-transform";
+
+  const styles: Record<CardVariant, string> = {
+    glass:
+      "border border-white/10 bg-zinc-900/40 hover:border-white/20 hover:bg-zinc-900/50",
+    glow:
+      "border border-white/10 bg-zinc-900/35 shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_18px_60px_rgba(99,102,241,0.10)] hover:shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_20px_80px_rgba(168,85,247,0.14)]",
+    gradientBorder:
+      "border border-transparent bg-zinc-950/40 hover:bg-zinc-950/55",
+    outlineDashed:
+      "border border-dashed border-white/15 bg-black/20 hover:border-white/25 hover:bg-black/30",
+    solid:
+      "border border-white/8 bg-zinc-900/70 hover:bg-zinc-900/80",
+    split:
+      "border border-white/10 bg-zinc-900/40",
+  };
+
+  return (
+    <div className={cx(base, styles[variant], className)}>
+      {/* Decorative layer */}
+      <div
+        aria-hidden
+        className={cx(
+          "pointer-events-none absolute inset-0 opacity-80",
+          `bg-gradient-to-br ${accentMap[accent]}`
+        )}
+      />
+
+      {/* Gradient border illusion */}
+      {variant === "gradientBorder" && (
+        <div aria-hidden className="pointer-events-none absolute inset-0 p-[1px]">
+          <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-r from-indigo-500/35 via-purple-500/25 to-fuchsia-500/35" />
+          <div className="absolute inset-[1px] rounded-[calc(2rem-1px)] bg-zinc-950/55" />
+        </div>
+      )}
+
+      {/* Shine sweep */}
+      {(variant === "glow" || variant === "gradientBorder") && (
+        <motion.div
+          aria-hidden
+          initial="hidden"
+          animate="show"
+          variants={shine}
+          className="pointer-events-none absolute top-0 -left-24 h-full w-24 rotate-12 bg-gradient-to-b from-white/0 via-white/10 to-white/0 blur-[2px]"
+        />
+      )}
+
+      {/* Content */}
+      <div className="relative">{children}</div>
+    </div>
+  );
+}
+
+
 function formatTime(ms: number) {
   const totalSec = Math.max(0, Math.floor(ms / 1000));
   const h = String(Math.floor(totalSec / 3600)).padStart(2, "0");
@@ -101,8 +196,15 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
   const [error, setError] = useState<string | null>(null);
 
   // Urgencia (countdown)
-  const [deadline, setDeadline] = useState<number>(() => Date.now() + 1000 * 60 * 18);
-  const [now, setNow] = useState<number>(() => Date.now());
+const [deadline, setDeadline] = useState<number>(0);
+const [now, setNow] = useState<number>(0);
+
+useEffect(() => {
+  const start = Date.now();
+  setNow(start);
+  setDeadline(start + 1000 * 60 * 18);
+}, []);
+
 
   // Social proof (ticker simple)
   const [tickerIdx, setTickerIdx] = useState(0);
@@ -431,7 +533,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
       </section>
 
       {/* HOW IT WORKS (reduce friction) */}
-      <section className="py-18 px-4 max-w-6xl mx-auto">
+      <section className="py-16 px-4 max-w-6xl mx-auto">
         <div className="rounded-[2.4rem] border border-white/10 bg-zinc-900/35 overflow-hidden">
           <div className="p-7 sm:p-9 md:p-10 relative">
             <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-purple-500/10 pointer-events-none" />
@@ -481,7 +583,12 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
       </section>
 
       {/* VALUE STACK (perceived value) */}
-      <section className="py-20 px-4 max-w-6xl mx-auto">
+      <section className="py-20 px-4 max-w-6xl mx-auto relative">
+  <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+    <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(99,102,241,0.14),transparent_55%)]" />
+    <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_90%,rgba(168,85,247,0.12),transparent_55%)]" />
+  </div>
+
         <SectionTitle
           kicker="OFERTA"
           title="Lo que te llevas hoy"
@@ -530,7 +637,12 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
       </section>
 
       {/* WHY (premium explanation) */}
-      <section className="py-20 px-4 max-w-6xl mx-auto">
+      <section className="py-20 px-4 max-w-6xl mx-auto relative">
+  <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+    <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(99,102,241,0.14),transparent_55%)]" />
+    <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_90%,rgba(168,85,247,0.12),transparent_55%)]" />
+  </div>
+
         <SectionTitle
           kicker="POR QUÉ"
           title="La razón por la que esto sí funciona"
@@ -545,7 +657,12 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
       </section>
 
       {/* COMPARATIVO (wow) */}
-      <section className="py-20 px-4 max-w-6xl mx-auto">
+      <section className="py-20 px-4 max-w-6xl mx-auto relative">
+  <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+    <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(99,102,241,0.14),transparent_55%)]" />
+    <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_90%,rgba(168,85,247,0.12),transparent_55%)]" />
+  </div>
+
         <SectionTitle
           kicker="COMPARATIVO"
           title="Comparado con lo típico"
@@ -590,7 +707,12 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
       </section>
 
       {/* TESTIMONIOS (estrellas llenas) */}
-      <section className="py-20 px-4 max-w-6xl mx-auto">
+      <section className="py-20 px-4 max-w-6xl mx-auto relative">
+  <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+    <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(99,102,241,0.14),transparent_55%)]" />
+    <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_90%,rgba(168,85,247,0.12),transparent_55%)]" />
+  </div>
+
         <SectionTitle
           kicker="TESTIMONIOS"
           title="Lo que dicen quienes ya lo probaron"
@@ -614,7 +736,12 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
       </section>
 
       {/* ANTES / DESPUÉS (sin comentarios / copy “inventado”) */}
-      <section className="py-20 px-4 max-w-6xl mx-auto">
+     <section className="py-20 px-4 max-w-6xl mx-auto relative">
+  <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+    <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(99,102,241,0.14),transparent_55%)]" />
+    <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_90%,rgba(168,85,247,0.12),transparent_55%)]" />
+  </div>
+
         <div className="grid lg:grid-cols-2 gap-8 items-stretch">
           <div className="relative rounded-[2rem] border border-white/10 bg-zinc-900/40 p-7 sm:p-8 overflow-hidden">
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-purple-500/10" />
@@ -1016,16 +1143,22 @@ function MiniStat({ icon, title, desc }: { icon: any; title: string; desc: strin
 
 function ConversionCard({ icon, title, desc }: { icon: any; title: string; desc: string }) {
   return (
-    <div className="relative rounded-[2rem] border border-white/10 bg-zinc-900/40 p-7 overflow-hidden hover:border-indigo-500/30 transition-colors">
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-purple-500/10 opacity-70" />
-      <div className="relative w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/15 flex items-center justify-center mb-4">
-        {icon}
+    <CardShell variant="gradientBorder" accent="indigo" className="p-7 hover:-translate-y-[2px]">
+      <div className="flex items-start justify-between gap-4">
+        <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+          {icon}
+        </div>
+        <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400 bg-black/20 border border-white/10 px-3 py-2 rounded-full">
+          Resultado
+        </span>
       </div>
-      <h3 className="relative text-xl font-black mb-2">{title}</h3>
-      <p className="relative text-sm text-zinc-500 leading-relaxed">{desc}</p>
-    </div>
+
+      <h3 className="mt-4 text-xl font-black">{title}</h3>
+      <p className="mt-2 text-sm text-zinc-400 leading-relaxed">{desc}</p>
+    </CardShell>
   );
 }
+
 
 function StepCard({
   n,
@@ -1064,21 +1197,23 @@ function OfferItem({
   badge: string;
 }) {
   return (
-    <div className="relative rounded-[2rem] border border-white/10 bg-zinc-900/40 p-7 overflow-hidden hover:border-indigo-500/30 transition-colors">
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-purple-500/10" />
-      <div className="relative flex items-center justify-between mb-4">
-        <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/15 flex items-center justify-center">
-          {icon}
+    <CardShell variant="outlineDashed" accent="emerald" className="p-7 hover:-translate-y-[2px]">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+            {icon}
+          </div>
+          <h3 className="text-xl font-black">{title}</h3>
         </div>
-        <span className="text-[10px] font-black uppercase tracking-widest bg-black/30 border border-white/10 px-3 py-2 rounded-full text-zinc-300">
+        <span className="text-[10px] font-black uppercase tracking-widest bg-black/30 border border-white/10 px-3 py-2 rounded-full text-zinc-200">
           {badge}
         </span>
       </div>
-      <h3 className="relative text-xl font-black mb-2">{title}</h3>
-      <p className="relative text-sm text-zinc-500 leading-relaxed">{desc}</p>
-    </div>
+      <p className="mt-3 text-sm text-zinc-400 leading-relaxed">{desc}</p>
+    </CardShell>
   );
 }
+
 
 function GlowBox({
   title,
@@ -1121,13 +1256,22 @@ function GlowBox({
 
 function FeatureCard({ icon, title, desc }: { icon: any; title: string; desc: string }) {
   return (
-    <div className="bg-zinc-900/50 border border-white/5 p-7 md:p-8 rounded-[2rem] hover:border-indigo-500/30 transition-colors group">
-      <div className="mb-4 scale-110 group-hover:scale-125 transition-transform duration-500">{icon}</div>
-      <h3 className="text-xl font-black mb-3">{title}</h3>
-      <p className="text-zinc-500 text-sm leading-relaxed">{desc}</p>
-    </div>
+    <CardShell variant="split" accent="purple" className="hover:-translate-y-[2px]">
+      <div className="p-7 border-b border-white/10 bg-gradient-to-r from-white/5 to-transparent">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-2xl bg-black/25 border border-white/10 flex items-center justify-center">
+            {icon}
+          </div>
+          <h3 className="text-xl font-black">{title}</h3>
+        </div>
+      </div>
+      <div className="p-7">
+        <p className="text-sm text-zinc-400 leading-relaxed">{desc}</p>
+      </div>
+    </CardShell>
   );
 }
+
 
 function CompareCard({
   title,
@@ -1188,15 +1332,15 @@ function RiskReducerCard({
   bullets: string[];
 }) {
   return (
-    <div className="relative rounded-[2rem] border border-white/10 bg-zinc-900/40 p-7 overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-purple-500/10" />
-      <div className="relative flex items-center gap-3 mb-4">
-        <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/15 flex items-center justify-center">
+    <CardShell variant="glow" accent="indigo" className="p-7 hover:-translate-y-[2px]">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
           {icon}
         </div>
         <h3 className="text-xl font-black">{title}</h3>
       </div>
-      <ul className="relative space-y-2.5 text-sm text-zinc-300">
+
+      <ul className="space-y-2.5 text-sm text-zinc-300">
         {bullets.map((b, i) => (
           <li key={i} className="flex gap-2">
             <BadgeCheck size={16} className="text-green-300 shrink-0 mt-0.5" />
@@ -1204,9 +1348,10 @@ function RiskReducerCard({
           </li>
         ))}
       </ul>
-    </div>
+    </CardShell>
   );
 }
+
 
 function Input({ label, icon, ...props }: any) {
   return (
@@ -1248,41 +1393,38 @@ function TestimonialCard({
   rating: number;
 }) {
   return (
-    <div className="rounded-[2rem] border border-white/10 bg-zinc-900/40 p-7 hover:border-indigo-500/30 transition-colors relative overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-purple-500/10 opacity-60" />
-
-      <div className="relative flex items-start justify-between gap-4 mb-4">
+    <CardShell variant="solid" accent="amber" className="p-7 hover:-translate-y-[2px]">
+      <div className="flex items-start justify-between gap-4 mb-4">
         <div>
           <p className="font-black leading-tight">{name}</p>
           <p className="text-xs text-zinc-500">{city}</p>
         </div>
 
         <div className="flex items-center gap-1 shrink-0">
-          {Array.from({ length: 5 }).map((_, i) => {
-            const filled = i < rating;
-            return (
-              <Star
-                key={i}
-                size={16}
-                className={filled ? "text-yellow-400" : "text-zinc-700"}
-                fill={filled ? "currentColor" : "transparent"}
-              />
-            );
-          })}
+         {Array.from({ length: 5 }).map((_, i) => (
+  <Star
+    key={i}
+    size={16}
+    className={i < rating ? "text-yellow-400" : "text-zinc-700"}
+    fill={i < rating ? "currentColor" : "none"}
+  />
+))}
+
         </div>
       </div>
 
-      <p className="relative text-sm text-zinc-200 leading-relaxed">“{text}”</p>
+      <p className="text-sm text-zinc-200 leading-relaxed">“{text}”</p>
 
-      <div className="relative mt-5 flex items-center gap-2 text-[11px] text-zinc-400">
+      <div className="mt-5 flex items-center gap-2 text-[11px] text-zinc-400">
         <BadgeCheck size={14} className="text-green-400" />
         <span className="font-bold">Compra verificada</span>
         <span className="text-zinc-600">•</span>
         <span className="font-bold">Entrega confirmada</span>
       </div>
-    </div>
+    </CardShell>
   );
 }
+
 
 function MicroProof({ icon, text }: { icon: any; text: string }) {
   return (
