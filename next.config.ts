@@ -2,14 +2,14 @@
 const nextConfig = {
   images: {
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'images.unsplash.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'randomuser.me', // Por si usas otras fuentes
-      },
+      { protocol: "https", hostname: "images.unsplash.com" },
+      { protocol: "https", hostname: "randomuser.me" },
+
+      // ✅ AGREGAR (si usas Cloudinary)
+      { protocol: "https", hostname: "res.cloudinary.com" },
+
+      // ✅ Si tus imágenes vienen de tu propio dominio, agrégalo aquí también:
+      // { protocol: "https", hostname: "tudominio.com" },
     ],
   },
 };
