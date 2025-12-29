@@ -84,8 +84,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
       : "🔥 Promo activa hoy (pago contraentrega).";
 
   const heroSubtitle =
-    product.subtitle ||
-    "Rutina simple para potenciar tu enfoque, claridad y rendimiento diario.";
+    product.subtitle || "Rutina simple para potenciar tu enfoque, claridad y rendimiento diario.";
 
   // ===== Contador promo (cierra fin de día local) =====
   const [now, setNow] = useState<Date>(() => new Date());
@@ -156,20 +155,19 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white relative overflow-hidden">
-      {/* Ambient lights (mismo lenguaje del dashboard) */}
+    <div className="min-h-screen bg-zinc-950 text-white relative overflow-x-clip">
+      {/* Ambient lights */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute top-[-180px] left-[-200px] w-[520px] h-[520px] bg-indigo-600/12 rounded-full blur-[120px]" />
         <div className="absolute bottom-[-180px] right-[-200px] w-[520px] h-[520px] bg-purple-600/12 rounded-full blur-[120px]" />
         <div className="absolute top-[20%] right-[-260px] w-[620px] h-[620px] bg-emerald-500/10 rounded-full blur-[140px]" />
-        {/* “noise” sutil */}
         <div
           className="absolute inset-0 opacity-[0.06]"
           style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }}
         />
       </div>
 
-      {/* Sticky Top Bar (más tipo dashboard) */}
+      {/* Sticky Top Bar */}
       <div className="sticky top-0 z-50 border-b border-white/10 bg-zinc-950/55 backdrop-blur-xl">
         <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between gap-3">
           <div className="min-w-0">
@@ -179,12 +177,10 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                 Compra contraentrega
               </span>
             </div>
-            <div className="text-sm font-semibold truncate mt-1">
-              {product.name}
-            </div>
+            <div className="text-sm font-semibold truncate mt-1">{product.name}</div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={copyLink}
               type="button"
@@ -196,7 +192,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
 
             <a
               href="#comprar"
-              className="rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 text-xs font-extrabold tracking-wide shadow-lg shadow-indigo-500/20 transition-colors"
+              className="rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 text-xs font-extrabold tracking-wide shadow-lg shadow-indigo-500/20 transition-colors whitespace-nowrap"
             >
               Comprar ahora
             </a>
@@ -204,33 +200,37 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
         </div>
       </div>
 
-      {/* HERO (más “header-card” premium) */}
+      {/* HERO */}
       <section className="relative mx-auto max-w-6xl px-4 pt-6 pb-8 md:pt-10">
         <motion.div
           initial={{ opacity: 0, y: -14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45 }}
-          className="relative overflow-hidden rounded-[2rem] p-6 md:p-10 border border-white/10 bg-zinc-900/60 backdrop-blur-md shadow-2xl"
+          className="relative overflow-hidden rounded-[2rem] p-5 sm:p-6 md:p-10 border border-white/10 bg-zinc-900/60 backdrop-blur-md shadow-2xl"
         >
           <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 via-purple-500/5 to-transparent pointer-events-none" />
 
-          <motion.div initial="hidden" animate="show" variants={stagger} className="relative z-10 grid gap-8 md:grid-cols-2 md:items-center">
+          <motion.div
+            initial="hidden"
+            animate="show"
+            variants={stagger}
+            className="relative z-10 grid gap-6 md:gap-8 md:grid-cols-2 md:items-center"
+          >
             {/* LEFT */}
-            <motion.div variants={fadeUp}>
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-xs text-white/80">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                {urgencyCopy}
+            <motion.div variants={fadeUp} className="min-w-0">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-xs text-white/80 max-w-full">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shrink-0" />
+                <span className="truncate">{urgencyCopy}</span>
               </div>
 
-              <h1 className="mt-4 text-4xl md:text-5xl font-bold tracking-tight text-white">
+              <h1 className="mt-4 text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white break-words">
                 {product.name}
               </h1>
 
-              <p className="mt-3 text-zinc-300/90 text-base md:text-lg leading-relaxed">
+              <p className="mt-3 text-zinc-300/90 text-sm sm:text-base md:text-lg leading-relaxed">
                 {heroSubtitle}
               </p>
 
-              {/* Countdown (más “dashboard card”) */}
               <div className="mt-4">
                 <PromoCountdown
                   label={promoLabel}
@@ -241,39 +241,24 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                 />
               </div>
 
-              {/* Trust + micro-benefits (KPI cards) */}
-              <div className="mt-5 grid grid-cols-2 gap-3">
-                <KpiCard
-                  icon={<LuTruck size={18} />}
-                  title="Envío nacional"
-                  desc="Pagas al recibir"
-                  tone="emerald"
-                />
+              {/* KPI grid: 2 cols mobile, 4 cols on sm */}
+              <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <KpiCard icon={<LuTruck size={18} />} title="Envío" desc="Nacional" tone="emerald" />
                 <KpiCard
                   icon={<LuShieldCheck size={18} />}
-                  title="Compra segura"
-                  desc="Confirmación WhatsApp"
+                  title="Seguro"
+                  desc="Confirmación"
                   tone="indigo"
                 />
-                <KpiCard
-                  icon={<LuZap size={18} />}
-                  title="Rutina simple"
-                  desc="Fácil de usar"
-                  tone="cyan"
-                />
-                <KpiCard
-                  icon={<LuClock size={18} />}
-                  title="Pedido rápido"
-                  desc="En 1 minuto"
-                  tone="purple"
-                />
+                <KpiCard icon={<LuZap size={18} />} title="Rutina" desc="Simple" tone="cyan" />
+                <KpiCard icon={<LuClock size={18} />} title="Rápido" desc="1 min" tone="purple" />
               </div>
 
-              {/* CTA Price Box (más fuerte para conversión) */}
+              {/* CTA Price Box */}
               <div className="mt-6">
                 <Card className="p-5">
-                  <div className="flex items-end justify-between gap-4">
-                    <div>
+                  <div className="flex items-end justify-between gap-4 flex-wrap">
+                    <div className="min-w-[180px]">
                       <div className="text-xs text-zinc-400 font-medium">Precio hoy</div>
                       <div className="text-3xl font-bold tracking-tight text-white mt-1">
                         ${priceNumber.toLocaleString("es-CO")}
@@ -285,14 +270,16 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
 
                     <div className="flex items-center gap-2">
                       <QtyButton onClick={() => setQty((v) => Math.max(1, v - 1))}>–</QtyButton>
-                      <div className="min-w-[44px] text-center text-lg font-semibold">{qty}</div>
+                      <div className="min-w-[44px] text-center text-lg font-semibold tabular-nums">
+                        {qty}
+                      </div>
                       <QtyButton onClick={() => setQty((v) => Math.min(9, v + 1))}>+</QtyButton>
                     </div>
                   </div>
 
                   <div className="mt-4 flex items-center justify-between">
                     <div className="text-sm text-zinc-400 font-medium">Total</div>
-                    <div className="text-xl font-bold">
+                    <div className="text-xl font-bold tabular-nums">
                       ${Math.round(total).toLocaleString("es-CO")}
                     </div>
                   </div>
@@ -314,58 +301,46 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
               </div>
             </motion.div>
 
-            {/* RIGHT (image card + proof badges) */}
-            <motion.div variants={fadeUp} className="relative">
+            {/* RIGHT */}
+            <motion.div variants={fadeUp} className="min-w-0">
               <Card className="p-3">
-                <div className="relative aspect-square w-full overflow-hidden rounded-[24px] bg-black/40">
-                  <Image
-                    src={product.imageUrl}
-                    alt={product.name}
-                    fill
-                    className="object-cover"
-                    priority
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+                {/* ✅ FIX: image container responsive + no overflow */}
+                <div className="relative w-full overflow-hidden rounded-[24px] bg-black/40">
+                  <div className="relative w-full aspect-square sm:aspect-[4/3] md:aspect-square">
+                    <Image
+                      src={product.imageUrl}
+                      alt={product.name}
+                      fill
+                      className="object-cover"
+                      priority
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 560px"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+                  </div>
 
-                  {/* Mobile-safe overlay badge */}
+                  {/* ✅ FIX: badges wrap and stay inside */}
                   <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-2">
                     <Badge text={stockLabel} />
-                    <Badge text="Pago contraentrega" />
+                    <Badge text="Contraentrega" />
                     <Badge text="Envío nacional" />
                   </div>
                 </div>
 
-                <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                <div className="mt-3 grid gap-2 grid-cols-2 sm:grid-cols-3">
                   <MiniPill icon={<LuSparkles />} text="Premium" />
                   <MiniPill icon={<LuBadgeCheck />} text="Seleccionado" />
                   <MiniPill icon={<LuShieldCheck />} text="Seguro" />
                 </div>
               </Card>
 
-              {/* Floating mini-card desktop */}
-              <motion.div
-                aria-hidden
-                className="absolute -right-2 -top-6 hidden md:block"
-                animate={{ y: [0, 10, 0] }}
-                transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
-              >
-                <Card className="px-4 py-3">
-                  <div className="text-[11px] text-zinc-400 font-bold tracking-wider uppercase">
-                    Disponibilidad
-                  </div>
-                  <div className="mt-1 text-sm font-semibold text-white">{stockLabel}</div>
-                </Card>
-              </motion.div>
-
-              {/* Social proof mini (looks like dashboard chip) */}
+              {/* Social proof mini */}
               <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Card className="p-4">
                   <div className="flex items-start gap-3">
-                    <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-white/5">
+                    <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-white/5 shrink-0">
                       <LuStar size={18} />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <div className="text-sm font-semibold">Compra fácil</div>
                       <div className="text-xs text-zinc-400 mt-1">
                         Dejas tus datos y confirmamos por WhatsApp.
@@ -375,10 +350,10 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                 </Card>
                 <Card className="p-4">
                   <div className="flex items-start gap-3">
-                    <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-white/5">
+                    <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-white/5 shrink-0">
                       <LuTruck size={18} />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <div className="text-sm font-semibold">Entrega nacional</div>
                       <div className="text-xs text-zinc-400 mt-1">
                         Recibes y pagas al momento de entrega.
@@ -392,7 +367,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
         </motion.div>
       </section>
 
-      {/* BENEFITS + AUDIENCE (copy más conversion) */}
+      {/* BENEFITS + AUDIENCE */}
       <section className="relative mx-auto max-w-6xl px-4 pb-8">
         <motion.div
           initial="hidden"
@@ -401,16 +376,16 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
           variants={stagger}
           className="grid gap-6 md:grid-cols-2"
         >
-          <motion.div variants={fadeUp}>
+          <motion.div variants={fadeUp} className="min-w-0">
             <Card className="p-6">
               <div className="text-[11px] text-zinc-400 font-bold tracking-wider uppercase">
                 ¿Para quién es?
               </div>
-              <h2 className="mt-2 text-2xl font-bold tracking-tight">
+              <h2 className="mt-2 text-xl sm:text-2xl font-bold tracking-tight">
                 Para días donde necesitas rendir sin complicarte
               </h2>
               <p className="mt-2 text-sm text-zinc-400">
-                Enfocado en una rutina simple: pedir → confirmar → recibir → usar.
+                Rutina simple: pedir → confirmar → recibir → usar.
               </p>
 
               <ul className="mt-5 space-y-3 text-sm text-zinc-300/90">
@@ -421,8 +396,8 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                   "Si prefieres pagar al recibir (contraentrega).",
                 ].map((t) => (
                   <li key={t} className="flex gap-3">
-                    <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-white/60" />
-                    <span>{t}</span>
+                    <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-white/60 shrink-0" />
+                    <span className="min-w-0">{t}</span>
                   </li>
                 ))}
               </ul>
@@ -436,20 +411,20 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
             </Card>
           </motion.div>
 
-          <motion.div variants={fadeUp}>
+          <motion.div variants={fadeUp} className="min-w-0">
             <Card className="p-6">
               <div className="text-[11px] text-zinc-400 font-bold tracking-wider uppercase">
                 Beneficios principales
               </div>
-              <h3 className="mt-2 text-2xl font-bold tracking-tight">
+              <h3 className="mt-2 text-xl sm:text-2xl font-bold tracking-tight">
                 Lo que más valoran quienes lo compran
               </h3>
 
-              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              <div className="mt-5 grid gap-3 grid-cols-1 sm:grid-cols-2">
                 {(benefits.length ? benefits.slice(0, 6) : defaultBenefits).map((b, i) => (
                   <div
                     key={i}
-                    className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white/90"
+                    className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white/90 break-words"
                   >
                     {String(b)}
                   </div>
@@ -465,21 +440,16 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
         </motion.div>
       </section>
 
-      {/* “SCIENCE / FEATURES” (misma vibra, pero más limpia) */}
+      {/* FEATURES */}
       <section className="relative mx-auto max-w-6xl px-4 pb-8">
-        <motion.div
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={stagger}
-        >
+        <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={stagger}>
           <Card className="p-6 md:p-8">
-            <motion.div variants={fadeUp} className="flex items-start justify-between gap-6">
-              <div>
+            <motion.div variants={fadeUp} className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+              <div className="min-w-0">
                 <div className="text-[11px] text-zinc-400 font-bold tracking-wider uppercase">
                   Enfoque premium
                 </div>
-                <h3 className="mt-2 text-2xl font-bold tracking-tight">
+                <h3 className="mt-2 text-xl sm:text-2xl font-bold tracking-tight">
                   Se siente como “claridad” cuando tienes constancia
                 </h3>
                 <p className="mt-2 text-sm text-zinc-400">
@@ -489,7 +459,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
 
               <a
                 href="#comprar"
-                className="hidden md:inline-flex rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-3 text-sm font-extrabold transition-colors shadow-lg shadow-indigo-500/20"
+                className="md:shrink-0 inline-flex w-full md:w-auto justify-center rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-3 text-sm font-extrabold transition-colors shadow-lg shadow-indigo-500/20"
               >
                 Comprar ahora
               </a>
@@ -516,21 +486,16 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
         </motion.div>
       </section>
 
-      {/* HOW IT WORKS (más directo a conversión) */}
+      {/* HOW IT WORKS */}
       <section className="relative mx-auto max-w-6xl px-4 pb-10">
-        <motion.div
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={stagger}
-        >
+        <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={stagger}>
           <Card className="p-6 md:p-8">
-            <motion.div variants={fadeUp} className="flex items-start justify-between gap-6">
-              <div>
+            <motion.div variants={fadeUp} className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+              <div className="min-w-0">
                 <div className="text-[11px] text-zinc-400 font-bold tracking-wider uppercase">
                   Cómo funciona la compra
                 </div>
-                <h3 className="mt-2 text-2xl font-bold tracking-tight">
+                <h3 className="mt-2 text-xl sm:text-2xl font-bold tracking-tight">
                   Pídelo en 1 minuto (sin pagos online)
                 </h3>
                 <p className="mt-2 text-sm text-zinc-400">
@@ -540,7 +505,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
 
               <a
                 href="#comprar"
-                className="hidden md:inline-flex rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white px-5 py-3 text-sm font-extrabold transition-colors border border-zinc-700"
+                className="md:shrink-0 inline-flex w-full md:w-auto justify-center rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white px-5 py-3 text-sm font-extrabold transition-colors border border-zinc-700"
               >
                 Ir al formulario
               </a>
@@ -555,7 +520,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
         </motion.div>
       </section>
 
-      {/* CHECKOUT (CTA principal) */}
+      {/* CHECKOUT */}
       <section id="comprar" className="relative mx-auto max-w-6xl px-4 pb-14">
         <motion.div
           initial="hidden"
@@ -565,36 +530,40 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
           className="grid gap-6 md:grid-cols-2"
         >
           {/* SUMMARY */}
-          <motion.div variants={fadeUp}>
+          <motion.div variants={fadeUp} className="min-w-0">
             <Card className="p-6">
               <div className="text-[11px] text-zinc-400 font-bold tracking-wider uppercase">
                 Resumen
               </div>
-              <h3 className="mt-2 text-2xl font-bold tracking-tight">{product.name}</h3>
+              <h3 className="mt-2 text-xl sm:text-2xl font-bold tracking-tight break-words">
+                {product.name}
+              </h3>
               <p className="mt-2 text-sm text-zinc-400">
                 {product.description?.slice(0, 220) || "Producto premium para tu rutina diaria."}
                 {product.description?.length > 220 ? "…" : ""}
               </p>
 
               <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-3 flex-wrap">
                   <div className="text-sm text-zinc-400 font-medium">Cantidad</div>
                   <div className="flex items-center gap-2">
                     <QtyButton onClick={() => setQty((v) => Math.max(1, v - 1))}>–</QtyButton>
-                    <div className="min-w-[44px] text-center text-lg font-semibold">{qty}</div>
+                    <div className="min-w-[44px] text-center text-lg font-semibold tabular-nums">
+                      {qty}
+                    </div>
                     <QtyButton onClick={() => setQty((v) => Math.min(9, v + 1))}>+</QtyButton>
                   </div>
                 </div>
 
                 <div className="mt-4 flex items-center justify-between">
                   <div className="text-sm text-zinc-400 font-medium">Total</div>
-                  <div className="text-xl font-bold">
+                  <div className="text-xl font-bold tabular-nums">
                     ${Math.round(total).toLocaleString("es-CO")}
                   </div>
                 </div>
               </div>
 
-              <div className="mt-5 grid grid-cols-3 gap-2 text-[11px] text-zinc-300/80">
+              <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] text-zinc-300/80">
                 <Chip>Contraentrega</Chip>
                 <Chip>Envío nacional</Chip>
                 <Chip>Confirmación WA</Chip>
@@ -615,18 +584,18 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
           </motion.div>
 
           {/* FORM */}
-          <motion.div variants={fadeUp} id="form">
+          <motion.div variants={fadeUp} id="form" className="min-w-0">
             <Card className="p-6">
               <div className="flex items-start justify-between gap-4">
-                <div>
+                <div className="min-w-0">
                   <h2 className="text-xl font-bold tracking-tight">Completa tus datos</h2>
                   <p className="mt-1 text-sm text-zinc-400">
                     Toma menos de 1 minuto. Confirmamos por WhatsApp.
                   </p>
                 </div>
-                <div className="text-right">
+                <div className="text-right shrink-0">
                   <div className="text-xs text-zinc-400 font-medium">Total</div>
-                  <div className="text-xl font-bold">
+                  <div className="text-xl font-bold tabular-nums">
                     ${Math.round(total).toLocaleString("es-CO")}
                   </div>
                 </div>
@@ -640,7 +609,8 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                   </p>
                   {orderId ? (
                     <p className="mt-2 text-sm text-zinc-400">
-                      Número de pedido: <span className="text-white font-semibold">#{orderId}</span>
+                      Número de pedido:{" "}
+                      <span className="text-white font-semibold">#{orderId}</span>
                     </p>
                   ) : null}
 
@@ -718,8 +688,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                 </>
               )}
 
-              {/* Trust chips */}
-              <div className="mt-6 grid grid-cols-3 gap-2 text-[11px] text-zinc-300/80">
+              <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] text-zinc-300/80">
                 <TrustChip icon={<LuTruck />} text="Envío nacional" />
                 <TrustChip icon={<LuShieldCheck />} text="Seguro" />
                 <TrustChip icon={<LuCheck />} text="Confirmación WA" />
@@ -733,14 +702,11 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
         </div>
       </section>
 
-      {/* Global styles: soporte mobile + cross-browser + “premium dashboard look” */}
       <style jsx global>{`
-        /* iOS Safari: evitar zoom raro y “rubber band” con blur */
         html,
         body {
           background: #09090b;
         }
-        /* Mejor rendering en móviles */
         * {
           -webkit-tap-highlight-color: transparent;
         }
@@ -749,9 +715,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
   );
 }
 
-/* =========================
-   UI blocks (dashboard style)
-========================= */
+/* ========================= UI blocks ========================= */
 
 function Card({
   children,
@@ -776,17 +740,17 @@ function Card({
 
 function Badge({ text }: { text: string }) {
   return (
-    <div className="inline-flex items-center rounded-full border border-white/10 bg-black/35 px-3 py-1 text-[11px] text-white/85 backdrop-blur-xl">
-      {text}
+    <div className="inline-flex items-center rounded-full border border-white/10 bg-black/35 px-3 py-1 text-[11px] text-white/85 backdrop-blur-xl max-w-full">
+      <span className="truncate">{text}</span>
     </div>
   );
 }
 
 function Pill({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
-    <span className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2">
-      <span className="text-white/80">{icon}</span>
-      <span>{text}</span>
+    <span className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2 max-w-full">
+      <span className="text-white/80 shrink-0">{icon}</span>
+      <span className="truncate">{text}</span>
     </span>
   );
 }
@@ -810,7 +774,7 @@ function QtyButton({
     <button
       type="button"
       onClick={onClick}
-      className="h-10 w-10 rounded-xl border border-white/10 bg-white/[0.04] text-white hover:bg-white/[0.08] transition-colors"
+      className="h-10 w-10 rounded-xl border border-white/10 bg-white/[0.04] text-white hover:bg-white/[0.08] transition-colors shrink-0"
     >
       {children}
     </button>
@@ -829,7 +793,7 @@ function Input({
   inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
 }) {
   return (
-    <div>
+    <div className="min-w-0">
       <label className="text-xs text-zinc-400 font-medium">{label}</label>
       <input
         value={value}
@@ -845,8 +809,8 @@ function Input({
 function TrustChip({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-3 text-center flex items-center justify-center gap-2">
-      <span className="text-white/80">{icon}</span>
-      <span>{text}</span>
+      <span className="text-white/80 shrink-0">{icon}</span>
+      <span className="truncate">{text}</span>
     </div>
   );
 }
@@ -873,15 +837,15 @@ function KpiCard({
     <motion.div
       whileHover={{ y: -2 }}
       transition={{ type: "spring", stiffness: 240, damping: 18 }}
-      className="bg-zinc-900/40 backdrop-blur-xl border border-white/5 rounded-3xl p-4 shadow-xl relative overflow-hidden hover:border-white/10 transition-colors"
+      className="bg-zinc-900/40 backdrop-blur-xl border border-white/5 rounded-3xl p-4 shadow-xl relative overflow-hidden hover:border-white/10 transition-colors min-w-0"
     >
       <div className="flex items-start gap-3">
-        <div className={`p-3 rounded-2xl border border-white/5 ${toneMap[tone]}`}>
+        <div className={`p-3 rounded-2xl border border-white/5 ${toneMap[tone]} shrink-0`}>
           {icon}
         </div>
         <div className="min-w-0">
-          <div className="text-sm font-semibold text-white/95">{title}</div>
-          <div className="text-xs text-zinc-400 mt-0.5">{desc}</div>
+          <div className="text-sm font-semibold text-white/95 leading-tight">{title}</div>
+          <div className="text-xs text-zinc-400 mt-0.5 leading-tight">{desc}</div>
         </div>
       </div>
     </motion.div>
@@ -902,16 +866,16 @@ function FeatureTile({
       variants={fadeUp}
       whileHover={{ y: -3 }}
       transition={{ type: "spring", stiffness: 240, damping: 18 }}
-      className="bg-zinc-900/40 backdrop-blur-xl border border-white/5 rounded-3xl p-5 shadow-xl relative overflow-hidden hover:border-white/10 transition-colors"
+      className="bg-zinc-900/40 backdrop-blur-xl border border-white/5 rounded-3xl p-5 shadow-xl relative overflow-hidden hover:border-white/10 transition-colors min-w-0"
     >
       <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 hover:opacity-100 transition-opacity pointer-events-none" />
       <div className="relative flex items-start gap-3">
-        <div className="h-11 w-11 rounded-2xl border border-white/10 bg-black/25 flex items-center justify-center text-white/90">
+        <div className="h-11 w-11 rounded-2xl border border-white/10 bg-black/25 flex items-center justify-center text-white/90 shrink-0">
           {icon}
         </div>
-        <div>
-          <div className="text-sm font-semibold text-white">{title}</div>
-          <div className="mt-1 text-sm text-zinc-400">{desc}</div>
+        <div className="min-w-0">
+          <div className="text-sm font-semibold text-white leading-tight">{title}</div>
+          <div className="mt-1 text-sm text-zinc-400 leading-tight">{desc}</div>
         </div>
       </div>
     </motion.div>
@@ -920,28 +884,26 @@ function FeatureTile({
 
 function StepCard({ n, title, desc }: { n: string; title: string; desc: string }) {
   return (
-    <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl">
+    <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl min-w-0">
       <div className="text-[11px] text-zinc-400 font-bold tracking-wider uppercase">
         Paso {n}
       </div>
-      <div className="mt-2 text-lg font-bold tracking-tight">{title}</div>
-      <div className="mt-2 text-sm text-zinc-400">{desc}</div>
+      <div className="mt-2 text-lg font-bold tracking-tight break-words">{title}</div>
+      <div className="mt-2 text-sm text-zinc-400 break-words">{desc}</div>
     </div>
   );
 }
 
 function MiniPill({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.05] px-3 py-2 text-xs text-white/85 flex items-center gap-2 backdrop-blur-xl">
-      <span className="text-white/80">{icon}</span>
-      <span>{text}</span>
+    <div className="rounded-2xl border border-white/10 bg-white/[0.05] px-3 py-2 text-xs text-white/85 flex items-center gap-2 backdrop-blur-xl min-w-0">
+      <span className="text-white/80 shrink-0">{icon}</span>
+      <span className="truncate">{text}</span>
     </div>
   );
 }
 
-/* =========================
-   Countdown (dashboard look)
-========================= */
+/* ========================= Countdown ========================= */
 
 function PromoCountdown({
   label,
@@ -958,7 +920,7 @@ function PromoCountdown({
 }) {
   return (
     <Card className="p-4">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex items-start sm:items-center justify-between gap-4 flex-col sm:flex-row">
         <div className="min-w-0">
           <div className="text-[11px] text-zinc-400 font-bold tracking-wider uppercase">
             Ventana de promoción
@@ -969,7 +931,8 @@ function PromoCountdown({
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* ✅ FIX: wrap on very small screens */}
+        <div className="flex items-center gap-2 flex-wrap justify-start sm:justify-end w-full sm:w-auto">
           <TimePill value={hh} unit="HRS" pulse={!isOver} />
           <Colon />
           <TimePill value={mm} unit="MIN" pulse={!isOver} />
@@ -992,7 +955,7 @@ function TimePill({
 }) {
   return (
     <motion.div
-      className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-xl px-3 py-2 text-center min-w-[64px]"
+      className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-xl px-3 py-2 text-center min-w-[60px] sm:min-w-[64px]"
       animate={pulse ? { y: [0, -1.5, 0], opacity: [1, 0.96, 1] } : { opacity: 0.9 }}
       transition={pulse ? { repeat: Infinity, duration: 2.8, ease: "easeInOut" } : { duration: 0.2 }}
     >
