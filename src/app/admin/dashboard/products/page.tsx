@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getSession } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { ProductManager } from "@/components/admin/ProductManager";
+import { ProductManager } from "@/components/admin/products/ProductManager";
 import { LuArrowLeft } from "react-icons/lu";
 
 export default async function ProductsPage() {
