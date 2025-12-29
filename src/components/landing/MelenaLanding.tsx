@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import React, { useEffect, useMemo, useState, useTransition } from "react";
-import { useSearchParams } from "next/navigation";
 import { createOrder } from "@/actions/orders";
 import { motion, Variants, AnimatePresence } from "framer-motion";
 import {
@@ -180,8 +179,15 @@ function formatTime(ms: number) {
 }
 
 export default function MelenaLanding({ product }: { product: ProductDTO }) {
-  const sp = useSearchParams();
-  const fbclid = sp.get("fbclid") || undefined;
+ const [fbclid, setFbclid] = useState<string | undefined>(undefined);
+
+useEffect(() => {
+  if (typeof window !== "undefined") {
+    const params = new URLSearchParams(window.location.search);
+    setFbclid(params.get("fbclid") || undefined);
+  }
+}, []);
+
 
   const [qty, setQty] = useState(1);
   const [isPending, startTransition] = useTransition();
