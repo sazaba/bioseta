@@ -310,11 +310,19 @@ useEffect(() => {
         <div className="max-w-6xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 min-w-0">
             <motion.div
-              initial="hidden"
-              animate="show"
-              variants={glowPulse}
-              className="w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-[0_0_26px_rgba(99,102,241,0.65)]"
-            />
+  aria-hidden
+  initial="hidden"
+  animate="show"
+  variants={glowPulse}
+  className="
+    pointer-events-none absolute -z-10
+    left-1/2 -translate-x-1/2 top-[-4rem]
+    w-[92vw] max-w-[720px]
+    h-[360px] sm:h-[460px]
+    bg-indigo-600/20 blur-[110px] rounded-full
+  "
+/>
+
             <span className="text-[10px] sm:text-[11px] md:text-xs font-extrabold tracking-widest uppercase text-indigo-200/90 truncate">
               Oferta por tiempo limitado • envío gratis • pago al recibir
             </span>
@@ -379,7 +387,8 @@ useEffect(() => {
       </div>
 
       {/* HERO (super upgrade / fully responsive) */}
-      <section className="relative pt-10 sm:pt-12 md:pt-16 pb-14 px-4">
+      <section className="relative pt-10 sm:pt-12 md:pt-16 pb-14 px-4 overflow-x-clip">
+
         <motion.div
           aria-hidden
           initial="hidden"
@@ -483,12 +492,14 @@ useEffect(() => {
 {/* Imagen (premium mockup + NO overflow en mobile) */}
 <motion.div
   variants={fadeUp}
-  className="relative w-full order-1 lg:order-2 min-w-0 overflow-hidden"
+  className="relative w-full order-1 lg:order-2 min-w-0 overflow-x-clip"
 >
+
   {/* Glow controlado (sin -inset que cause overflow horizontal) */}
-  <div aria-hidden className="absolute inset-0 flex items-center justify-center">
-    <div className="w-[520px] sm:w-[620px] h-[520px] sm:h-[620px] rounded-full blur-[90px] opacity-30 bg-gradient-to-r from-indigo-500/60 via-purple-500/40 to-fuchsia-500/50" />
-  </div>
+ <div aria-hidden className="pointer-events-none absolute inset-0 flex items-center justify-center">
+  <div className="w-[88vw] max-w-[620px] h-[88vw] max-h-[620px] rounded-full blur-[90px] opacity-30 bg-gradient-to-r from-indigo-500/60 via-purple-500/40 to-fuchsia-500/50" />
+</div>
+
 
   {/* “Device / Mockup” */}
   <div className="relative mx-auto w-full max-w-[520px] sm:max-w-[560px] md:max-w-[600px] px-2 sm:px-0">
@@ -496,8 +507,9 @@ useEffect(() => {
       {/* Borde premium */}
       <div aria-hidden className="absolute inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-white/0 opacity-60" />
-        <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-indigo-500/20 blur-[80px]" />
-        <div className="absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-purple-500/20 blur-[80px]" />
+        <div className="absolute -top-10 -right-10 sm:-top-24 sm:-right-24 w-56 h-56 sm:w-72 sm:h-72 rounded-full bg-indigo-500/20 blur-[80px]" />
+<div className="absolute -bottom-10 -left-10 sm:-bottom-24 sm:-left-24 w-56 h-56 sm:w-72 sm:h-72 rounded-full bg-purple-500/20 blur-[80px]" />
+
       </div>
 
       
