@@ -18,24 +18,33 @@ export default async function LandingsPage() {
     });
     if (!user) redirect("/admin/login");
 
-    const products = await prisma.product.findMany({
-      where: { isActive: true },
-      orderBy: { createdAt: "desc" },
+    // ✅ Solo el producto "MELENA DE LEÓN" (según tu BD)
+    const product = await prisma.product.findFirst({
+      where: {
+        isActive: true,
+        name: { equals: "MELENA DE LEÓN" },
+      },
       select: { id: true, name: true },
     });
 
-    // ✅ Por ahora: 1 landing real
-    const items = products.map((p) => ({
-      id: p.id,
-      name: p.name,
-      url: "/melena-de-leon",
-    }));
+    // ✅ Si existe, mostramos 1 sola landing. Si no, lista vacía.
+    const items = product
+      ? [
+          {
+            id: product.id,
+            name: product.name,
+            url: "/melena-de-leon",
+          },
+        ]
+      : [];
 
     return (
       <main className="min-h-screen bg-[#050505] pt-12 pb-12 px-6 md:px-12 relative">
         <div
           className="absolute inset-0 opacity-[0.05] pointer-events-none"
-          style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }}
+          style={{
+            backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")',
+          }}
         />
 
         <div className="relative z-10 max-w-7xl mx-auto">
@@ -62,7 +71,6 @@ export default async function LandingsPage() {
       </main>
     );
   } catch (e) {
-    // ✅ fallback: nunca tumba el admin
     return (
       <main className="min-h-screen bg-[#050505] pt-12 pb-12 px-6 md:px-12">
         <div className="max-w-3xl mx-auto rounded-3xl border border-red-500/20 bg-red-500/10 p-6 text-red-200">
