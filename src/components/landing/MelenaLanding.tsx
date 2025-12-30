@@ -469,28 +469,29 @@ useEffect(() => {
   });
 
   if (res.ok) {
-    // Conversión real
-    await trackMeta({
-      event_name: "Lead",
-      event_id: genEventId("lead"),
-      event_source_url: typeof window !== "undefined" ? window.location.href : "",
-      fbclid,
-      user: { fullName, phone },
-      custom_data: {
-        currency: "COP",
-        value: total,
-        content_ids: [String(product?.id)],
-        content_name: product?.name,
-        content_type: "product",
-        num_items: qty,
-        city,
-      },
-    });
+  // Conversión real (COD = Purchase)
+  await trackMeta({
+    event_name: "Purchase",
+    event_id: genEventId("purchase"),
+    event_source_url: typeof window !== "undefined" ? window.location.href : "",
+    fbclid,
+    user: { fullName, phone },
+    custom_data: {
+      currency: "COP",
+      value: total,
+      content_ids: [String(product?.id)],
+      content_name: product?.name,
+      content_type: "product",
+      num_items: qty,
+      city,
+    },
+  });
 
-    setOk(true);
-  } else {
-    setError("Hubo un error, intenta de nuevo.");
-  }
+  setOk(true);
+} else {
+  setError("Hubo un error, intenta de nuevo.");
+}
+
 });
 
   };
