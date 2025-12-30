@@ -1123,14 +1123,7 @@ useEffect(() => {
           />
         </div>
 
-        <div className="mt-10 text-center">
-          <a
-            href="#form"
-            className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 px-7 py-4 rounded-2xl font-black shadow-xl shadow-indigo-600/25 transition-all active:scale-95"
-          >
-            Listo, quiero pedir <ArrowRight size={18} />
-          </a>
-        </div>
+       
       </section>
 
       {/* STICKY CTA (mobile) */}
