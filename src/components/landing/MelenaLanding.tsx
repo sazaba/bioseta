@@ -409,19 +409,16 @@ useEffect(() => {
 
       </div>
 
-      {/* HERO (super upgrade / fully responsive) */}
-      <section className="relative pt-10 sm:pt-12 md:pt-16 pb-14 px-4 overflow-hidden [contain:paint]">
-
-
-
-    <motion.div
-  aria-hidden
-  initial="hidden"
-  animate="show"
-  variants={glowPulse}
-  className="absolute -top-8 left-1/2 -translate-x-1/2 w-[70vw] max-w-[560px] h-[360px] sm:h-[480px] bg-indigo-600/16 blur-[70px] rounded-full -z-10"
-/>
-
+        {/* HERO (fixed responsive / iOS-safe) */}
+      <section className="relative pt-10 sm:pt-12 md:pt-16 pb-14 px-4 overflow-x-clip [contain:paint]">
+        {/* glow */}
+        <motion.div
+          aria-hidden
+          initial="hidden"
+          animate="show"
+          variants={glowPulse}
+          className="absolute -top-8 left-1/2 -translate-x-1/2 w-[78vw] max-w-[560px] h-[360px] sm:h-[480px] bg-indigo-600/16 blur-[70px] rounded-full -z-10"
+        />
 
         <motion.div
           initial="hidden"
@@ -429,14 +426,24 @@ useEffect(() => {
           variants={stagger}
           className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-10 lg:gap-12 items-center"
         >
-          <motion.div variants={fadeUp} className="order-2 lg:order-1">
+          {/* TEXT */}
+          <motion.div variants={fadeUp} className="order-2 lg:order-1 min-w-0">
             <div className="flex flex-wrap items-center gap-2 mb-5">
-              <BadgePill icon={<Sparkles size={14} />} text="producto original • alta demanda" tone="indigo" />
-              {lowStock && <BadgePill icon={<Package size={14} />} text={`quedan ${remainingStock} unidades`} tone="orange" />}
+              <BadgePill
+                icon={<Sparkles size={14} />}
+                text="producto original • alta demanda"
+                tone="indigo"
+              />
+              {lowStock && (
+                <BadgePill
+                  icon={<Package size={14} />}
+                  text={`quedan ${remainingStock} unidades`}
+                  tone="orange"
+                />
+              )}
             </div>
 
-          <h1 className="text-[34px] sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[1.08] mb-4">
-
+            <h1 className="text-[34px] sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[1.08] mb-4 break-words">
               Potencia tu{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
                 Enfoque Mental
@@ -445,7 +452,6 @@ useEffect(() => {
             </h1>
 
             <p className="text-zinc-400 text-[14px] sm:text-lg md:text-xl mb-6 leading-relaxed max-w-xl">
-
               {product.subtitle ||
                 "Fórmula avanzada diseñada para quienes buscan maximizar su rendimiento diario con un ritmo más estable."}
             </p>
@@ -463,7 +469,9 @@ useEffect(() => {
                 className="inline-flex justify-center items-center gap-2 w-full sm:w-auto text-center bg-indigo-600 hover:bg-indigo-500 px-7 sm:px-10 py-4 sm:py-5 rounded-2xl font-black text-base sm:text-lg shadow-xl shadow-indigo-600/25 transition-all active:scale-95"
               >
                 PEDIR AHORA{" "}
-                <span className="opacity-85 font-extrabold">• ${Number(product.price).toLocaleString()}</span>
+                <span className="opacity-85 font-extrabold">
+                  • ${Number(product.price).toLocaleString()}
+                </span>
                 <ArrowRight size={18} />
               </a>
 
@@ -490,12 +498,12 @@ useEffect(() => {
               />
             </div>
 
-            {/* micro-wow strip */}
+            {/* micro strip */}
             <motion.div
               initial="hidden"
               animate="show"
               variants={fadeUp}
-              className="mt-7 rounded-[1.6rem] border border-white/10 bg-zinc-900/35 p-4 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between overflow-hidden"
+              className="mt-7 rounded-[1.6rem] border border-white/10 bg-zinc-900/35 p-4 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between overflow-hidden min-w-0"
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-11 h-11 rounded-2xl bg-indigo-500/10 border border-indigo-500/15 flex items-center justify-center">
@@ -503,7 +511,9 @@ useEffect(() => {
                 </div>
                 <div className="min-w-0">
                   <p className="text-sm font-black">Reserva tu pedido en 60 segundos</p>
-                  <p className="text-[11px] text-zinc-500 truncate">Completa el formulario y lo dejamos listo para confirmación.</p>
+                  <p className="text-[11px] text-zinc-500 truncate">
+                    Completa el formulario y lo dejamos listo para confirmación.
+                  </p>
                 </div>
               </div>
               <a
@@ -515,91 +525,72 @@ useEffect(() => {
             </motion.div>
           </motion.div>
 
-      
-          {/* Imagen (no overflow + mobile perfect) */}
-{/* Imagen (premium mockup + NO overflow en mobile) */}
-<motion.div
-  variants={fadeUp}
-  className="relative w-full order-1 lg:order-2 min-w-0 overflow-hidden [contain:paint]"
->
+          {/* IMAGE (no overflow, controlled aspect) */}
+          <motion.div
+            variants={fadeUp}
+            className="relative w-full order-1 lg:order-2 min-w-0 overflow-x-clip"
+          >
+            <div aria-hidden className="pointer-events-none absolute inset-0">
+              <div className="absolute inset-6 rounded-[2.6rem] bg-gradient-to-br from-indigo-500/12 via-transparent to-purple-500/10 blur-2xl" />
+            </div>
 
+            <div className="relative mx-auto w-full max-w-[520px] sm:max-w-[560px] md:max-w-[600px] px-2 sm:px-0">
+              <div className="relative rounded-[2.6rem] border border-white/10 bg-zinc-950/40 backdrop-blur-xl shadow-[0_30px_120px_rgba(0,0,0,0.55)] overflow-hidden">
+                {/* premium highlights */}
+                <div aria-hidden className="absolute inset-0 pointer-events-none">
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-white/0 opacity-60" />
+                  <div className="absolute -top-10 -right-10 sm:-top-24 sm:-right-24 w-56 h-56 sm:w-72 sm:h-72 rounded-full bg-indigo-500/20 blur-[80px]" />
+                  <div className="absolute -bottom-10 -left-10 sm:-bottom-24 sm:-left-24 w-56 h-56 sm:w-72 sm:h-72 rounded-full bg-purple-500/20 blur-[80px]" />
+                </div>
 
+                {/* image box with aspect ratio (key fix) */}
+                <div className="relative w-full aspect-[4/5] sm:aspect-[1/1] md:aspect-[6/7] overflow-hidden">
+                  <Image
+                    src={product.imageUrl}
+                    alt={product.name || "Producto"}
+                    fill
+                    priority
+                    sizes="(max-width: 640px) 92vw, (max-width: 1024px) 560px, 600px"
+                    className="object-contain p-4 sm:p-6"
+                  />
+                </div>
 
-  {/* Glow interno (iOS-safe) */}
-<div aria-hidden className="pointer-events-none absolute inset-0">
-  <div className="absolute inset-6 rounded-[2.6rem] bg-gradient-to-br from-indigo-500/12 via-transparent to-purple-500/10 blur-2xl" />
-</div>
+                {/* base/dock */}
+                <div className="px-5 py-4 border-t border-white/10 bg-black/25">
+                  <div className="flex items-center justify-between gap-3 min-w-0">
+                    <div className="flex items-center gap-2 text-xs text-zinc-300 min-w-0">
+                      <ShieldCheck size={16} className="text-indigo-300 shrink-0" />
+                      <span className="font-black truncate">Producto original • compra segura</span>
+                    </div>
+                    <span className="text-[11px] font-black text-zinc-200 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full shrink-0">
+                      Envío gratis
+                    </span>
+                  </div>
+                </div>
+              </div>
 
-
-
-  {/* “Device / Mockup” */}
- <div className="relative mx-auto w-full max-w-[520px] sm:max-w-[560px] md:max-w-[600px] px-2 sm:px-0 overflow-hidden">
-
-
-    <div className="relative rounded-[2.6rem] border border-white/10 bg-zinc-950/40 backdrop-blur-xl shadow-[0_30px_120px_rgba(0,0,0,0.55)] overflow-hidden">
-      {/* Borde premium */}
-      <div aria-hidden className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-white/0 opacity-60" />
-        <div className="absolute -top-10 -right-10 sm:-top-24 sm:-right-24 w-56 h-56 sm:w-72 sm:h-72 rounded-full bg-indigo-500/20 blur-[80px]" />
-<div className="absolute -bottom-10 -left-10 sm:-bottom-24 sm:-left-24 w-56 h-56 sm:w-72 sm:h-72 rounded-full bg-purple-500/20 blur-[80px]" />
-
-      </div>
-
-      
-      {/* Área de imagen: altura controlada en mobile (NO gigante) */}
-<div className="w-full overflow-hidden">
-  <Image
-    src={product.imageUrl}
-    alt={product.name || "Producto"}
-    width={1200}
-    height={1200}
-    priority
-    sizes="(max-width: 640px) 92vw, (max-width: 1024px) 560px, 600px"
-    className="w-full h-auto max-w-full object-contain block p-4 sm:p-0"
-  />
-</div>
-
-
-
-      {/* Base / “dock” */}
-      <div className="px-5 py-4 border-t border-white/10 bg-black/25">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-xs text-zinc-300 min-w-0">
-            <ShieldCheck size={16} className="text-indigo-300 shrink-0" />
-            <span className="font-black truncate">Producto original • compra segura</span>
-          </div>
-          <span className="text-[11px] font-black text-zinc-200 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full shrink-0">
-            Envío gratis
-          </span>
-        </div>
-      </div>
-    </div>
-
- 
-   {/* Barra flotante (iOS-safe, sin translate que genera overflow) */}
-<motion.div
-  variants={floaty}
-  initial="hidden"
-  animate="show"
-  className="absolute -bottom-4 left-2 right-2 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 w-auto sm:w-[92%] max-w-[560px] mx-auto"
->
-
-      <div className="bg-zinc-950/70 backdrop-blur-xl border border-white/10 rounded-2xl px-4 py-3 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-xs text-zinc-300 min-w-0">
-          <Timer size={16} className="text-indigo-300" />
-          <span className="font-black truncate">Oferta activa • se agota pronto</span>
-        </div>
-        <div className="text-xs font-black tabular-nums shrink-0">
-          {countdown.h}:{countdown.m}:{countdown.s}
-        </div>
-      </div>
-    </motion.div>
-  </div>
-</motion.div>
-
-
+              {/* floating bar (NO translate on mobile) */}
+              <motion.div
+                variants={floaty}
+                initial="hidden"
+                animate="show"
+                className="absolute -bottom-5 inset-x-3 sm:inset-x-6 md:inset-x-8"
+              >
+                <div className="mx-auto w-full max-w-[560px] bg-zinc-950/70 backdrop-blur-xl border border-white/10 rounded-2xl px-4 py-3 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 text-xs text-zinc-300 min-w-0">
+                    <Timer size={16} className="text-indigo-300 shrink-0" />
+                    <span className="font-black truncate">Oferta activa • se agota pronto</span>
+                  </div>
+                  <div className="text-xs font-black tabular-nums shrink-0">
+                    {countdown.h}:{countdown.m}:{countdown.s}
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
         </motion.div>
       </section>
+
 
       {/* TRUST BAR */}
       <div className="border-y border-white/5 bg-zinc-900/45 py-6">
