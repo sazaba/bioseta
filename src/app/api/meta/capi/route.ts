@@ -9,7 +9,7 @@ function sha256(value?: string | null) {
     .digest("hex");
 }
 
-
+// ✅ Para preflight (evita 405 en algunos navegadores)
 export async function OPTIONS() {
   return NextResponse.json(
     {},
@@ -23,8 +23,6 @@ export async function OPTIONS() {
     }
   );
 }
-
-
 
 export async function POST(req: Request) {
   const pixelId = process.env.META_PIXEL_ID;
@@ -49,9 +47,15 @@ export async function POST(req: Request) {
     fbc,
     client_user_agent,
     client_ip_address,
-    test_event_code,
+    test_event_code, // lo recibimos del cliente pero NO va en el payload
   } = body;
 
+  // ✅ Autocompleta IP/UA desde el request si no vienen
+  const ua = req.headers.get("user-agent") || undefined;
+  const ip =
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || undefined;
+
+  // ✅ Payload SIN test_event_code (lo mandamos por querystring)
   const payload = {
     data: [
       {
@@ -63,31 +67,36 @@ export async function POST(req: Request) {
         user_data: {
           em: user.email ? [sha256(user.email)] : undefined,
           ph: user.phone ? [sha256(user.phone)] : undefined,
-          fbp,
-          fbc,
-          client_user_agent,
-          client_ip_address,
+          fbp: fbp || undefined,
+          fbc: fbc || undefined,
+          client_user_agent: client_user_agent || ua,
+          client_ip_address: client_ip_address || ip,
         },
         custom_data,
       },
     ],
-    test_event_code,
   };
 
-  payload.data[0].user_data = Object.fromEntries(
-    Object.entries(payload.data[0].user_data).filter(([, v]) => v !== undefined)
-  ) as any;
-
-  const res = await fetch(
-    `https://graph.facebook.com/v20.0/${pixelId}/events?access_token=${token}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    }
+  // limpia undefined
+  (payload.data[0] as any).user_data = Object.fromEntries(
+    Object.entries((payload.data[0] as any).user_data).filter(
+      ([, v]) => v !== undefined
+    )
   );
 
-  const json = await res.json();
+  // ✅ test_event_code por query string (evita "Invalid parameter")
+  const url =
+    `https://graph.facebook.com/v20.0/${pixelId}/events?access_token=${token}` +
+    (test_event_code
+      ? `&test_event_code=${encodeURIComponent(String(test_event_code))}`
+      : "");
 
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  const json = await res.json();
   return NextResponse.json({ ok: res.ok, meta: json });
 }
