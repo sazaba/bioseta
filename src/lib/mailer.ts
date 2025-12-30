@@ -2,7 +2,7 @@ import nodemailer from "nodemailer";
 
 type OwnerOrderEmail = {
   orderId: number;
-  productId: number;
+  productName: string; // ✅ nombre real del producto
   qty: number;
   unitPrice: number;
   total: number;
@@ -29,14 +29,14 @@ export async function sendOwnerOrderEmail(data: OwnerOrderEmail) {
     auth: { user: SMTP_USER, pass: SMTP_PASS },
   });
 
-  const subject = `✅ Nueva venta • ${data.qty} und • $${data.total.toLocaleString()}`;
+  const subject = `✅ Nueva venta • ${data.productName} • ${data.qty} und • $${data.total.toLocaleString()}`;
 
   const html = `
   <div style="font-family:Arial,sans-serif;line-height:1.5">
     <h2>Nueva compra en tu landing ✅</h2>
 
     <p><b>Order ID:</b> ${data.orderId}</p>
-    <p><b>Producto ID:</b> ${data.productId}</p>
+    <p><b>Producto:</b> ${data.productName}</p>
     <p><b>Cantidad:</b> ${data.qty}</p>
     <p><b>Precio unitario:</b> $${data.unitPrice.toLocaleString()}</p>
     <p><b>Total:</b> <span style="font-size:16px"><b>$${data.total.toLocaleString()}</b></span></p>

@@ -37,8 +37,9 @@ export async function createOrder(input: CreateOrderInput) {
   // Traemos precio real desde DB (evita manipulación)
   const product = await prisma.product.findUnique({
     where: { id: input.productId },
-    select: { id: true, price: true, isActive: true, stock: true },
+    select: { id: true, name: true, price: true, isActive: true, stock: true },
   });
+
 
   if (!product || product.isActive === false) {
     return { ok: false, message: "Producto no disponible." };
@@ -101,9 +102,9 @@ export async function createOrder(input: CreateOrderInput) {
 
   // Enviar email al dueño (NO debe romper la compra si falla)
   try {
-    await sendOwnerOrderEmail({
+       await sendOwnerOrderEmail({
       orderId: order.id,
-      productId: product.id,
+      productName: product.name,
       qty,
       unitPrice: Number(product.price),
       total: Number(product.price) * qty,
@@ -112,6 +113,7 @@ export async function createOrder(input: CreateOrderInput) {
       city: input.city.trim(),
       address: input.address.trim(),
     });
+
   } catch (e) {
     console.error("[mailer] Failed to send owner email:", e);
   }
