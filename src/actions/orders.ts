@@ -2,6 +2,8 @@
 
 import { prisma } from "@/lib/prisma"; // ajusta si tu prisma client está en otra ruta
 import { headers, cookies } from "next/headers";
+import { sendOwnerOrderEmail } from "@/lib/mailer";
+
 
 type CreateOrderInput = {
   productId: number;
@@ -91,10 +93,29 @@ export async function createOrder(input: CreateOrderInput) {
   });
 
   // (Opcional) Reducir stock automáticamente (si quieres)
+  // Reducir stock
   await prisma.product.update({
     where: { id: product.id },
     data: { stock: { decrement: qty } },
   });
 
+  // Enviar email al dueño (NO debe romper la compra si falla)
+  try {
+    await sendOwnerOrderEmail({
+      orderId: order.id,
+      productId: product.id,
+      qty,
+      unitPrice: Number(product.price),
+      total: Number(product.price) * qty,
+      fullName: input.fullName.trim(),
+      phone: input.phone.trim(),
+      city: input.city.trim(),
+      address: input.address.trim(),
+    });
+  } catch (e) {
+    console.error("[mailer] Failed to send owner email:", e);
+  }
+
   return { ok: true, orderId: order.id };
+
 }
