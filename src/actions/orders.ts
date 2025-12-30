@@ -126,40 +126,41 @@ export async function createOrder(input: CreateOrderInput) {
 
 export async function deleteOrder(orderId: number) {
   try {
-    if (!orderId) return { ok: false, message: "ID inválido" };
+    if (!orderId || Number.isNaN(Number(orderId))) {
+      return { ok: false, message: "ID inválido" };
+    }
 
-    const res = await prisma.$transaction(async (tx) => {
+    const id = Number(orderId);
+
+    await prisma.$transaction(async (tx) => {
       const order = await tx.order.findUnique({
-        where: { id: orderId },
-        select: { id: true, quantity: true, productId: true, status: true },
+        where: { id },
+        select: { id: true, quantity: true, productId: true },
       });
 
-      if (!order) return { ok: false as const, message: "Orden no encontrada" };
-
-      // ✅ BLINDAJE: si el status ya es "cancelado/cancelled/canceled", no tocar stock
-      const status = String(order.status ?? "").toLowerCase();
-      const isCanceled =
-        status.includes("cancel"); // cubre: cancelado, cancelled, canceled
-
-      if (isCanceled) {
-        return { ok: false as const, message: "Esta orden ya está cancelada." };
+      if (!order) {
+        throw new Error("ORDER_NOT_FOUND");
       }
 
-      // Devolver stock
+      // devolver stock
       await tx.product.update({
         where: { id: order.productId },
         data: { stock: { increment: order.quantity } },
       });
 
-      // Eliminar orden
-      await tx.order.delete({ where: { id: orderId } });
-
-      return { ok: true as const };
+      // borrar orden
+      await tx.order.delete({ where: { id } });
     });
 
+    // ✅ Revalidar rutas donde ves órdenes (por si tienes 2 páginas)
     revalidatePath("/admin/orders");
-    return res;
-  } catch (e) {
+    revalidatePath("/admin/dashboard/orders");
+
+    return { ok: true };
+  } catch (e: any) {
+    if (e?.message === "ORDER_NOT_FOUND") {
+      return { ok: false, message: "Orden no encontrada" };
+    }
     console.error("[deleteOrder] error:", e);
     return { ok: false, message: "No se pudo eliminar la orden" };
   }

@@ -3,6 +3,9 @@
 import React, { useMemo, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { deleteOrder } from "@/actions/orders";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+
 import {
   CalendarDays,
   Filter,
@@ -14,6 +17,16 @@ import {
   MapPin,
   Hash,
 } from "lucide-react";
+
+const MySwal = withReactContent(Swal);
+
+const DarkSwal = MySwal.mixin({
+  background: "#0b0b10",
+  color: "#fff",
+  confirmButtonColor: "#6366f1",
+  cancelButtonColor: "#27272a",
+});
+
 
 export type OrderRow = {
   id: number;
@@ -105,23 +118,62 @@ export default function OrdersTable({
   }
 
   async function onDelete(id: number) {
-    const ok = confirm("¿Eliminar esta orden? Esto devolverá stock y borrará el registro.");
-    if (!ok) return;
+    const res = await DarkSwal.fire({
+      title: "¿Eliminar esta orden?",
+      html: `<div style="color:#a1a1aa;font-size:13px;margin-top:6px">
+              Se devolverá el stock y la orden se eliminará de la base de datos.
+            </div>`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+      reverseButtons: true,
+      focusCancel: true,
+    });
+
+    if (!res.isConfirmed) return;
 
     setDeletingId(id);
+
+    // modal loading premium
+    DarkSwal.fire({
+      title: "Eliminando...",
+      html: `<div style="color:#a1a1aa;font-size:13px;margin-top:6px">Actualizando inventario y borrando orden</div>`,
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => DarkSwal.showLoading(),
+    });
+
     startTransition(async () => {
-      const res = await deleteOrder(id);
+      const r = await deleteOrder(id);
       setDeletingId(null);
 
-      if (!res?.ok) {
-        alert(res?.message || "No se pudo eliminar la orden.");
+      if (!r?.ok) {
+        await DarkSwal.fire({
+          icon: "error",
+          title: "No se pudo eliminar",
+          text: r?.message || "Intenta nuevamente.",
+          confirmButtonText: "Ok",
+        });
         return;
       }
 
-      // refresca server component
+      // refresca server component (trae órdenes de DB)
       router.refresh();
+
+      // toast premium dark
+      DarkSwal.fire({
+        toast: true,
+        position: "top-end",
+        icon: "success",
+        title: "Orden eliminada",
+        showConfirmButton: false,
+        timer: 2200,
+        timerProgressBar: true,
+      });
     });
   }
+
 
   return (
     <section className="space-y-5">
