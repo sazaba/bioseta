@@ -4,7 +4,7 @@ import { Montserrat, Cormorant_Garamond, Cinzel } from "next/font/google";
 import "./globals.css";
 import MetaPixelPageView from "@/components/MetaPixelPageView";
 import { Suspense } from "react";
-
+import { Analytics } from "@vercel/analytics/next";
 
 const montserrat = Montserrat({ subsets: ["latin"], variable: "--font-montserrat", display: "swap" });
 const cormorant = Cormorant_Garamond({
@@ -37,7 +37,7 @@ export default function RootLayout({
               {`
                 !function(f,b,e,v,n,t,s)
                 {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-                n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+                n.callMethod.apply(n,arguments):n.queue.push(arguments)}; 
                 if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
                 n.queue=[];t=b.createElement(e);t.async=!0;
                 t.src=v;s=b.getElementsByTagName(e)[0];
@@ -65,10 +65,13 @@ export default function RootLayout({
         className={`${montserrat.variable} ${cormorant.variable} ${cinzel.variable} bg-[#050505] text-stone-100 antialiased`}
       >
         <Suspense fallback={null}>
-  <MetaPixelPageView />
-</Suspense>
+          <MetaPixelPageView />
+        </Suspense>
 
         {children}
+
+        {/* ✅ Vercel Analytics */}
+        <Analytics />
       </body>
     </html>
   );
