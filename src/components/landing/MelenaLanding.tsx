@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import React, { useEffect, useMemo, useState, useTransition } from "react";
+import React, { useEffect, useMemo, useRef, useState, useTransition } from "react";
+
 import { createOrder } from "@/actions/orders";
 import { motion, Variants, AnimatePresence } from "framer-motion";
 import {
@@ -180,15 +181,192 @@ function formatTime(ms: number) {
   return { h, m, s };
 }
 
+// ---------------- META TRACKING HELPERS ----------------
+function getCookie(name: string) {
+  if (typeof document === "undefined") return undefined;
+  const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
+  return match ? decodeURIComponent(match[2]) : undefined;
+}
+
+function buildFbc(fbclid?: string) {
+  if (!fbclid) return undefined;
+  // Meta standard format: fb.1.<timestamp>.<fbclid>
+  return `fb.1.${Math.floor(Date.now() / 1000)}.${fbclid}`;
+}
+
+function genEventId(prefix: string) {
+  // Dedupe id across Pixel + CAPI
+  const uid =
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? (crypto as any).randomUUID()
+      : `${Date.now()}_${Math.random().toString(16).slice(2)}`;
+  return `${prefix}_${uid}`;
+}
+
+async function sendCapi(payload: any) {
+  try {
+    const r = await fetch("/api/meta/capi", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    // No te rompas si la respuesta no trae JSON por algún motivo
+    const text = await r.text();
+    try {
+      return { ok: r.ok, data: JSON.parse(text) };
+    } catch {
+      return { ok: r.ok, data: text };
+    }
+  } catch (e) {
+    return { ok: false, error: e };
+  }
+}
+
+// Pixel wrapper (no revienta si fbq no existe)
+function fbqTrack(event: string, params?: Record<string, any>, eventId?: string) {
+  const w = typeof window !== "undefined" ? (window as any) : undefined;
+  if (!w?.fbq) return;
+  try {
+    if (eventId) w.fbq("track", event, params || {}, { eventID: eventId });
+    else w.fbq("track", event, params || {});
+  } catch {}
+}
+
+function fbqTrackCustom(event: string, params?: Record<string, any>, eventId?: string) {
+  const w = typeof window !== "undefined" ? (window as any) : undefined;
+  if (!w?.fbq) return;
+  try {
+    if (eventId) w.fbq("trackCustom", event, params || {}, { eventID: eventId });
+    else w.fbq("trackCustom", event, params || {});
+  } catch {}
+}
+// -------------------------------------------------------
+
+
+
 export default function MelenaLanding({ product }: { product: ProductDTO }) {
  const [fbclid, setFbclid] = useState<string | undefined>(undefined);
 
+
+   // Evita duplicar ViewContent en React StrictMode / re-renders
+  const viewContentSentRef = useRef(false);
+
+  // Helpers para fbp/fbc (cookies de Meta)
+  const getFbp = () => getCookie("_fbp");
+const getFbc = (_fbclid?: string) => {
+  const fromCookie = getCookie("_fbc");
+  if (fromCookie) return fromCookie;
+  return buildFbc(_fbclid);
+};
+
+
+
+  const trackMeta = async ({
+    event_name,
+    event_id,
+    event_source_url,
+    user,
+    custom_data,
+    fbclid,
+  }: {
+    event_name: string;
+    event_id: string;
+    event_source_url: string;
+    user?: { phone?: string; fullName?: string; email?: string };
+    custom_data?: Record<string, any>;
+    fbclid?: string;
+  }) => {
+    const fbp = getFbp();
+    const fbc = getFbc(fbclid);
+
+    // 1) Pixel (browser)
+    // Para eventos estándar usa track; para custom usa trackCustom.
+    // Aquí mandamos estándar por nombre: ViewContent/InitiateCheckout/AddToCart/Lead
+    fbqTrack(event_name, custom_data, event_id);
+
+    // 2) CAPI (server)
+    await sendCapi({
+      event_name,
+      event_id,
+      event_source_url,
+      user: {
+        phone: user?.phone,
+        email: user?.email,
+        fullName: user?.fullName,
+      },
+      custom_data,
+      fbp,
+      fbc,
+      // no podemos obtener IP desde el browser; el route lo puede sacar de headers
+      client_user_agent: typeof navigator !== "undefined" ? navigator.userAgent : undefined,
+      fbclid,
+      test_event_code: "TEST32620",
+    });
+  };
+
+  const trackCTA = async (label: string, extra?: Record<string, any>) => {
+    const event_id = genEventId("cta");
+    const url = typeof window !== "undefined" ? window.location.href : "";
+    const fbp = getFbp();
+    const fbc = getFbc(fbclid);
+
+    // Pixel custom
+    fbqTrackCustom("CTA_Click", { label, ...extra }, event_id);
+
+    // CAPI custom (lo mandamos como event_name "CTA_Click")
+    await sendCapi({
+      event_name: "CTA_Click",
+      event_id,
+      event_source_url: url,
+      custom_data: {
+        label,
+        product_id: product?.id,
+        product_name: product?.name,
+        value: Number(product?.price || 0) * Number(extra?.qty || 1),
+        currency: "COP",
+        ...extra,
+      },
+      fbp,
+      fbc,
+      client_user_agent: typeof navigator !== "undefined" ? navigator.userAgent : undefined,
+      fbclid,
+    });
+  };
+
 useEffect(() => {
-  if (typeof window !== "undefined") {
-    const params = new URLSearchParams(window.location.search);
-    setFbclid(params.get("fbclid") || undefined);
-  }
-}, []);
+  if (typeof window === "undefined") return;
+
+  // Espera a tener producto real (evita disparar con undefined)
+  if (!product?.id) return;
+
+  const params = new URLSearchParams(window.location.search);
+  const fbclidParam = params.get("fbclid") || undefined;
+
+  // Guardamos fbclid para otros eventos
+  setFbclid(fbclidParam);
+
+  // ViewContent (solo 1 vez real)
+  if (viewContentSentRef.current) return;
+  viewContentSentRef.current = true;
+
+  const event_id = genEventId("viewcontent");
+  const url = window.location.href;
+
+  trackMeta({
+    event_name: "ViewContent",
+    event_id,
+    event_source_url: url,
+    fbclid: fbclidParam,
+    custom_data: {
+      currency: "COP",
+      value: Number(product?.price || 0),
+      content_name: product?.name,
+      content_ids: [String(product?.id)],
+      content_type: "product",
+    },
+  });
+}, [product?.id]); // 👈 importante
+
 
 
   const [qty, setQty] = useState(1);
@@ -262,19 +440,59 @@ useEffect(() => {
       setError("Por favor completa todos los campos de envío.");
       return;
     }
-    startTransition(async () => {
-      const res = await createOrder({
-        productId: product.id,
-        quantity: qty,
-        fullName,
-        phone,
+   startTransition(async () => {
+  // Intento de compra (alta intención)
+  await trackMeta({
+    event_name: "InitiateCheckout",
+    event_id: genEventId("initcheckout"),
+    event_source_url: typeof window !== "undefined" ? window.location.href : "",
+    fbclid,
+    user: { fullName, phone },
+    custom_data: {
+      currency: "COP",
+      value: total,
+      content_ids: [String(product?.id)],
+      content_name: product?.name,
+      content_type: "product",
+      num_items: qty,
+    },
+  });
+
+  const res = await createOrder({
+    productId: product.id,
+    quantity: qty,
+    fullName,
+    phone,
+    city,
+    address,
+    fbclid,
+  });
+
+  if (res.ok) {
+    // Conversión real
+    await trackMeta({
+      event_name: "Lead",
+      event_id: genEventId("lead"),
+      event_source_url: typeof window !== "undefined" ? window.location.href : "",
+      fbclid,
+      user: { fullName, phone },
+      custom_data: {
+        currency: "COP",
+        value: total,
+        content_ids: [String(product?.id)],
+        content_name: product?.name,
+        content_type: "product",
+        num_items: qty,
         city,
-        address,
-        fbclid,
-      });
-      if (res.ok) setOk(true);
-      else setError("Hubo un error, intenta de nuevo.");
+      },
     });
+
+    setOk(true);
+  } else {
+    setError("Hubo un error, intenta de nuevo.");
+  }
+});
+
   };
 
   const purchaseTicker = [
@@ -350,6 +568,8 @@ useEffect(() => {
             <a
               href="#form"
               className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 px-3.5 py-2 text-xs font-black transition-all active:scale-95 shadow-lg shadow-indigo-600/25"
+              onClick={() => trackCTA("topbar_tomar_oferta", { section: "topbar" })}
+
             >
               Tomar oferta <ArrowRight size={14} />
             </a>
@@ -467,6 +687,8 @@ useEffect(() => {
               <a
                 href="#form"
                 className="inline-flex justify-center items-center gap-2 w-full sm:w-auto text-center bg-indigo-600 hover:bg-indigo-500 px-7 sm:px-10 py-4 sm:py-5 rounded-2xl font-black text-base sm:text-lg shadow-xl shadow-indigo-600/25 transition-all active:scale-95"
+                onClick={() => trackCTA("hero_pedir_ahora", { section: "hero" })}
+
               >
                 PEDIR AHORA{" "}
                 <span className="opacity-85 font-extrabold">
@@ -1030,7 +1252,27 @@ useEffect(() => {
                       <span className="text-zinc-300">Cantidad:</span>
                       <div className="flex items-center gap-4 bg-zinc-800 p-1 rounded-xl">
                         <button
-                          onClick={() => setQty((q) => Math.max(1, q - 1))}
+                          onClick={() => {
+  setQty((q) => {
+    const next = Math.max(1, q - 1);
+    trackMeta({
+      event_name: "AddToCart",
+      event_id: genEventId("addtocart"),
+      event_source_url: window.location.href,
+      fbclid,
+      custom_data: {
+        currency: "COP",
+        value: Number(product?.price || 0) * next,
+        content_ids: [String(product?.id)],
+        content_name: product?.name,
+        content_type: "product",
+        num_items: next,
+      },
+    });
+    return next;
+  });
+}}
+
                           className="w-10 h-10 flex items-center justify-center hover:bg-zinc-700 rounded-lg"
                           aria-label="Disminuir cantidad"
                         >
@@ -1038,7 +1280,27 @@ useEffect(() => {
                         </button>
                         <span className="font-black w-5 text-center tabular-nums">{qty}</span>
                         <button
-                          onClick={() => setQty((q) => q + 1)}
+                          onClick={() => {
+  setQty((q) => {
+    const next = q + 1;
+    trackMeta({
+      event_name: "AddToCart",
+      event_id: genEventId("addtocart"),
+      event_source_url: window.location.href,
+      fbclid,
+      custom_data: {
+        currency: "COP",
+        value: Number(product?.price || 0) * next,
+        content_ids: [String(product?.id)],
+        content_name: product?.name,
+        content_type: "product",
+        num_items: next,
+      },
+    });
+    return next;
+  });
+}}
+
                           className="w-10 h-10 flex items-center justify-center hover:bg-zinc-700 rounded-lg"
                           aria-label="Aumentar cantidad"
                         >
@@ -1076,7 +1338,10 @@ useEffect(() => {
                     </motion.div>
 
                     <button
-                      onClick={handleOrder}
+                       onClick={() => {
+    trackCTA("form_comprar_contraentrega", { section: "form", qty });
+    handleOrder();
+  }}
                       disabled={isPending}
                       className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 py-5 rounded-2xl font-black text-lg transition-all shadow-lg shadow-indigo-600/30 active:scale-[0.99]"
                     >
@@ -1138,6 +1403,8 @@ useEffect(() => {
             <a
               href="#form"
               className="flex items-center justify-between bg-indigo-600 p-4 rounded-xl font-black active:scale-[0.99]"
+              onClick={() => trackCTA("sticky_pedir_ahora", { section: "sticky", qty })}
+
             >
               <span>PEDIR AHORA</span>
               <span className="tabular-nums">${total.toLocaleString()}</span>
