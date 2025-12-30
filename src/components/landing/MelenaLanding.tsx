@@ -1133,7 +1133,7 @@ useEffect(() => {
             initial={{ y: 110 }}
             animate={{ y: 0 }}
             exit={{ y: 110 }}
-            className="fixed bottom-0 left-0 right-0 p-4 pb-[calc(env(safe-area-inset-bottom)+16px)] z-[240] bg-zinc-900/80 backdrop-blur-lg border-t border-white/10 md:hidden"
+            className="fixed bottom-0 left-0 right-0 mt-5 p-4 pb-[calc(env(safe-area-inset-bottom)+16px)] z-[240] bg-zinc-900/80 backdrop-blur-lg border-t border-white/10 md:hidden"
           >
             <a
               href="#form"
