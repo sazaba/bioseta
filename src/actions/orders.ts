@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma"; // ajusta si tu prisma client está en otra ruta
 import { headers, cookies } from "next/headers";
 import { sendOwnerOrderEmail } from "@/lib/mailer";
+import { revalidatePath } from "next/cache";
 
 
 type CreateOrderInput = {
@@ -120,4 +121,46 @@ export async function createOrder(input: CreateOrderInput) {
 
   return { ok: true, orderId: order.id };
 
+}
+
+
+export async function deleteOrder(orderId: number) {
+  try {
+    if (!orderId) return { ok: false, message: "ID inválido" };
+
+    const res = await prisma.$transaction(async (tx) => {
+      const order = await tx.order.findUnique({
+        where: { id: orderId },
+        select: { id: true, quantity: true, productId: true, status: true },
+      });
+
+      if (!order) return { ok: false as const, message: "Orden no encontrada" };
+
+      // ✅ BLINDAJE: si el status ya es "cancelado/cancelled/canceled", no tocar stock
+      const status = String(order.status ?? "").toLowerCase();
+      const isCanceled =
+        status.includes("cancel"); // cubre: cancelado, cancelled, canceled
+
+      if (isCanceled) {
+        return { ok: false as const, message: "Esta orden ya está cancelada." };
+      }
+
+      // Devolver stock
+      await tx.product.update({
+        where: { id: order.productId },
+        data: { stock: { increment: order.quantity } },
+      });
+
+      // Eliminar orden
+      await tx.order.delete({ where: { id: orderId } });
+
+      return { ok: true as const };
+    });
+
+    revalidatePath("/admin/orders");
+    return res;
+  } catch (e) {
+    console.error("[deleteOrder] error:", e);
+    return { ok: false, message: "No se pudo eliminar la orden" };
+  }
 }
