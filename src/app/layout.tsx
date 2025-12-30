@@ -3,6 +3,8 @@ import Script from "next/script";
 import { Montserrat, Cormorant_Garamond, Cinzel } from "next/font/google";
 import "./globals.css";
 import MetaPixelPageView from "@/components/MetaPixelPageView";
+import { Suspense } from "react";
+
 
 const montserrat = Montserrat({ subsets: ["latin"], variable: "--font-montserrat", display: "swap" });
 const cormorant = Cormorant_Garamond({
@@ -62,7 +64,10 @@ export default function RootLayout({
       <body
         className={`${montserrat.variable} ${cormorant.variable} ${cinzel.variable} bg-[#050505] text-stone-100 antialiased`}
       >
-        <MetaPixelPageView />
+        <Suspense fallback={null}>
+  <MetaPixelPageView />
+</Suspense>
+
         {children}
       </body>
     </html>
