@@ -300,7 +300,7 @@ const getFbc = (_fbclid?: string) => {
       // no podemos obtener IP desde el browser; el route lo puede sacar de headers
       client_user_agent: typeof navigator !== "undefined" ? navigator.userAgent : undefined,
       fbclid,
-      test_event_code: "TEST32620",
+      test_event_code: "TEST66276",
     });
   };
 
