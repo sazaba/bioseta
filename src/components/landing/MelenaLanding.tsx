@@ -2,7 +2,9 @@
 
 import Image from "next/image";
 import React, { useEffect, useMemo, useRef, useState, useTransition } from "react";
-
+import gal1 from "./melena/gallery-1.webp";
+import gal2 from "./melena/gallery-2.webp";
+import gal3 from "./melena/gallery-3.webp";
 
 import { createOrder } from "@/actions/orders";
 import { motion, Variants, AnimatePresence } from "framer-motion";
@@ -51,14 +53,10 @@ type ProductDTO = {
   stock: number;
 };
 
-// ================== IMÁGENES (SUBE A /public/landing/melena/) ==================
-const HERO_IMG = "/landing/melena/hero.png"; // <- cambia por tu hero
-const GALLERY = [
-  "./melena/gallery-1.webp",
-  "./melena/gallery-2.webp",
-  "./melena/gallery-3.webp",
-];
-// ==============================================================================
+// ================== IMÁGENES (HERO PUEDE SER /public) ==================
+const HERO_IMG = "/landing/melena/hero.png"; // opcional fallback si product.imageUrl no viene
+const GALLERY = [gal1, gal2, gal3];
+// =======================================================================
 
 // --- ANIMACIONES ---
 const fadeUp: Variants = {
@@ -75,15 +73,6 @@ const glowPulse: Variants = {
   show: {
     opacity: [0.25, 0.65, 0.25],
     transition: { duration: 2.8, repeat: Infinity, ease: "easeInOut" },
-  },
-};
-
-const shine: Variants = {
-  hidden: { opacity: 0, x: -40 },
-  show: {
-    opacity: 1,
-    x: [-60, 260],
-    transition: { duration: 2.8, repeat: Infinity, ease: "easeInOut", repeatDelay: 1.2 },
   },
 };
 
@@ -125,7 +114,10 @@ function CardShell({
 
   return (
     <div className={cx(base, styles[variant], className)}>
-      <div aria-hidden className={cx("pointer-events-none absolute inset-0 opacity-80", `bg-gradient-to-br ${accentMap[accent]}`)} />
+      <div
+        aria-hidden
+        className={cx("pointer-events-none absolute inset-0 opacity-80", `bg-gradient-to-br ${accentMap[accent]}`)}
+      />
 
       {variant === "gradientBorder" && (
         <div aria-hidden className="pointer-events-none absolute inset-0 p-[1px]">
@@ -134,15 +126,7 @@ function CardShell({
         </div>
       )}
 
-      {(variant === "glow" || variant === "gradientBorder") && (
-        <motion.div
-          aria-hidden
-          initial="hidden"
-          animate="show"
-          variants={shine}
-          className="pointer-events-none absolute top-0 -left-16 h-full w-16 rotate-12 bg-gradient-to-b from-white/0 via-white/10 to-white/0 blur-[2px]"
-        />
-      )}
+      {/* ❌ Eliminado el “rectángulo animado” (shine) */}
 
       <div className="relative">{children}</div>
     </div>
@@ -542,7 +526,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
         </div>
       </div>
 
-      {/* ================= HERO / PDP STYLE (como Armonía) ================= */}
+      {/* ================= HERO ================= */}
       <section className="pt-10 sm:pt-12 md:pt-16 pb-10 px-4 overflow-x-clip">
         <motion.div
           aria-hidden
@@ -575,11 +559,14 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
               {/* thumbs */}
               <div className="mt-4 grid grid-cols-3 gap-3">
                 {GALLERY.map((src, i) => (
-                  <div
-                    key={i}
-                    className="relative aspect-[1/1] overflow-hidden rounded-2xl border border-white/10 bg-black/25"
-                  >
-                    <Image src={src} alt={`Galería ${i + 1}`} fill sizes="(max-width:640px) 30vw, 160px" className="object-cover" />
+                  <div key={i} className="relative aspect-[1/1] overflow-hidden rounded-2xl border border-white/10 bg-black/25">
+                    <Image
+                      src={src}
+                      alt={`Galería ${i + 1}`}
+                      fill
+                      sizes="(max-width:640px) 30vw, 160px"
+                      className="object-cover"
+                    />
                   </div>
                 ))}
               </div>
@@ -602,7 +589,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
             </CardShell>
           </motion.div>
 
-          {/* RIGHT: PRICE / CTA / QUICK CHECKOUT */}
+          {/* RIGHT: PRICE / CTA */}
           <motion.div variants={fadeUp} className="min-w-0">
             <h1 className="text-[30px] sm:text-5xl md:text-6xl font-black leading-[1.08]">
               {product?.name || "Melena de León"}{" "}
@@ -622,7 +609,6 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
               <MiniStat icon={<ShieldCheck size={16} />} title="Compra segura" desc="Proceso simple" />
             </div>
 
-            {/* PRICE BOX */}
             <div className="mt-7">
               <CardShell variant="gradientBorder" accent="purple" className="p-6 sm:p-7">
                 <div className="flex items-start justify-between gap-4">
@@ -632,9 +618,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                       ${Number(product?.price || 0).toLocaleString()}
                       <span className="text-xs text-zinc-400 font-bold ml-2">COP</span>
                     </p>
-                    <p className="text-[12px] text-zinc-400 mt-2">
-                      Incluye envío gratis + confirmación por WhatsApp.
-                    </p>
+                    <p className="text-[12px] text-zinc-400 mt-2">Incluye envío gratis + confirmación por WhatsApp.</p>
                   </div>
 
                   <div className="text-right">
@@ -675,23 +659,10 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
               </CardShell>
             </div>
 
-            {/* QUICK BENEFITS SHORT (no wall of text) */}
             <div className="mt-8 grid md:grid-cols-3 gap-4">
-              <ConversionCard
-                icon={<Brain className="text-indigo-300" />}
-                title="Enfoque"
-                desc="Bloques de concentración más largos para avanzar."
-              />
-              <ConversionCard
-                icon={<BatteryCharging className="text-yellow-300" />}
-                title="Ritmo estable"
-                desc="Sensación de constancia durante el día."
-              />
-              <ConversionCard
-                icon={<ShieldCheck className="text-green-300" />}
-                title="Cero fricción"
-                desc="Sin pagos online: confirmación y entrega."
-              />
+              <ConversionCard icon={<Brain className="text-indigo-300" />} title="Enfoque" desc="Bloques de concentración más largos para avanzar." />
+              <ConversionCard icon={<BatteryCharging className="text-yellow-300" />} title="Ritmo estable" desc="Sensación de constancia durante el día." />
+              <ConversionCard icon={<ShieldCheck className="text-green-300" />} title="Cero fricción" desc="Sin pagos online: confirmación y entrega." />
             </div>
           </motion.div>
         </motion.div>
@@ -768,7 +739,6 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                 </div>
               ) : (
                 <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-12">
-                  {/* LEFT: Shipping */}
                   <div>
                     <div className="flex items-start justify-between gap-3 mb-6">
                       <div>
@@ -804,7 +774,6 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                     </div>
                   </div>
 
-                  {/* RIGHT: Summary */}
                   <div className="bg-white/5 p-6 rounded-3xl border border-white/10 h-fit sticky top-[88px]">
                     <h3 className="text-xl font-black mb-5 text-center">Resumen</h3>
 
