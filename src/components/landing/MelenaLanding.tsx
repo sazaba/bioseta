@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import React, { useEffect, useMemo, useRef, useState, useTransition } from "react";
+
 import gal1 from "./melena/gallery-1.webp";
 import gal2 from "./melena/gallery-2.webp";
 import gal3 from "./melena/gallery-3.webp";
@@ -38,7 +39,7 @@ import {
   HandCoins,
   MapPin,
   PhoneCall,
-  Image as ImageIcon,
+  X,
 } from "lucide-react";
 
 // --- TIPADOS ---
@@ -52,11 +53,6 @@ type ProductDTO = {
   benefits: any | null;
   stock: number;
 };
-
-// ================== IMÁGENES (HERO PUEDE SER /public) ==================
-const HERO_IMG = "/landing/melena/hero.png"; // opcional fallback si product.imageUrl no viene
-const GALLERY = [gal1, gal2, gal3];
-// =======================================================================
 
 // --- ANIMACIONES ---
 const fadeUp: Variants = {
@@ -80,7 +76,13 @@ function cx(...c: Array<string | false | null | undefined>) {
   return c.filter(Boolean).join(" ");
 }
 
-type CardVariant = "glass" | "glow" | "gradientBorder" | "outlineDashed" | "solid" | "split";
+type CardVariant =
+  | "glass"
+  | "glow"
+  | "gradientBorder"
+  | "outlineDashed"
+  | "solid"
+  | "split";
 
 function CardShell({
   children,
@@ -100,14 +102,17 @@ function CardShell({
     amber: "from-amber-500/18 via-transparent to-orange-500/18",
   };
 
-  const base = "relative rounded-[2rem] overflow-hidden transition-all will-change-transform";
+  const base =
+    "relative rounded-[2rem] overflow-hidden transition-all will-change-transform";
 
   const styles: Record<CardVariant, string> = {
-    glass: "border border-white/10 bg-zinc-900/40 hover:border-white/20 hover:bg-zinc-900/50",
+    glass:
+      "border border-white/10 bg-zinc-900/40 hover:border-white/20 hover:bg-zinc-900/50",
     glow:
       "border border-white/10 bg-zinc-900/35 shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_18px_60px_rgba(99,102,241,0.10)] hover:shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_20px_80px_rgba(168,85,247,0.14)]",
     gradientBorder: "border border-transparent bg-zinc-950/40 hover:bg-zinc-950/55",
-    outlineDashed: "border border-dashed border-white/15 bg-black/20 hover:border-white/25 hover:bg-black/30",
+    outlineDashed:
+      "border border-dashed border-white/15 bg-black/20 hover:border-white/25 hover:bg-black/30",
     solid: "border border-white/8 bg-zinc-900/70 hover:bg-zinc-900/80",
     split: "border border-white/10 bg-zinc-900/40",
   };
@@ -116,7 +121,10 @@ function CardShell({
     <div className={cx(base, styles[variant], className)}>
       <div
         aria-hidden
-        className={cx("pointer-events-none absolute inset-0 opacity-80", `bg-gradient-to-br ${accentMap[accent]}`)}
+        className={cx(
+          "pointer-events-none absolute inset-0 opacity-80",
+          `bg-gradient-to-br ${accentMap[accent]}`
+        )}
       />
 
       {variant === "gradientBorder" && (
@@ -126,7 +134,7 @@ function CardShell({
         </div>
       )}
 
-      {/* ❌ Eliminado el “rectángulo animado” (shine) */}
+      {/* ✅ Quitado: efecto “rectángulo” animado encima de las cards */}
 
       <div className="relative">{children}</div>
     </div>
@@ -188,7 +196,11 @@ function fbqTrack(event: string, params?: Record<string, any>, eventId?: string)
   } catch {}
 }
 
-function fbqTrackCustom(event: string, params?: Record<string, any>, eventId?: string) {
+function fbqTrackCustom(
+  event: string,
+  params?: Record<string, any>,
+  eventId?: string
+) {
   const w = typeof window !== "undefined" ? (window as any) : undefined;
   if (!w?.fbq) return;
   try {
@@ -199,6 +211,10 @@ function fbqTrackCustom(event: string, params?: Record<string, any>, eventId?: s
 // -------------------------------------------------------
 
 export default function MelenaLanding({ product }: { product: ProductDTO }) {
+  // ✅ Galería con imports
+  const GALLERY = useMemo(() => [gal1, gal2, gal3], []);
+  const MAIN_IMG = gal1; // ✅ 1) imagen principal = gal1
+
   const [fbclid, setFbclid] = useState<string | undefined>(undefined);
   const viewContentSentRef = useRef(false);
 
@@ -241,7 +257,8 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
       custom_data,
       fbp,
       fbc,
-      client_user_agent: typeof navigator !== "undefined" ? navigator.userAgent : undefined,
+      client_user_agent:
+        typeof navigator !== "undefined" ? navigator.userAgent : undefined,
       fbclid,
       test_event_code: "TEST66276",
     });
@@ -269,7 +286,8 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
       },
       fbp,
       fbc,
-      client_user_agent: typeof navigator !== "undefined" ? navigator.userAgent : undefined,
+      client_user_agent:
+        typeof navigator !== "undefined" ? navigator.userAgent : undefined,
       fbclid,
     });
   };
@@ -328,7 +346,8 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
   const [tickerIdx, setTickerIdx] = useState(0);
 
   useEffect(() => {
-    if (typeof window !== "undefined") window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    if (typeof window !== "undefined")
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }, []);
 
   useEffect(() => {
@@ -360,6 +379,29 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
 
   const lowStock = remainingStock > 0 && remainingStock <= 20;
   const countdown = useMemo(() => formatTime(deadline - now), [deadline, now]);
+
+  // ✅ Lightbox (click en galería => ver grande)
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIdx, setLightboxIdx] = useState(0);
+
+  const openLightbox = (idx: number) => {
+    setLightboxIdx(idx);
+    setLightboxOpen(true);
+  };
+
+  const closeLightbox = () => setLightboxOpen(false);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!lightboxOpen) return;
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowRight") setLightboxIdx((i) => (i + 1) % GALLERY.length);
+      if (e.key === "ArrowLeft")
+        setLightboxIdx((i) => (i - 1 + GALLERY.length) % GALLERY.length);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightboxOpen, GALLERY.length]);
 
   // ✅ NO TOCAR: backend createOrder
   const handleOrder = () => {
@@ -526,7 +568,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
         </div>
       </div>
 
-      {/* ================= HERO ================= */}
+      {/* ================= HERO / PDP STYLE ================= */}
       <section className="pt-10 sm:pt-12 md:pt-16 pb-10 px-4 overflow-x-clip">
         <motion.div
           aria-hidden
@@ -536,7 +578,12 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
           className="absolute -top-10 left-1/2 -translate-x-1/2 w-[78vw] max-w-[620px] h-[380px] sm:h-[480px] bg-indigo-600/16 blur-[80px] rounded-full -z-10"
         />
 
-        <motion.div initial="hidden" animate="show" variants={stagger} className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-10 lg:gap-12 items-start">
+        <motion.div
+          initial="hidden"
+          animate="show"
+          variants={stagger}
+          className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-10 lg:gap-12 items-start"
+        >
           {/* LEFT: GALLERY / IMAGE */}
           <motion.div variants={fadeUp} className="min-w-0">
             <CardShell variant="glow" accent="indigo" className="p-4 sm:p-6">
@@ -545,21 +592,32 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                 {lowStock && <BadgePill icon={<Package size={14} />} text={`quedan ${remainingStock}`} tone="orange" />}
               </div>
 
-              <div className="relative w-full aspect-[1/1] sm:aspect-[6/6] overflow-hidden rounded-[1.8rem] border border-white/10 bg-black/30">
+              <button
+                type="button"
+                onClick={() => openLightbox(0)}
+                className="relative w-full aspect-square overflow-hidden rounded-[1.8rem] border border-white/10 bg-black/30 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                aria-label="Ver imagen principal en grande"
+              >
                 <Image
-                  src={product?.imageUrl || HERO_IMG}
+                  src={MAIN_IMG}
                   alt={product?.name || "Producto"}
                   fill
                   priority
                   sizes="(max-width: 640px) 92vw, (max-width: 1024px) 520px, 560px"
                   className="object-contain p-5 sm:p-7"
                 />
-              </div>
+              </button>
 
-              {/* thumbs */}
+              {/* thumbs (clic => abre grande) */}
               <div className="mt-4 grid grid-cols-3 gap-3">
                 {GALLERY.map((src, i) => (
-                  <div key={i} className="relative aspect-[1/1] overflow-hidden rounded-2xl border border-white/10 bg-black/25">
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => openLightbox(i)}
+                    className="relative aspect-square overflow-hidden rounded-2xl border border-white/10 bg-black/25 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                    aria-label={`Ver Galería ${i + 1} en grande`}
+                  >
                     <Image
                       src={src}
                       alt={`Galería ${i + 1}`}
@@ -567,7 +625,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                       sizes="(max-width:640px) 30vw, 160px"
                       className="object-cover"
                     />
-                  </div>
+                  </button>
                 ))}
               </div>
 
@@ -589,16 +647,17 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
             </CardShell>
           </motion.div>
 
-          {/* RIGHT: PRICE / CTA */}
+          {/* RIGHT: PRICE / CTA / QUICK CHECKOUT */}
           <motion.div variants={fadeUp} className="min-w-0">
-            <h1 className="text-[30px] sm:text-5xl md:text-6xl font-black leading-[1.08]">
+            {/* ✅ 3) full responsive: evitar desbordes */}
+            <h1 className="text-[28px] sm:text-5xl md:text-6xl font-black leading-[1.08] tracking-tight break-words text-pretty max-w-full">
               {product?.name || "Melena de León"}{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 break-words">
                 (120 cápsulas)
               </span>
             </h1>
 
-            <p className="mt-3 text-zinc-400 text-[14px] sm:text-lg max-w-xl">
+            <p className="mt-3 text-zinc-400 text-[14px] sm:text-lg max-w-xl break-words text-pretty">
               {product?.subtitle || "Enfoque más estable para tu día: trabajo, estudio y tareas exigentes."}
             </p>
 
@@ -609,22 +668,27 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
               <MiniStat icon={<ShieldCheck size={16} />} title="Compra segura" desc="Proceso simple" />
             </div>
 
+            {/* PRICE BOX */}
             <div className="mt-7">
               <CardShell variant="gradientBorder" accent="purple" className="p-6 sm:p-7">
                 <div className="flex items-start justify-between gap-4">
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-[11px] uppercase tracking-widest text-zinc-400 font-black">Precio hoy</p>
-                    <p className="text-3xl sm:text-4xl font-black mt-1">
+                    <p className="text-3xl sm:text-4xl font-black mt-1 break-words">
                       ${Number(product?.price || 0).toLocaleString()}
                       <span className="text-xs text-zinc-400 font-bold ml-2">COP</span>
                     </p>
-                    <p className="text-[12px] text-zinc-400 mt-2">Incluye envío gratis + confirmación por WhatsApp.</p>
+                    <p className="text-[12px] text-zinc-400 mt-2">
+                      Incluye envío gratis + confirmación por WhatsApp.
+                    </p>
                   </div>
 
-                  <div className="text-right">
+                  <div className="text-right shrink-0">
+                    {/* ✅ 4) estrella visible (fill) */}
                     <div className="inline-flex items-center gap-2 rounded-full bg-black/30 border border-white/10 px-3 py-2 text-[11px] font-black">
                       <Star size={14} className="text-yellow-400" fill="currentColor" />
-                      4.9 <span className="text-zinc-500 font-bold">• reseñas</span>
+                      <span className="text-white">4.9</span>
+                      <span className="text-zinc-500 font-bold">• reseñas</span>
                     </div>
                     <div className="mt-2 text-[11px] text-zinc-500 font-bold tabular-nums">
                       Cierra: {countdown.h}:{countdown.m}:{countdown.s}
@@ -641,13 +705,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                     Comprar contraentrega <ArrowRight size={18} />
                   </a>
 
-                  <button
-                    onClick={() => trackCTA("hero_ver_galeria", { section: "hero" })}
-                    className="inline-flex justify-center items-center gap-2 w-full sm:w-auto bg-white/5 hover:bg-white/10 border border-white/10 px-6 py-4 rounded-2xl font-black text-sm transition-all active:scale-95"
-                    type="button"
-                  >
-                    Ver fotos <ImageIcon size={18} />
-                  </button>
+                  {/* ✅ 2) Quitado botón “Ver fotos” */}
                 </div>
 
                 <div className="mt-5 grid grid-cols-2 gap-3">
@@ -659,10 +717,23 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
               </CardShell>
             </div>
 
+            {/* QUICK BENEFITS SHORT */}
             <div className="mt-8 grid md:grid-cols-3 gap-4">
-              <ConversionCard icon={<Brain className="text-indigo-300" />} title="Enfoque" desc="Bloques de concentración más largos para avanzar." />
-              <ConversionCard icon={<BatteryCharging className="text-yellow-300" />} title="Ritmo estable" desc="Sensación de constancia durante el día." />
-              <ConversionCard icon={<ShieldCheck className="text-green-300" />} title="Cero fricción" desc="Sin pagos online: confirmación y entrega." />
+              <ConversionCard
+                icon={<Brain className="text-indigo-300" />}
+                title="Enfoque"
+                desc="Bloques de concentración más largos para avanzar."
+              />
+              <ConversionCard
+                icon={<BatteryCharging className="text-yellow-300" />}
+                title="Ritmo estable"
+                desc="Sensación de constancia durante el día."
+              />
+              <ConversionCard
+                icon={<ShieldCheck className="text-green-300" />}
+                title="Cero fricción"
+                desc="Sin pagos online: confirmación y entrega."
+              />
             </div>
           </motion.div>
         </motion.div>
@@ -684,15 +755,32 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
           <div className="p-7 sm:p-9 md:p-10 relative">
             <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-purple-500/10 pointer-events-none" />
             <div className="relative">
-              <h3 className="text-2xl md:text-3xl font-black mb-2">Compra en 3 pasos</h3>
-              <p className="text-zinc-500 text-sm md:text-base max-w-2xl">
+              <h3 className="text-2xl md:text-3xl font-black mb-2 break-words text-pretty">
+                Compra en 3 pasos
+              </h3>
+              <p className="text-zinc-500 text-sm md:text-base max-w-2xl break-words text-pretty">
                 Sin cuentas, sin pagos anticipados. Solo confirmación por WhatsApp y pagas al recibir.
               </p>
 
               <div className="mt-7 grid md:grid-cols-3 gap-4">
-                <StepCard n="1" icon={<Users className="text-indigo-200" size={18} />} title="Completa el formulario" desc="Nombre, WhatsApp, ciudad y dirección." />
-                <StepCard n="2" icon={<PhoneCall className="text-indigo-200" size={18} />} title="Confirmamos por WhatsApp" desc="Validamos datos para envío." />
-                <StepCard n="3" icon={<HandCoins className="text-indigo-200" size={18} />} title="Recibe y paga" desc="Pagas cuando lo tienes en tus manos." />
+                <StepCard
+                  n="1"
+                  icon={<Users className="text-indigo-200" size={18} />}
+                  title="Completa el formulario"
+                  desc="Nombre, WhatsApp, ciudad y dirección."
+                />
+                <StepCard
+                  n="2"
+                  icon={<PhoneCall className="text-indigo-200" size={18} />}
+                  title="Confirmamos por WhatsApp"
+                  desc="Validamos datos para envío."
+                />
+                <StepCard
+                  n="3"
+                  icon={<HandCoins className="text-indigo-200" size={18} />}
+                  title="Recibe y paga"
+                  desc="Pagas cuando lo tienes en tus manos."
+                />
               </div>
 
               <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
@@ -734,19 +822,24 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                   <div className="w-20 h-20 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
                     <Check size={40} />
                   </div>
-                  <h3 className="text-3xl font-black mb-2">¡Pedido Exitoso!</h3>
-                  <p className="text-zinc-400">Un asesor te contactará por WhatsApp en breve.</p>
+                  <h3 className="text-3xl font-black mb-2 break-words">¡Pedido Exitoso!</h3>
+                  <p className="text-zinc-400 break-words">
+                    Un asesor te contactará por WhatsApp en breve.
+                  </p>
                 </div>
               ) : (
                 <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-12">
+                  {/* LEFT: Shipping */}
                   <div>
                     <div className="flex items-start justify-between gap-3 mb-6">
-                      <div>
-                        <h3 className="text-2xl font-black">Datos de envío</h3>
-                        <p className="text-zinc-500 text-sm mt-1">Completa para reservar tu pedido (pago al recibir).</p>
+                      <div className="min-w-0">
+                        <h3 className="text-2xl font-black break-words">Datos de envío</h3>
+                        <p className="text-zinc-500 text-sm mt-1 break-words">
+                          Completa para reservar tu pedido (pago al recibir).
+                        </p>
                       </div>
                       {lowStock && (
-                        <div className="hidden sm:inline-flex items-center gap-2 bg-orange-500/10 border border-orange-500/20 px-3 py-2 rounded-xl text-orange-200 text-xs font-black">
+                        <div className="hidden sm:inline-flex items-center gap-2 bg-orange-500/10 border border-orange-500/20 px-3 py-2 rounded-xl text-orange-200 text-xs font-black shrink-0">
                           <Package size={16} />
                           {remainingStock} disponibles
                         </div>
@@ -760,10 +853,34 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                         </div>
                       )}
 
-                      <Input label="Tu Nombre Completo" icon={<Users size={16} className="text-indigo-200" />} placeholder="Ej: Juan Pérez" value={fullName} onChange={(e: any) => setFullName(e.target.value)} />
-                      <Input label="WhatsApp / Teléfono" icon={<PhoneCall size={16} className="text-indigo-200" />} placeholder="Para confirmar entrega" value={phone} onChange={(e: any) => setPhone(e.target.value)} />
-                      <Input label="Ciudad" icon={<MapPin size={16} className="text-indigo-200" />} placeholder="Ej: Medellín" value={city} onChange={(e: any) => setCity(e.target.value)} />
-                      <Input label="Dirección Exacta" icon={<MapPin size={16} className="text-indigo-200" />} placeholder="Calle, número, apto/barrio" value={address} onChange={(e: any) => setAddress(e.target.value)} />
+                      <Input
+                        label="Tu Nombre Completo"
+                        icon={<Users size={16} className="text-indigo-200" />}
+                        placeholder="Ej: Juan Pérez"
+                        value={fullName}
+                        onChange={(e: any) => setFullName(e.target.value)}
+                      />
+                      <Input
+                        label="WhatsApp / Teléfono"
+                        icon={<PhoneCall size={16} className="text-indigo-200" />}
+                        placeholder="Para confirmar entrega"
+                        value={phone}
+                        onChange={(e: any) => setPhone(e.target.value)}
+                      />
+                      <Input
+                        label="Ciudad"
+                        icon={<MapPin size={16} className="text-indigo-200" />}
+                        placeholder="Ej: Medellín"
+                        value={city}
+                        onChange={(e: any) => setCity(e.target.value)}
+                      />
+                      <Input
+                        label="Dirección Exacta"
+                        icon={<MapPin size={16} className="text-indigo-200" />}
+                        placeholder="Calle, número, apto/barrio"
+                        value={address}
+                        onChange={(e: any) => setAddress(e.target.value)}
+                      />
                     </div>
 
                     <div className="mt-6 grid grid-cols-2 gap-3">
@@ -774,13 +891,16 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                     </div>
                   </div>
 
+                  {/* RIGHT: Summary */}
                   <div className="bg-white/5 p-6 rounded-3xl border border-white/10 h-fit sticky top-[88px]">
-                    <h3 className="text-xl font-black mb-5 text-center">Resumen</h3>
+                    <h3 className="text-xl font-black mb-5 text-center break-words">Resumen</h3>
 
                     <div className="rounded-2xl border border-white/10 bg-black/25 p-4 mb-5">
-                      <div className="flex items-center justify-between text-sm text-zinc-300">
+                      <div className="flex items-center justify-between text-sm text-zinc-300 gap-3">
                         <span className="font-bold truncate">{product?.name}</span>
-                        <span className="font-black">${Number(product?.price || 0).toLocaleString()}</span>
+                        <span className="font-black shrink-0">
+                          ${Number(product?.price || 0).toLocaleString()}
+                        </span>
                       </div>
                       <div className="mt-2 text-[11px] text-zinc-500 flex items-center gap-2">
                         <Truck size={14} className="text-indigo-300" />
@@ -856,13 +976,17 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                         <span>Envío:</span>
                         <span className="text-green-400 font-black">GRATIS</span>
                       </div>
-                      <div className="flex justify-between text-2xl font-black">
+                      <div className="flex justify-between text-2xl font-black gap-3">
                         <span>Total:</span>
-                        <span>${total.toLocaleString()}</span>
+                        <span className="break-words">${total.toLocaleString()}</span>
                       </div>
                     </div>
 
-                    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mb-4 rounded-2xl border border-indigo-500/20 bg-indigo-500/10 p-4">
+                    <motion.div
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mb-4 rounded-2xl border border-indigo-500/20 bg-indigo-500/10 p-4"
+                    >
                       <p className="text-xs font-black uppercase tracking-widest text-indigo-200/90 mb-1 flex items-center gap-2">
                         <Timer size={14} />
                         Cierra en{" "}
@@ -870,7 +994,9 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                           {countdown.h}:{countdown.m}:{countdown.s}
                         </span>
                       </p>
-                      <p className="text-[11px] text-zinc-300">Completa el pedido y lo reservamos para confirmación por WhatsApp.</p>
+                      <p className="text-[11px] text-zinc-300">
+                        Completa el pedido y lo reservamos para confirmación por WhatsApp.
+                      </p>
                     </motion.div>
 
                     <button
@@ -903,7 +1029,9 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
 
       {/* FAQ */}
       <section className="py-16 sm:py-20 px-4 max-w-3xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-black text-center mb-10">Preguntas Frecuentes</h2>
+        <h2 className="text-3xl md:text-4xl font-black text-center mb-10 break-words">
+          Preguntas Frecuentes
+        </h2>
         <div className="space-y-4">
           <FaqItem q="¿En cuánto tiempo llega mi pedido?" a="El tiempo de entrega suele ser de 2 a 4 días hábiles según tu ciudad. Te confirmamos y coordinamos por WhatsApp." />
           <FaqItem q="¿Es seguro el pago contraentrega?" a="Sí. Solo pagas cuando recibes el producto. Antes confirmamos tu información de envío." />
@@ -932,6 +1060,76 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* ✅ Lightbox */}
+      <AnimatePresence>
+        {lightboxOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[999] bg-black/80 backdrop-blur-sm p-4 sm:p-8"
+            onMouseDown={(e) => {
+              // cerrar si el click es en el overlay (no en el contenido)
+              if (e.target === e.currentTarget) closeLightbox();
+            }}
+            aria-modal="true"
+            role="dialog"
+          >
+            <div className="max-w-5xl mx-auto h-full flex items-center">
+              <motion.div
+                initial={{ scale: 0.98, y: 10, opacity: 0 }}
+                animate={{ scale: 1, y: 0, opacity: 1 }}
+                exit={{ scale: 0.98, y: 10, opacity: 0 }}
+                className="w-full rounded-[2rem] border border-white/10 bg-zinc-950/70 overflow-hidden shadow-2xl"
+              >
+                <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-white/10">
+                  <div className="text-xs sm:text-sm font-black tracking-widest uppercase text-zinc-300">
+                    Galería • {lightboxIdx + 1}/{GALLERY.length}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={closeLightbox}
+                    className="rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 p-2"
+                    aria-label="Cerrar"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+
+                <div className="relative w-full aspect-square bg-black/40">
+                  <Image
+                    src={GALLERY[lightboxIdx]}
+                    alt={`Galería ${lightboxIdx + 1}`}
+                    fill
+                    sizes="(max-width: 640px) 92vw, 980px"
+                    className="object-contain p-4 sm:p-8"
+                  />
+                </div>
+
+                <div className="px-4 sm:px-6 py-4 border-t border-white/10 flex items-center justify-between gap-3">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setLightboxIdx((i) => (i - 1 + GALLERY.length) % GALLERY.length)
+                    }
+                    className="rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 px-4 py-2 text-sm font-black"
+                  >
+                    ← Anterior
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setLightboxIdx((i) => (i + 1) % GALLERY.length)}
+                    className="rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 px-4 py-2 text-sm font-black"
+                  >
+                    Siguiente →
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -939,10 +1137,22 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
 /* ---------------- SUBCOMPONENTES ---------------- */
 
 function MarqueePill({ icon, text }: { icon: any; text: string }) {
-  return <span className="inline-flex items-center gap-2">{icon} {text}</span>;
+  return (
+    <span className="inline-flex items-center gap-2">
+      {icon} {text}
+    </span>
+  );
 }
 
-function BadgePill({ icon, text, tone }: { icon: any; text: string; tone: "indigo" | "orange" | "neutral" }) {
+function BadgePill({
+  icon,
+  text,
+  tone,
+}: {
+  icon: any;
+  text: string;
+  tone: "indigo" | "orange" | "neutral";
+}) {
   const cls =
     tone === "indigo"
       ? "bg-indigo-500/10 border-indigo-500/20 text-indigo-200/90"
@@ -950,7 +1160,9 @@ function BadgePill({ icon, text, tone }: { icon: any; text: string; tone: "indig
       ? "bg-orange-500/10 border-orange-500/20 text-orange-200/90"
       : "bg-black/30 border-white/10 text-zinc-300";
   return (
-    <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-[11px] font-black tracking-widest uppercase ${cls}`}>
+    <div
+      className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-[11px] font-black tracking-widest uppercase ${cls}`}
+    >
       {icon} {text}
     </div>
   );
@@ -972,23 +1184,43 @@ function TrustIcon({ icon, text }: { icon: any; text: string }) {
   );
 }
 
-function MiniStat({ icon, title, desc }: { icon: any; title: string; desc: string }) {
+function MiniStat({
+  icon,
+  title,
+  desc,
+}: {
+  icon: any;
+  title: string;
+  desc: string;
+}) {
   return (
     <div className="rounded-2xl border border-white/10 bg-zinc-900/40 p-4 flex items-center gap-3 min-w-0">
       <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/15 flex items-center justify-center text-indigo-200 shrink-0">
         {icon}
       </div>
       <div className="min-w-0">
-        <p className="text-sm font-black">{title}</p>
+        <p className="text-sm font-black truncate">{title}</p>
         <p className="text-[11px] text-zinc-500 truncate">{desc}</p>
       </div>
     </div>
   );
 }
 
-function ConversionCard({ icon, title, desc }: { icon: any; title: string; desc: string }) {
+function ConversionCard({
+  icon,
+  title,
+  desc,
+}: {
+  icon: any;
+  title: string;
+  desc: string;
+}) {
   return (
-    <CardShell variant="gradientBorder" accent="indigo" className="p-6 sm:p-7 hover:-translate-y-[2px]">
+    <CardShell
+      variant="gradientBorder"
+      accent="indigo"
+      className="p-6 sm:p-7 hover:-translate-y-[2px]"
+    >
       <div className="flex items-start justify-between gap-4">
         <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
           {icon}
@@ -997,23 +1229,37 @@ function ConversionCard({ icon, title, desc }: { icon: any; title: string; desc:
           Beneficio
         </span>
       </div>
-      <h3 className="mt-4 text-xl font-black">{title}</h3>
-      <p className="mt-2 text-sm text-zinc-400 leading-relaxed">{desc}</p>
+      <h3 className="mt-4 text-xl font-black break-words">{title}</h3>
+      <p className="mt-2 text-sm text-zinc-400 leading-relaxed break-words text-pretty">
+        {desc}
+      </p>
     </CardShell>
   );
 }
 
-function StepCard({ n, icon, title, desc }: { n: string; icon: any; title: string; desc: string }) {
+function StepCard({
+  n,
+  icon,
+  title,
+  desc,
+}: {
+  n: string;
+  icon: any;
+  title: string;
+  desc: string;
+}) {
   return (
     <div className="rounded-[1.6rem] border border-white/10 bg-black/25 p-5">
       <div className="flex items-center justify-between mb-3">
         <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 border border-indigo-500/15 flex items-center justify-center">
           {icon}
         </div>
-        <span className="text-[11px] font-black tracking-widest uppercase text-zinc-400">Paso {n}</span>
+        <span className="text-[11px] font-black tracking-widest uppercase text-zinc-400">
+          Paso {n}
+        </span>
       </div>
-      <h4 className="font-black mb-1">{title}</h4>
-      <p className="text-sm text-zinc-500">{desc}</p>
+      <h4 className="font-black mb-1 break-words">{title}</h4>
+      <p className="text-sm text-zinc-500 break-words text-pretty">{desc}</p>
     </div>
   );
 }
@@ -1021,10 +1267,12 @@ function StepCard({ n, icon, title, desc }: { n: string; icon: any; title: strin
 function Input({ label, icon, ...props }: any) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-[10px] font-black text-zinc-500 uppercase ml-2 tracking-widest">{label}</label>
+      <label className="text-[10px] font-black text-zinc-500 uppercase ml-2 tracking-widest">
+        {label}
+      </label>
       <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus-within:border-indigo-500 transition-all">
         <span className="shrink-0">{icon}</span>
-        <input {...props} className="bg-transparent outline-none text-sm w-full" />
+        <input {...props} className="bg-transparent outline-none text-sm w-full min-w-0" />
       </div>
     </div>
   );
@@ -1034,19 +1282,27 @@ function FaqItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="border border-white/5 bg-zinc-900/30 rounded-2xl overflow-hidden">
-      <button onClick={() => setOpen(!open)} className="w-full p-5 flex justify-between items-center text-left font-black gap-3" type="button">
-        <span className="text-sm md:text-base">{q}</span>
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full p-5 flex justify-between items-center text-left font-black gap-3"
+        type="button"
+      >
+        <span className="text-sm md:text-base break-words text-pretty">{q}</span>
         <ChevronDown className={`transition-transform shrink-0 ${open ? "rotate-180" : ""}`} />
       </button>
-      {open && <div className="p-5 pt-0 text-zinc-400 text-sm leading-relaxed">{a}</div>}
+      {open && (
+        <div className="p-5 pt-0 text-zinc-400 text-sm leading-relaxed break-words text-pretty">
+          {a}
+        </div>
+      )}
     </div>
   );
 }
 
 function MicroProof({ icon, text }: { icon: any; text: string }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-black/30 px-3 py-2 flex items-center gap-2 text-[11px] text-zinc-300 font-bold">
-      <span className="text-indigo-300">{icon}</span>
+    <div className="rounded-xl border border-white/10 bg-black/30 px-3 py-2 flex items-center gap-2 text-[11px] text-zinc-300 font-bold min-w-0">
+      <span className="text-indigo-300 shrink-0">{icon}</span>
       <span className="truncate">{text}</span>
     </div>
   );
