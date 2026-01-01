@@ -11,8 +11,6 @@ import tes1 from "./melena/testimonial-1.webp";
 // import tes3 from "./melena/testimonial-3.webp";
 import limitlessImg from "./melena/limitless.webp";
 
-const LIMITLESS_IMG = limitlessImg as StaticImageData;
-
 import { createOrder } from "@/actions/orders";
 import { motion, type Variants, AnimatePresence } from "framer-motion";
 import {
@@ -39,6 +37,9 @@ import {
   X,
 } from "lucide-react";
 
+// ✅ para Next/Image (import local)
+const LIMITLESS_IMG = limitlessImg as StaticImageData;
+
 // --- TIPADOS ---
 type ProductDTO = {
   id: number;
@@ -61,7 +62,7 @@ type Testimonial = {
   date: string;
 };
 
-// ✅ TESTIMONIOS (top-level para que NO dé "Cannot find name 'TESTIMONIALS'")
+// ✅ TESTIMONIOS (top-level)
 const TESTIMONIALS: Testimonial[] = [
   {
     name: "Juan P.",
@@ -223,10 +224,43 @@ function RatingStars({ rating = 5 }: { rating?: number }) {
   );
 }
 
+/** ✅ Wrapper para variar diseño por sección (menos “monótono”) */
+function SectionWrap({
+  id,
+  variant = "base",
+  children,
+}: {
+  id?: string;
+  variant?: "base" | "alt" | "spotlight" | "band";
+  children: React.ReactNode;
+}) {
+  const styles =
+    variant === "alt"
+      ? "bg-gradient-to-b from-white/[0.02] via-transparent to-white/[0.02] border-y border-white/5"
+      : variant === "spotlight"
+      ? "relative overflow-hidden"
+      : variant === "band"
+      ? "bg-indigo-600/5 border-y border-white/5"
+      : "";
+
+  return (
+    <section id={id} className={cx("py-12 sm:py-14 px-4", styles)}>
+      {variant === "spotlight" && (
+        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(168,85,247,0.12),transparent_55%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(99,102,241,0.10),transparent_58%)]" />
+          <div className="absolute inset-0 opacity-[0.04] [background-image:linear-gradient(to_right,white_1px,transparent_1px),linear-gradient(to_bottom,white_1px,transparent_1px)] [background-size:64px_64px]" />
+        </div>
+      )}
+      {children}
+    </section>
+  );
+}
+
 export default function MelenaLanding({ product }: { product: ProductDTO }) {
   // ✅ Galería con imports
   const GALLERY = useMemo(() => [gal1, gal2, gal3], []);
-  const MAIN_IMG = gal1; // ✅ 1) imagen principal = gal1
+  const MAIN_IMG = gal1;
 
   const [fbclid, setFbclid] = useState<string | undefined>(undefined);
   const viewContentSentRef = useRef(false);
@@ -391,7 +425,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
   const lowStock = remainingStock > 0 && remainingStock <= 20;
   const countdown = useMemo(() => formatTime(deadline - now), [deadline, now]);
 
-  // ✅ Lightbox (click en galería => ver grande)
+  // ✅ Lightbox
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIdx, setLightboxIdx] = useState(0);
 
@@ -599,9 +633,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
             <CardShell variant="glow" accent="indigo" className="p-4 sm:p-6">
               <div className="flex items-center justify-between gap-3 mb-4">
                 <BadgePill icon={<Sparkles size={14} />} text="OFERTA ACTIVA" tone="indigo" />
-                {lowStock && (
-                  <BadgePill icon={<Package size={14} />} text={`quedan ${remainingStock}`} tone="orange" />
-                )}
+                {lowStock && <BadgePill icon={<Package size={14} />} text={`quedan ${remainingStock}`} tone="orange" />}
               </div>
 
               <button
@@ -620,7 +652,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                 />
               </button>
 
-              {/* thumbs (clic => abre grande) */}
+              {/* thumbs */}
               <div className="mt-4 grid grid-cols-3 gap-3">
                 {GALLERY.map((src, i) => (
                   <button
@@ -630,13 +662,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                     className="relative aspect-square overflow-hidden rounded-2xl border border-white/10 bg-black/25 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
                     aria-label={`Ver Galería ${i + 1} en grande`}
                   >
-                    <Image
-                      src={src}
-                      alt={`Galería ${i + 1}`}
-                      fill
-                      sizes="(max-width:640px) 30vw, 160px"
-                      className="object-cover"
-                    />
+                    <Image src={src} alt={`Galería ${i + 1}`} fill sizes="(max-width:640px) 30vw, 160px" className="object-cover" />
                   </button>
                 ))}
               </div>
@@ -669,27 +695,32 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
             </h1>
 
             <p className="mt-3 text-zinc-400 text-[14px] sm:text-lg max-w-xl break-words text-pretty">
-              {product?.subtitle ||
-                "Enfoque más estable para tu día: trabajo, estudio y tareas exigentes."}
+              {product?.subtitle || "Enfoque más estable para tu día: trabajo, estudio y tareas exigentes."}
             </p>
 
-            {/* ✅ LIMITLESS ANGLE (sutil y creíble) */}
+            {/* ✅ LIMITLESS ANGLE + IMAGEN (ya renderiza) */}
             <div className="mt-5 max-w-xl">
               <CardShell variant="outlineDashed" accent="purple" className="p-5">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-purple-500/10 border border-purple-500/15 flex items-center justify-center text-purple-200 shrink-0">
-                    <Brain size={18} />
-                  </div>
+                <div className="grid gap-4 sm:grid-cols-[1fr_0.9fr] items-center">
                   <div className="min-w-0">
                     <p className="text-[11px] font-black uppercase tracking-widest text-purple-200/90">
                       Inspirado en “Limitless”
                     </p>
-                    <p className="mt-1 text-sm text-zinc-300 leading-relaxed break-words text-pretty">
-                      No es ciencia ficción. Es lo más cerca que la naturaleza ha estado de ayudarte
-                      a sentir <span className="font-black text-white">claridad</span>,{" "}
-                      <span className="font-black text-white">enfoque</span> y{" "}
-                      <span className="font-black text-white">productividad</span> en tu día.
+                    <p className="mt-2 text-sm text-zinc-300 leading-relaxed break-words text-pretty">
+                      Una forma <span className="font-black text-white">realista</span> de buscar claridad, enfoque y
+                      productividad en tu día (sin humo).
                     </p>
+                  </div>
+
+                  <div className="relative w-full aspect-[4/3] overflow-hidden rounded-2xl border border-white/10 bg-black/30">
+                    <Image
+                      src={LIMITLESS_IMG}
+                      alt="Inspiración Limitless"
+                      fill
+                      sizes="(max-width: 640px) 90vw, 420px"
+                      className="object-cover"
+                    />
+                    <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-transparent" />
                   </div>
                 </div>
               </CardShell>
@@ -707,16 +738,12 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
               <CardShell variant="gradientBorder" accent="purple" className="p-6 sm:p-7">
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
-                    <p className="text-[11px] uppercase tracking-widest text-zinc-400 font-black">
-                      Precio hoy
-                    </p>
+                    <p className="text-[11px] uppercase tracking-widest text-zinc-400 font-black">Precio hoy</p>
                     <p className="text-3xl sm:text-4xl font-black mt-1 break-words">
                       ${Number(product?.price || 0).toLocaleString()}
                       <span className="text-xs text-zinc-400 font-bold ml-2">COP</span>
                     </p>
-                    <p className="text-[12px] text-zinc-400 mt-2">
-                      Incluye envío gratis + confirmación por WhatsApp.
-                    </p>
+                    <p className="text-[12px] text-zinc-400 mt-2">Incluye envío gratis + confirmación por WhatsApp.</p>
                   </div>
 
                   <div className="text-right shrink-0">
@@ -750,92 +777,66 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
               </CardShell>
             </div>
 
-            {/* QUICK BENEFITS SHORT */}
+            {/* QUICK BENEFITS SHORT (más corto) */}
             <div className="mt-8 grid md:grid-cols-3 gap-4">
-              <ConversionCard
-                icon={<Brain className="text-indigo-300" />}
-                title="Enfoque"
-                desc="Bloques de concentración más largos para avanzar."
-              />
-              <ConversionCard
-                icon={<BatteryCharging className="text-yellow-300" />}
-                title="Ritmo estable"
-                desc="Sensación de constancia durante el día."
-              />
-              <ConversionCard
-                icon={<ShieldCheck className="text-green-300" />}
-                title="Cero fricción"
-                desc="Sin pagos online: confirmación y entrega."
-              />
+              <ConversionCard icon={<Brain className="text-indigo-300" />} title="Enfoque" desc="Te ayuda a sostenerte más tiempo." />
+              <ConversionCard icon={<BatteryCharging className="text-yellow-300" />} title="Ritmo estable" desc="Sensación de constancia." />
+              <ConversionCard icon={<ShieldCheck className="text-green-300" />} title="Cero fricción" desc="Contraentrega + WhatsApp." />
             </div>
           </motion.div>
         </motion.div>
       </section>
 
+      {/* ✅ ORDEN DE SECCIONES (como pediste): Dolores → Urgencia → Escasez → Testimonios → Objeciones → Garantía */}
+
       {/* ===================== 1) DOLORES ===================== */}
-      <section id="dolores" className="py-14 sm:py-16 px-4">
+      <SectionWrap id="dolores" variant="spotlight">
         <div className="max-w-6xl mx-auto">
           <HeaderBlock
-            kicker="Dolores reales"
-            title="¿Sientes que tu mente ya no rinde como antes?"
-            subtitle="No es pereza. No es falta de ganas. A veces es saturación mental: enfoque corto, mente nublada y productividad inconsistente."
+            kicker="Dolores"
+            title="Cuando tu mente no coopera… todo se siente cuesta arriba"
+            subtitle="Esto es lo que más se repite: poca claridad, enfoque frágil y días que se van sin avanzar."
           />
 
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
+          <div className="mt-7 grid gap-4 md:grid-cols-3">
             <PainCard
               icon={<Brain size={18} className="text-indigo-200" />}
               title="Mente nublada"
-              bullets={[
-                "Lees y lo repites 2–3 veces",
-                "Sientes la mente “lenta” o pesada",
-                "Te dispersas con facilidad",
-              ]}
+              bullets={["Lees y repites varias veces", "Te cuesta decidir rápido", "Te distraes por todo"]}
             />
             <PainCard
               icon={<Timer size={18} className="text-indigo-200" />}
               title="Enfoque corto"
-              bullets={[
-                "Te concentras 20–30 min y caes",
-                "Procrastinas tareas simples",
-                "Te cuesta arrancar aunque tengas tiempo",
-              ]}
+              bullets={["Arrancas y te caes", "Procrastinas tareas simples", "Te cuesta sostener el ritmo"]}
             />
             <PainCard
               icon={<BatteryCharging size={18} className="text-indigo-200" />}
               title="Energía mental baja"
-              bullets={[
-                "Duermes, pero no sientes claridad",
-                "Dependes del café y aún así…",
-                "Al mediodía ya estás apagado",
-              ]}
+              bullets={["Cansancio mental temprano", "Café sin resultados", "Sensación de “apagado”"]}
             />
           </div>
 
-          {/* ✅ mini “Limitless” (más fuerte) + imagen opcional */}
+          {/* Mini bloque Limitless (compacto + CTA) */}
           <div className="mt-6">
             <CardShell variant="glow" accent="purple" className="p-6 sm:p-7">
               <div className="grid gap-6 md:grid-cols-[1fr_0.9fr] items-center">
-                <div>
-                  <p className="text-[11px] font-black uppercase tracking-widest text-purple-200/90">
-                    El ángulo “Limitless” (bien usado)
-                  </p>
+                <div className="min-w-0">
+                  <p className="text-[11px] font-black uppercase tracking-widest text-purple-200/90">Limitless, pero real</p>
                   <h3 className="mt-2 text-2xl sm:text-3xl font-black leading-tight">
-                    Esa sensación de claridad y productividad… pero en versión natural.
+                    Menos ruido mental. Más claridad para ejecutar.
                   </h3>
                   <p className="mt-3 text-sm text-zinc-300 leading-relaxed">
-                    ¿Recuerdas <span className="font-black text-white">Limitless</span>? Esa idea de
-                    “desbloquear tu mente”. Aquí lo planteamos de forma realista: apoyo a tu día para
-                    sostener <span className="font-black text-white">enfoque</span>,{" "}
-                    <span className="font-black text-white">claridad</span> y{" "}
-                    <span className="font-black text-white">ritmo</span> sin sentirte acelerado.
+                    Aquí no vendemos “milagros”. Vendemos una experiencia simple: apoyo para tu enfoque, con compra sin riesgo
+                    (contraentrega + garantía).
                   </p>
+
                   <div className="mt-5 flex flex-col sm:flex-row gap-3">
                     <a
                       href="#form"
                       className="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 hover:bg-indigo-500 px-6 py-3.5 font-black shadow-lg shadow-indigo-600/25 transition-all active:scale-95"
                       onClick={() => trackCTA("dolores_ir_form", { section: "dolores" })}
                     >
-                      Quiero probarlo hoy <ArrowRight size={18} />
+                      Quiero pedir hoy <ArrowRight size={18} />
                     </a>
                     <div className="text-[11px] text-zinc-400 font-bold flex items-center gap-2">
                       <Lock size={14} className="text-indigo-300" />
@@ -844,53 +845,41 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                   </div>
                 </div>
 
-                {/* ✅ IMAGEN OPCIONAL */}
-                <div className="rounded-[1.8rem] border border-white/10 bg-black/30 overflow-hidden">
-                  {/* Si importas LIMITLESS_IMG arriba, reemplaza este bloque por el Image real */}
-                  <div className="p-6">
-                    <div className="text-[11px] font-black uppercase tracking-widest text-zinc-400">
-                      Imagen opcional
-                    </div>
-                    <div className="mt-3 rounded-2xl border border-white/10 bg-white/5 p-5 text-sm text-zinc-300 leading-relaxed">
-                      Si quieres meter una imagen tipo “focus / mente / productividad”:
-                      <ul className="mt-3 list-disc list-inside text-zinc-400 space-y-1">
-                        <li>Agrega: <span className="text-white font-black">./melena/limitless.webp</span></li>
-                        <li>Descomenta el import al inicio</li>
-                        <li>Y cambia este bloque por un &lt;Image /&gt;</li>
-                      </ul>
-                    </div>
-
-                    {/* EJEMPLO (cuando importes LIMITLESS_IMG):
-                    <div className="relative w-full aspect-[4/3]">
-                      <Image src={LIMITLESS_IMG} alt="Inspiración focus" fill className="object-cover" />
-                    </div>
-                    */}
+                <div className="relative w-full aspect-[16/11] rounded-[1.8rem] border border-white/10 bg-black/30 overflow-hidden">
+                  <Image
+                    src={LIMITLESS_IMG}
+                    alt="Efecto Limitless"
+                    fill
+                    sizes="(max-width: 768px) 92vw, 520px"
+                    className="object-cover"
+                  />
+                  <div aria-hidden className="absolute inset-0 bg-gradient-to-tr from-black/55 via-black/10 to-transparent" />
+                  <div className="absolute bottom-3 left-3 right-3 text-[11px] font-black uppercase tracking-widest text-white/85">
+                    Claridad • Enfoque • Productividad
                   </div>
                 </div>
               </div>
             </CardShell>
           </div>
         </div>
-      </section>
+      </SectionWrap>
 
       {/* ===================== 2) URGENCIA ===================== */}
-      <section id="urgencia" className="py-14 sm:py-16 px-4">
+      <SectionWrap id="urgencia" variant="alt">
         <div className="max-w-6xl mx-auto">
           <HeaderBlock
             kicker="Urgencia"
-            title="Hoy tienes la oferta activa (y se reinicia)"
-            subtitle="No lo dejes para “después”. Si estás en un momento de trabajo/estudio exigente, este es el mejor punto para arrancar."
+            title="La oferta está activa ahora (y se reinicia)"
+            subtitle="Si estás en semanas exigentes, este es el mejor momento para arrancar."
           />
 
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
+          <div className="mt-7 grid gap-4 md:grid-cols-3">
             <CardShell variant="gradientBorder" accent="indigo" className="p-6 sm:p-7">
               <p className="text-[11px] font-black uppercase tracking-widest text-zinc-400">Cierra en</p>
               <p className="mt-2 text-4xl font-black tabular-nums">
                 {countdown.h}:{countdown.m}:{countdown.s}
               </p>
-              <p className="mt-2 text-sm text-zinc-400">
-                Completa el formulario para reservar tu pedido.
-              </p>
+              <p className="mt-2 text-sm text-zinc-400">Completa el formulario y reservas tu pedido.</p>
             </CardShell>
 
             <CardShell variant="glass" accent="purple" className="p-6 sm:p-7">
@@ -900,9 +889,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                 </div>
                 <div className="min-w-0">
                   <p className="font-black">Confirmación rápida</p>
-                  <p className="mt-1 text-sm text-zinc-400">
-                    Te contactamos por WhatsApp para validar y enviar.
-                  </p>
+                  <p className="mt-1 text-sm text-zinc-400">Te escribimos por WhatsApp para validar el envío.</p>
                 </div>
               </div>
             </CardShell>
@@ -930,38 +917,32 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
             </a>
           </div>
         </div>
-      </section>
+      </SectionWrap>
 
       {/* ===================== 3) ESCASEZ ===================== */}
-      <section id="escasez" className="py-14 sm:py-16 px-4">
+      <SectionWrap id="escasez" variant="base">
         <div className="max-w-6xl mx-auto">
           <HeaderBlock
             kicker="Escasez"
             title="Stock limitado (lotes pequeños)"
-            subtitle="Si estás viendo esto, aún hay unidades disponibles. Cuando se agotan, se pausa la oferta."
+            subtitle="Cuando se agota, se pausa la oferta hasta el siguiente lote."
           />
 
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
+          <div className="mt-7 grid gap-4 md:grid-cols-3">
             <CardShell variant="glow" accent="amber" className="p-6 sm:p-7">
               <div className="flex items-center justify-between gap-3">
-                <p className="text-[11px] font-black uppercase tracking-widest text-zinc-400">
-                  Disponibilidad
-                </p>
+                <p className="text-[11px] font-black uppercase tracking-widest text-zinc-400">Disponibilidad</p>
                 <Package size={18} className="text-orange-200" />
               </div>
 
-              <p className="mt-2 text-3xl font-black">
-                {remainingStock > 0 ? `${remainingStock} unidades` : "Stock por confirmar"}
-              </p>
+              <p className="mt-2 text-3xl font-black">{remainingStock > 0 ? `${remainingStock} unidades` : "Stock por confirmar"}</p>
               <p className="mt-2 text-sm text-zinc-400">
-                {lowStock
-                  ? "⚠️ Stock bajo: suele agotarse rápido."
-                  : "Recomendación: asegura tu unidad completando el formulario."}
+                {lowStock ? "⚠️ Stock bajo: suele agotarse rápido." : "Tip: completa el formulario para reservar."}
               </p>
             </CardShell>
 
             <CardShell variant="glass" accent="indigo" className="p-6 sm:p-7">
-              <p className="font-black">Lo que reserva tu pedido</p>
+              <p className="font-black">Tu pedido queda reservado</p>
               <ul className="mt-3 space-y-2 text-sm text-zinc-400">
                 <li className="flex gap-2">
                   <Check size={16} className="text-indigo-300 mt-0.5 shrink-0" />
@@ -973,16 +954,15 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                 </li>
                 <li className="flex gap-2">
                   <Check size={16} className="text-indigo-300 mt-0.5 shrink-0" />
-                  Pago contraentrega
+                  Contraentrega (pagas al recibir)
                 </li>
               </ul>
             </CardShell>
 
             <CardShell variant="glass" accent="purple" className="p-6 sm:p-7">
-              <p className="font-black">Tip de compra</p>
+              <p className="font-black">Recomendación simple</p>
               <p className="mt-2 text-sm text-zinc-400">
-                Si estás en semanas de mucha carga (trabajo/estudio), este tipo de apoyo rinde más
-                cuando lo integras a tu rutina diaria.
+                Si estás con alta carga (trabajo/estudio), te conviene asegurar antes de que se acabe el lote.
               </p>
               <a
                 href="#form"
@@ -994,27 +974,25 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
             </CardShell>
           </div>
         </div>
-      </section>
+      </SectionWrap>
 
-      {/* TRUST BAR */}
+      {/* TRUST BAR (corto) */}
       <div className="border-y border-white/5 bg-zinc-900/45 py-6">
         <div className="max-w-6xl mx-auto px-4 flex flex-wrap justify-center gap-6 md:gap-14 opacity-70">
           <TrustIcon icon={<ShieldCheck />} text="Calidad Premium" />
           <TrustIcon icon={<Truck />} text="Entrega 24-48h" />
-          <TrustIcon icon={<RefreshCcw />} text="Garantía Satisf." />
+          <TrustIcon icon={<RefreshCcw />} text="Garantía" />
           <TrustIcon icon={<Leaf />} text="Ingredientes Naturales" />
         </div>
       </div>
 
-      {/* ✅ 4) TESTIMONIOS */}
-      <section id="testimonios" className="py-14 sm:py-16 px-4">
+      {/* ===================== 4) TESTIMONIOS ===================== */}
+      <SectionWrap id="testimonios" variant="spotlight">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-black leading-tight px-2">
-              Testimonios reales
-            </h2>
+          <div className="text-center mb-9">
+            <h2 className="text-3xl md:text-4xl font-black leading-tight px-2">Testimonios reales</h2>
             <p className="mt-3 text-zinc-500 text-sm md:text-base max-w-2xl mx-auto px-4">
-              Compra contraentrega, confirmación por WhatsApp y entrega rápida.
+              Contraentrega, confirmación por WhatsApp y entrega rápida.
             </p>
           </div>
 
@@ -1050,10 +1028,10 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                       Pago contraentrega ✅
                     </span>
                     <span className="text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-full bg-black/25 border border-white/10 text-zinc-300">
-                      Confirmación WhatsApp 💬
+                      WhatsApp 💬
                     </span>
                     <span className="text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-full bg-black/25 border border-white/10 text-zinc-300">
-                      Envío rápido 🚚
+                      Envío 🚚
                     </span>
                   </div>
                 </div>
@@ -1061,7 +1039,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
             ))}
           </div>
 
-          <div className="mt-10 flex justify-center">
+          <div className="mt-9 flex justify-center">
             <a
               href="#form"
               className="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 hover:bg-indigo-500 px-7 py-4 font-black shadow-lg shadow-indigo-600/25 transition-all active:scale-95"
@@ -1071,48 +1049,50 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
             </a>
           </div>
         </div>
-      </section>
+      </SectionWrap>
 
-      {/* ✅ 5) QUIEBRE DE OBJECIONES */}
-      <section id="objeciones" className="py-14 sm:py-16 px-4 max-w-5xl mx-auto">
-        <HeaderBlock
-          kicker="Quiebre de objeciones"
-          title="Lo que probablemente estás pensando (y es normal)"
-          subtitle="Respuestas cortas, claras y sin vueltas."
-        />
+      {/* ===================== 5) QUIEBRE DE OBJECIONES ===================== */}
+      <SectionWrap id="objeciones" variant="alt">
+        <div className="max-w-5xl mx-auto">
+          <HeaderBlock
+            kicker="Quiebre de objeciones"
+            title="Lo que probablemente estás pensando"
+            subtitle="Respuestas cortas, claras y sin vueltas."
+          />
 
-        <div className="mt-8 space-y-4">
-          <SalesFaq
-            q="¿No será otra promesa más?"
-            a="Totalmente válido. Por eso lo planteamos como apoyo a tu rutina (no “milagro”). La clave es constancia + hábitos básicos. Lo bueno: pagas al recibir y tienes garantía."
-          />
-          <SalesFaq
-            q="¿Me va a acelerar como el café?"
-            a="La idea es sentir enfoque y claridad sin el subidón típico de estimulantes. Si eres sensible, empieza con la dosis más baja recomendada en la etiqueta."
-          />
-          <SalesFaq
-            q="¿Y si no me funciona?"
-            a="Por eso tienes garantía: si no te sientes satisfecho, te acompañamos con el proceso de solución según condiciones de la garantía."
-          />
-          <SalesFaq
-            q="¿Cómo sé que sí llega?"
-            a="Confirmamos por WhatsApp antes del envío y es pago contraentrega: recibes primero, pagas después."
-          />
+          <div className="mt-7 space-y-3">
+            <SalesFaq
+              q="¿No será otra promesa más?"
+              a="Válido. Por eso lo planteamos como apoyo a tu rutina (no “milagro”). Además: contraentrega + garantía."
+            />
+            <SalesFaq
+              q="¿Me va a acelerar como el café?"
+              a="La idea es enfoque más estable sin el “subidón” típico. Si eres sensible, inicia con dosis baja (según etiqueta)."
+            />
+            <SalesFaq
+              q="¿Y si no me funciona?"
+              a="Tienes garantía según términos del producto. Te acompañamos en el proceso."
+            />
+            <SalesFaq
+              q="¿Cómo sé que sí llega?"
+              a="Confirmamos por WhatsApp antes del envío y pagas al recibir."
+            />
+          </div>
+
+          <div className="mt-8 flex justify-center">
+            <a
+              href="#form"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 hover:bg-indigo-500 px-7 py-4 font-black shadow-lg shadow-indigo-600/25 transition-all active:scale-95"
+              onClick={() => trackCTA("objeciones_ir_form", { section: "objeciones" })}
+            >
+              Listo, quiero pedir <ArrowRight size={18} />
+            </a>
+          </div>
         </div>
+      </SectionWrap>
 
-        <div className="mt-10 flex justify-center">
-          <a
-            href="#form"
-            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 hover:bg-indigo-500 px-7 py-4 font-black shadow-lg shadow-indigo-600/25 transition-all active:scale-95"
-            onClick={() => trackCTA("objeciones_ir_form", { section: "objeciones" })}
-          >
-            Listo, quiero pedir <ArrowRight size={18} />
-          </a>
-        </div>
-      </section>
-
-      {/* ✅ 6) GARANTÍA (antes del form para cerrar el riesgo) */}
-      <section id="garantia" className="py-14 sm:py-16 px-4">
+      {/* ===================== 6) GARANTÍA ===================== */}
+      <SectionWrap id="garantia" variant="spotlight">
         <div className="max-w-6xl mx-auto">
           <HeaderBlock
             kicker="Garantía"
@@ -1120,17 +1100,15 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
             subtitle="Reducimos el riesgo al máximo: contraentrega + acompañamiento + garantía."
           />
 
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
+          <div className="mt-7 grid gap-4 md:grid-cols-3">
             <CardShell variant="glow" accent="emerald" className="p-6 sm:p-7">
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/15 flex items-center justify-center text-emerald-200 shrink-0">
                   <RefreshCcw size={18} />
                 </div>
                 <div className="min-w-0">
-                  <p className="font-black">Garantía de satisfacción</p>
-                  <p className="mt-1 text-sm text-zinc-400">
-                    Si no estás satisfecho, aplicas a la garantía según términos del producto.
-                  </p>
+                  <p className="font-black">Garantía</p>
+                  <p className="mt-1 text-sm text-zinc-400">Aplica según términos del producto.</p>
                 </div>
               </div>
             </CardShell>
@@ -1141,7 +1119,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                   <HandCoins size={18} />
                 </div>
                 <div className="min-w-0">
-                  <p className="font-black">Pago contraentrega</p>
+                  <p className="font-black">Contraentrega</p>
                   <p className="mt-1 text-sm text-zinc-400">Recibes primero, pagas después.</p>
                 </div>
               </div>
@@ -1153,16 +1131,14 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                   <PhoneCall size={18} />
                 </div>
                 <div className="min-w-0">
-                  <p className="font-black">Soporte por WhatsApp</p>
-                  <p className="mt-1 text-sm text-zinc-400">
-                    Confirmamos y coordinamos tu entrega sin fricción.
-                  </p>
+                  <p className="font-black">Soporte WhatsApp</p>
+                  <p className="mt-1 text-sm text-zinc-400">Confirmamos y coordinamos tu entrega.</p>
                 </div>
               </div>
             </CardShell>
           </div>
 
-          <div className="mt-10 flex justify-center">
+          <div className="mt-9 flex justify-center">
             <a
               href="#form"
               className="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 hover:bg-indigo-500 px-7 py-4 font-black shadow-lg shadow-indigo-600/25 transition-all active:scale-95"
@@ -1172,62 +1148,45 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
             </a>
           </div>
         </div>
-      </section>
+      </SectionWrap>
 
-      {/* HOW IT WORKS */}
-      <section className="py-14 sm:py-16 px-4 max-w-6xl mx-auto">
-        <div className="rounded-[2.4rem] border border-white/10 bg-zinc-900/35 overflow-hidden">
-          <div className="p-7 sm:p-9 md:p-10 relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-purple-500/10 pointer-events-none" />
-            <div className="relative">
-              <h3 className="text-2xl md:text-3xl font-black mb-2 break-words text-pretty">
-                Compra en 3 pasos
-              </h3>
-              <p className="text-zinc-500 text-sm md:text-base max-w-2xl break-words text-pretty">
-                Sin cuentas, sin pagos anticipados. Solo confirmación por WhatsApp y pagas al recibir.
-              </p>
+      {/* HOW IT WORKS (compacto para que no se vea “eterna”) */}
+      <SectionWrap variant="band">
+        <div className="max-w-6xl mx-auto">
+          <div className="rounded-[2.4rem] border border-white/10 bg-zinc-900/35 overflow-hidden">
+            <div className="p-7 sm:p-9 md:p-10 relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-purple-500/10 pointer-events-none" />
+              <div className="relative">
+                <h3 className="text-2xl md:text-3xl font-black mb-2 break-words text-pretty">Compra en 3 pasos</h3>
+                <p className="text-zinc-500 text-sm md:text-base max-w-2xl break-words text-pretty">
+                  Sin pagos anticipados. Solo WhatsApp y pagas al recibir.
+                </p>
 
-              <div className="mt-7 grid md:grid-cols-3 gap-4">
-                <StepCard
-                  n="1"
-                  icon={<Users className="text-indigo-200" size={18} />}
-                  title="Completa el formulario"
-                  desc="Nombre, WhatsApp, ciudad y dirección."
-                />
-                <StepCard
-                  n="2"
-                  icon={<PhoneCall className="text-indigo-200" size={18} />}
-                  title="Confirmamos por WhatsApp"
-                  desc="Validamos datos para envío."
-                />
-                <StepCard
-                  n="3"
-                  icon={<HandCoins className="text-indigo-200" size={18} />}
-                  title="Recibe y paga"
-                  desc="Pagas cuando lo tienes en tus manos."
-                />
-              </div>
-
-              <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
-                <div className="flex flex-wrap gap-2">
-                  <BadgePill icon={<Lock size={14} />} text="Sin pago anticipado" tone="neutral" />
-                  <BadgePill icon={<Truck size={14} />} text="Envío gratis hoy" tone="neutral" />
-                  {lowStock && (
-                    <BadgePill icon={<Package size={14} />} text={`Stock bajo: ${remainingStock}`} tone="orange" />
-                  )}
+                <div className="mt-6 grid md:grid-cols-3 gap-4">
+                  <StepCard n="1" icon={<Users className="text-indigo-200" size={18} />} title="Formulario" desc="Nombre, WhatsApp, ciudad y dirección." />
+                  <StepCard n="2" icon={<PhoneCall className="text-indigo-200" size={18} />} title="Confirmación" desc="Validamos datos por WhatsApp." />
+                  <StepCard n="3" icon={<HandCoins className="text-indigo-200" size={18} />} title="Recibe y paga" desc="Contraentrega sin fricción." />
                 </div>
-                <a
-                  href="#form"
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 hover:bg-indigo-500 px-6 py-3.5 font-black shadow-lg shadow-indigo-600/25 transition-all active:scale-95"
-                  onClick={() => trackCTA("how_it_works_ir_form", { section: "how_it_works" })}
-                >
-                  Ir a pedir ahora <ArrowRight size={18} />
-                </a>
+
+                <div className="mt-7 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+                  <div className="flex flex-wrap gap-2">
+                    <BadgePill icon={<Lock size={14} />} text="Sin pago anticipado" tone="neutral" />
+                    <BadgePill icon={<Truck size={14} />} text="Envío gratis hoy" tone="neutral" />
+                    {lowStock && <BadgePill icon={<Package size={14} />} text={`Stock bajo: ${remainingStock}`} tone="orange" />}
+                  </div>
+                  <a
+                    href="#form"
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 hover:bg-indigo-500 px-6 py-3.5 font-black shadow-lg shadow-indigo-600/25 transition-all active:scale-95"
+                    onClick={() => trackCTA("how_it_works_ir_form", { section: "how_it_works" })}
+                  >
+                    Ir a pedir ahora <ArrowRight size={18} />
+                  </a>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </section>
+      </SectionWrap>
 
       {/* ================= FORM (NO DAÑAR FUNCIONALIDAD) ================= */}
       <section id="form" className="py-16 sm:py-20 px-4 bg-indigo-600/5">
@@ -1259,9 +1218,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                     <div className="flex items-start justify-between gap-3 mb-6">
                       <div className="min-w-0">
                         <h3 className="text-2xl font-black break-words">Datos de envío</h3>
-                        <p className="text-zinc-500 text-sm mt-1 break-words">
-                          Completa para reservar tu pedido (pago al recibir).
-                        </p>
+                        <p className="text-zinc-500 text-sm mt-1 break-words">Completa para reservar tu pedido (pago al recibir).</p>
                       </div>
                       {lowStock && (
                         <div className="hidden sm:inline-flex items-center gap-2 bg-orange-500/10 border border-orange-500/20 px-3 py-2 rounded-xl text-orange-200 text-xs font-black shrink-0">
@@ -1323,9 +1280,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                     <div className="rounded-2xl border border-white/10 bg-black/25 p-4 mb-5">
                       <div className="flex items-center justify-between text-sm text-zinc-300 gap-3">
                         <span className="font-bold truncate">{product?.name}</span>
-                        <span className="font-black shrink-0">
-                          ${Number(product?.price || 0).toLocaleString()}
-                        </span>
+                        <span className="font-black shrink-0">${Number(product?.price || 0).toLocaleString()}</span>
                       </div>
                       <div className="mt-2 text-[11px] text-zinc-500 flex items-center gap-2">
                         <Truck size={14} className="text-indigo-300" />
@@ -1419,9 +1374,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                           {countdown.h}:{countdown.m}:{countdown.s}
                         </span>
                       </p>
-                      <p className="text-[11px] text-zinc-300">
-                        Completa el pedido y lo reservamos para confirmación por WhatsApp.
-                      </p>
+                      <p className="text-[11px] text-zinc-300">Completa el pedido y lo reservamos para confirmación por WhatsApp.</p>
                     </motion.div>
 
                     <button
@@ -1454,26 +1407,15 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
 
       {/* FAQ (extra) */}
       <section className="py-16 sm:py-20 px-4 max-w-3xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-black text-center mb-10 break-words">
-          Preguntas Frecuentes
-        </h2>
+        <h2 className="text-3xl md:text-4xl font-black text-center mb-10 break-words">Preguntas Frecuentes</h2>
         <div className="space-y-4">
           <FaqItem
             q="¿En cuánto tiempo llega mi pedido?"
             a="El tiempo de entrega suele ser de 2 a 4 días hábiles según tu ciudad. Te confirmamos y coordinamos por WhatsApp."
           />
-          <FaqItem
-            q="¿Es seguro el pago contraentrega?"
-            a="Sí. Solo pagas cuando recibes el producto. Antes confirmamos tu información de envío."
-          />
-          <FaqItem
-            q="¿Qué pasa si necesito cambiar mis datos?"
-            a="Cuando te contactemos por WhatsApp puedes corregir ciudad, dirección o teléfono antes del envío."
-          />
-          <FaqItem
-            q="¿Cómo debo usarlo?"
-            a="Sigue las indicaciones del empaque. Si tienes condiciones médicas o estás en tratamiento, consulta a un profesional."
-          />
+          <FaqItem q="¿Es seguro el pago contraentrega?" a="Sí. Solo pagas cuando recibes el producto. Antes confirmamos tu información de envío." />
+          <FaqItem q="¿Qué pasa si necesito cambiar mis datos?" a="Cuando te contactemos por WhatsApp puedes corregir ciudad, dirección o teléfono antes del envío." />
+          <FaqItem q="¿Cómo debo usarlo?" a="Sigue las indicaciones del empaque. Si tienes condiciones médicas o estás en tratamiento, consulta a un profesional." />
         </div>
       </section>
 
@@ -1594,9 +1536,7 @@ function BadgePill({
       ? "bg-orange-500/10 border-orange-500/20 text-orange-200/90"
       : "bg-black/30 border-white/10 text-zinc-300";
   return (
-    <div
-      className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-[11px] font-black tracking-widest uppercase ${cls}`}
-    >
+    <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-[11px] font-black tracking-widest uppercase ${cls}`}>
       {icon} {text}
     </div>
   );
@@ -1632,21 +1572,11 @@ function MiniStat({ icon, title, desc }: { icon: React.ReactNode; title: string;
   );
 }
 
-function ConversionCard({
-  icon,
-  title,
-  desc,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  desc: string;
-}) {
+function ConversionCard({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
   return (
     <CardShell variant="gradientBorder" accent="indigo" className="p-6 sm:p-7 hover:-translate-y-[2px]">
       <div className="flex items-start justify-between gap-4">
-        <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
-          {icon}
-        </div>
+        <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">{icon}</div>
         <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400 bg-black/20 border border-white/10 px-3 py-2 rounded-full">
           Beneficio
         </span>
@@ -1657,23 +1587,11 @@ function ConversionCard({
   );
 }
 
-function StepCard({
-  n,
-  icon,
-  title,
-  desc,
-}: {
-  n: string;
-  icon: React.ReactNode;
-  title: string;
-  desc: string;
-}) {
+function StepCard({ n, icon, title, desc }: { n: string; icon: React.ReactNode; title: string; desc: string }) {
   return (
     <div className="rounded-[1.6rem] border border-white/10 bg-black/25 p-5">
       <div className="flex items-center justify-between mb-3">
-        <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 border border-indigo-500/15 flex items-center justify-center">
-          {icon}
-        </div>
+        <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 border border-indigo-500/15 flex items-center justify-center">{icon}</div>
         <span className="text-[11px] font-black tracking-widest uppercase text-zinc-400">Paso {n}</span>
       </div>
       <h4 className="font-black mb-1 break-words">{title}</h4>
@@ -1703,11 +1621,7 @@ function FaqItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="border border-white/5 bg-zinc-900/30 rounded-2xl overflow-hidden">
-      <button
-        onClick={() => setOpen(!open)}
-        className="w-full p-5 flex justify-between items-center text-left font-black gap-3"
-        type="button"
-      >
+      <button onClick={() => setOpen(!open)} className="w-full p-5 flex justify-between items-center text-left font-black gap-3" type="button">
         <span className="text-sm md:text-base break-words text-pretty">{q}</span>
         <ChevronDown className={`transition-transform shrink-0 ${open ? "rotate-180" : ""}`} />
       </button>
@@ -1725,17 +1639,9 @@ function MicroProof({ icon, text }: { icon: React.ReactNode; text: string }) {
   );
 }
 
-/* ==================== NUEVOS SUBCOMPONENTES (estructura) ==================== */
+/* ==================== SUBCOMPONENTES (estructura) ==================== */
 
-function HeaderBlock({
-  kicker,
-  title,
-  subtitle,
-}: {
-  kicker: string;
-  title: string;
-  subtitle: string;
-}) {
+function HeaderBlock({ kicker, title, subtitle }: { kicker: string; title: string; subtitle: string }) {
   return (
     <div className="text-center">
       <p className="text-[11px] font-black uppercase tracking-widest text-indigo-200/90">{kicker}</p>
@@ -1745,15 +1651,7 @@ function HeaderBlock({
   );
 }
 
-function PainCard({
-  icon,
-  title,
-  bullets,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  bullets: string[];
-}) {
+function PainCard({ icon, title, bullets }: { icon: React.ReactNode; title: string; bullets: string[] }) {
   return (
     <CardShell variant="glass" accent="indigo" className="p-6 sm:p-7">
       <div className="flex items-start gap-3">
@@ -1780,11 +1678,7 @@ function SalesFaq({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="border border-white/10 bg-zinc-900/35 rounded-2xl overflow-hidden">
-      <button
-        onClick={() => setOpen(!open)}
-        className="w-full p-5 flex justify-between items-center text-left font-black gap-3"
-        type="button"
-      >
+      <button onClick={() => setOpen(!open)} className="w-full p-5 flex justify-between items-center text-left font-black gap-3" type="button">
         <span className="text-sm md:text-base break-words text-pretty">{q}</span>
         <ChevronDown className={`transition-transform shrink-0 ${open ? "rotate-180" : ""}`} />
       </button>
