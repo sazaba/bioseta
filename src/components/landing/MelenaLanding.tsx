@@ -869,7 +869,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
         <div className="max-w-6xl mx-auto">
           <HeaderBlock
             kicker="Urgencia"
-            title="La oferta está activa ahora (y se reinicia)"
+            title="La oferta está activa ahora"
             subtitle="Si estás en semanas exigentes, este es el mejor momento para arrancar."
           />
 
