@@ -1,24 +1,23 @@
 "use client";
 
-import Image from "next/image";
+import Image, { type StaticImageData } from "next/image";
 import React, { useEffect, useMemo, useRef, useState, useTransition } from "react";
 
 import gal1 from "./melena/gallery-1.webp";
 import gal2 from "./melena/gallery-2.webp";
 import gal3 from "./melena/gallery-3.webp";
+import tes1 from "./melena/testimonial-1.webp";
+// import tes2 from "./melena/testimonial-2.webp";
+// import tes3 from "./melena/testimonial-3.webp";
 
 import { createOrder } from "@/actions/orders";
-import { motion, Variants, AnimatePresence } from "framer-motion";
+import { motion, type Variants, AnimatePresence } from "framer-motion";
 import {
   ShieldCheck,
   Truck,
-  Zap,
-  Clock,
   Sparkles,
   Check,
   Brain,
-  Flame,
-  BadgeCheck,
   Leaf,
   Star,
   RefreshCcw,
@@ -30,12 +29,7 @@ import {
   Lock,
   Package,
   ArrowRight,
-  Gift,
-  BadgeDollarSign,
-  Store,
-  Coffee,
   BatteryCharging,
-  ScanEye,
   HandCoins,
   MapPin,
   PhoneCall,
@@ -53,6 +47,47 @@ type ProductDTO = {
   benefits: any | null;
   stock: number;
 };
+
+type Testimonial = {
+  name: string;
+  city: string;
+  title: string;
+  text: string;
+  rating: number; // 1..5
+  img: StaticImageData;
+  date: string;
+};
+
+// ✅ TESTIMONIOS (top-level para que NO dé "Cannot find name 'TESTIMONIALS'")
+const TESTIMONIALS: Testimonial[] = [
+  {
+    name: "Laura M.",
+    city: "Medellín",
+    title: "Más enfoque sin sentirme acelerada",
+    text: "Lo uso para trabajar y estudiar. Siento el día más constante y rindo mejor. Me confirmaron por WhatsApp y llegó rápido.",
+    rating: 5,
+    img: tes1,
+    date: "Hace 2 días",
+  },
+  // {
+  //   name: "Daniela R.",
+  //   city: "Bogotá",
+  //   title: "Me ayudó a organizarme",
+  //   text: "Me gustó porque no tuve que pagar online. Lo recibí, pagué y todo bien. Buen empaque y la atención súper.",
+  //   rating: 5,
+  //   img: tes2,
+  //   date: "Hace 1 semana",
+  // },
+  // {
+  //   name: "Juan P.",
+  //   city: "Cali",
+  //   title: "Buen producto y entrega rápida",
+  //   text: "Pedí contraentrega. Confirmación por WhatsApp y llegó en 48h. Lo recomiendo si tienes días pesados de trabajo.",
+  //   rating: 5,
+  //   img: tes3,
+  //   date: "Hace 2 semanas",
+  // },
+];
 
 // --- ANIMACIONES ---
 const fadeUp: Variants = {
@@ -76,13 +111,7 @@ function cx(...c: Array<string | false | null | undefined>) {
   return c.filter(Boolean).join(" ");
 }
 
-type CardVariant =
-  | "glass"
-  | "glow"
-  | "gradientBorder"
-  | "outlineDashed"
-  | "solid"
-  | "split";
+type CardVariant = "glass" | "glow" | "gradientBorder" | "outlineDashed" | "solid" | "split";
 
 function CardShell({
   children,
@@ -95,24 +124,21 @@ function CardShell({
   className?: string;
   accent?: "indigo" | "purple" | "emerald" | "amber";
 }) {
-  const accentMap = {
+  const accentMap: Record<NonNullable<typeof accent>, string> = {
     indigo: "from-indigo-500/18 via-transparent to-purple-500/18",
     purple: "from-purple-500/18 via-transparent to-fuchsia-500/18",
     emerald: "from-emerald-500/18 via-transparent to-teal-500/18",
     amber: "from-amber-500/18 via-transparent to-orange-500/18",
   };
 
-  const base =
-    "relative rounded-[2rem] overflow-hidden transition-all will-change-transform";
+  const base = "relative rounded-[2rem] overflow-hidden transition-all will-change-transform";
 
   const styles: Record<CardVariant, string> = {
-    glass:
-      "border border-white/10 bg-zinc-900/40 hover:border-white/20 hover:bg-zinc-900/50",
+    glass: "border border-white/10 bg-zinc-900/40 hover:border-white/20 hover:bg-zinc-900/50",
     glow:
       "border border-white/10 bg-zinc-900/35 shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_18px_60px_rgba(99,102,241,0.10)] hover:shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_20px_80px_rgba(168,85,247,0.14)]",
     gradientBorder: "border border-transparent bg-zinc-950/40 hover:bg-zinc-950/55",
-    outlineDashed:
-      "border border-dashed border-white/15 bg-black/20 hover:border-white/25 hover:bg-black/30",
+    outlineDashed: "border border-dashed border-white/15 bg-black/20 hover:border-white/25 hover:bg-black/30",
     solid: "border border-white/8 bg-zinc-900/70 hover:bg-zinc-900/80",
     split: "border border-white/10 bg-zinc-900/40",
   };
@@ -121,10 +147,7 @@ function CardShell({
     <div className={cx(base, styles[variant], className)}>
       <div
         aria-hidden
-        className={cx(
-          "pointer-events-none absolute inset-0 opacity-80",
-          `bg-gradient-to-br ${accentMap[accent]}`
-        )}
+        className={cx("pointer-events-none absolute inset-0 opacity-80", `bg-gradient-to-br ${accentMap[accent]}`)}
       />
 
       {variant === "gradientBorder" && (
@@ -133,8 +156,6 @@ function CardShell({
           <div className="absolute inset-[1px] rounded-[calc(2rem-1px)] bg-zinc-950/55" />
         </div>
       )}
-
-      {/* ✅ Quitado: efecto “rectángulo” animado encima de las cards */}
 
       <div className="relative">{children}</div>
     </div>
@@ -196,11 +217,7 @@ function fbqTrack(event: string, params?: Record<string, any>, eventId?: string)
   } catch {}
 }
 
-function fbqTrackCustom(
-  event: string,
-  params?: Record<string, any>,
-  eventId?: string
-) {
+function fbqTrackCustom(event: string, params?: Record<string, any>, eventId?: string) {
   const w = typeof window !== "undefined" ? (window as any) : undefined;
   if (!w?.fbq) return;
   try {
@@ -209,6 +226,22 @@ function fbqTrackCustom(
   } catch {}
 }
 // -------------------------------------------------------
+
+function RatingStars({ rating = 5 }: { rating?: number }) {
+  const n = Math.max(0, Math.min(5, Math.floor(rating)));
+  return (
+    <div className="flex items-center gap-1" aria-label={`${n} estrellas`}>
+      {Array.from({ length: 5 }).map((_, i) => (
+        <Star
+          key={i}
+          size={14}
+          className={i < n ? "text-yellow-400" : "text-zinc-700"}
+          fill="currentColor"
+        />
+      ))}
+    </div>
+  );
+}
 
 export default function MelenaLanding({ product }: { product: ProductDTO }) {
   // ✅ Galería con imports
@@ -257,8 +290,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
       custom_data,
       fbp,
       fbc,
-      client_user_agent:
-        typeof navigator !== "undefined" ? navigator.userAgent : undefined,
+      client_user_agent: typeof navigator !== "undefined" ? navigator.userAgent : undefined,
       fbclid,
       test_event_code: "TEST66276",
     });
@@ -286,8 +318,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
       },
       fbp,
       fbc,
-      client_user_agent:
-        typeof navigator !== "undefined" ? navigator.userAgent : undefined,
+      client_user_agent: typeof navigator !== "undefined" ? navigator.userAgent : undefined,
       fbclid,
     });
   };
@@ -319,6 +350,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
         content_type: "product",
       },
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product?.id]);
 
   const [qty, setQty] = useState(1);
@@ -346,8 +378,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
   const [tickerIdx, setTickerIdx] = useState(0);
 
   useEffect(() => {
-    if (typeof window !== "undefined")
-      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }, []);
 
   useEffect(() => {
@@ -396,8 +427,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
       if (!lightboxOpen) return;
       if (e.key === "Escape") closeLightbox();
       if (e.key === "ArrowRight") setLightboxIdx((i) => (i + 1) % GALLERY.length);
-      if (e.key === "ArrowLeft")
-        setLightboxIdx((i) => (i - 1 + GALLERY.length) % GALLERY.length);
+      if (e.key === "ArrowLeft") setLightboxIdx((i) => (i - 1 + GALLERY.length) % GALLERY.length);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -589,7 +619,9 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
             <CardShell variant="glow" accent="indigo" className="p-4 sm:p-6">
               <div className="flex items-center justify-between gap-3 mb-4">
                 <BadgePill icon={<Sparkles size={14} />} text="OFERTA ACTIVA" tone="indigo" />
-                {lowStock && <BadgePill icon={<Package size={14} />} text={`quedan ${remainingStock}`} tone="orange" />}
+                {lowStock && (
+                  <BadgePill icon={<Package size={14} />} text={`quedan ${remainingStock}`} tone="orange" />
+                )}
               </div>
 
               <button
@@ -618,13 +650,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                     className="relative aspect-square overflow-hidden rounded-2xl border border-white/10 bg-black/25 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
                     aria-label={`Ver Galería ${i + 1} en grande`}
                   >
-                    <Image
-                      src={src}
-                      alt={`Galería ${i + 1}`}
-                      fill
-                      sizes="(max-width:640px) 30vw, 160px"
-                      className="object-cover"
-                    />
+                    <Image src={src} alt={`Galería ${i + 1}`} fill sizes="(max-width:640px) 30vw, 160px" className="object-cover" />
                   </button>
                 ))}
               </div>
@@ -649,7 +675,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
 
           {/* RIGHT: PRICE / CTA / QUICK CHECKOUT */}
           <motion.div variants={fadeUp} className="min-w-0">
-            {/* ✅ 3) full responsive: evitar desbordes */}
+            {/* ✅ full responsive: evitar desbordes */}
             <h1 className="text-[28px] sm:text-5xl md:text-6xl font-black leading-[1.08] tracking-tight break-words text-pretty max-w-full">
               {product?.name || "Melena de León"}{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 break-words">
@@ -678,13 +704,11 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                       ${Number(product?.price || 0).toLocaleString()}
                       <span className="text-xs text-zinc-400 font-bold ml-2">COP</span>
                     </p>
-                    <p className="text-[12px] text-zinc-400 mt-2">
-                      Incluye envío gratis + confirmación por WhatsApp.
-                    </p>
+                    <p className="text-[12px] text-zinc-400 mt-2">Incluye envío gratis + confirmación por WhatsApp.</p>
                   </div>
 
                   <div className="text-right shrink-0">
-                    {/* ✅ 4) estrella visible (fill) */}
+                    {/* ✅ 4.9 reseñas con estrella (fill) */}
                     <div className="inline-flex items-center gap-2 rounded-full bg-black/30 border border-white/10 px-3 py-2 text-[11px] font-black">
                       <Star size={14} className="text-yellow-400" fill="currentColor" />
                       <span className="text-white">4.9</span>
@@ -705,7 +729,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                     Comprar contraentrega <ArrowRight size={18} />
                   </a>
 
-                  {/* ✅ 2) Quitado botón “Ver fotos” */}
+                  {/* ✅ Quitado botón “Ver fotos” */}
                 </div>
 
                 <div className="mt-5 grid grid-cols-2 gap-3">
@@ -719,21 +743,9 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
 
             {/* QUICK BENEFITS SHORT */}
             <div className="mt-8 grid md:grid-cols-3 gap-4">
-              <ConversionCard
-                icon={<Brain className="text-indigo-300" />}
-                title="Enfoque"
-                desc="Bloques de concentración más largos para avanzar."
-              />
-              <ConversionCard
-                icon={<BatteryCharging className="text-yellow-300" />}
-                title="Ritmo estable"
-                desc="Sensación de constancia durante el día."
-              />
-              <ConversionCard
-                icon={<ShieldCheck className="text-green-300" />}
-                title="Cero fricción"
-                desc="Sin pagos online: confirmación y entrega."
-              />
+              <ConversionCard icon={<Brain className="text-indigo-300" />} title="Enfoque" desc="Bloques de concentración más largos para avanzar." />
+              <ConversionCard icon={<BatteryCharging className="text-yellow-300" />} title="Ritmo estable" desc="Sensación de constancia durante el día." />
+              <ConversionCard icon={<ShieldCheck className="text-green-300" />} title="Cero fricción" desc="Sin pagos online: confirmación y entrega." />
             </div>
           </motion.div>
         </motion.div>
@@ -749,38 +761,79 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
         </div>
       </div>
 
+      {/* ✅ TESTIMONIOS (ubicación tipo página referencia: después del trust/beneficios y antes de “Cómo funciona”/FAQ) */}
+      <section className="py-14 sm:py-16 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-black leading-tight px-2">Opiniones reales de clientes</h2>
+            <p className="mt-3 text-zinc-500 text-sm md:text-base max-w-2xl mx-auto px-4">
+              Compra contraentrega, confirmación por WhatsApp y entrega rápida.
+            </p>
+          </div>
+
+          <div className="grid gap-4 md:gap-6 md:grid-cols-3">
+            {TESTIMONIALS.map((t, idx) => (
+              <div key={idx} className="rounded-[2rem] border border-white/10 bg-zinc-900/35 overflow-hidden">
+                <div className="relative aspect-[4/3] w-full bg-black/30">
+                  <Image src={t.img} alt={`Testimonio ${t.name}`} fill sizes="(max-width: 768px) 92vw, 360px" className="object-cover" />
+                </div>
+
+                <div className="p-6">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="font-black text-base truncate">{t.name}</p>
+                      <p className="text-[12px] text-zinc-500 font-bold truncate">
+                        {t.city} • {t.date}
+                      </p>
+                    </div>
+                    <RatingStars rating={t.rating} />
+                  </div>
+
+                  <h3 className="mt-4 font-black text-lg leading-snug">{t.title}</h3>
+                  <p className="mt-2 text-sm text-zinc-400 leading-relaxed">“{t.text}”</p>
+
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-full bg-black/25 border border-white/10 text-zinc-300">
+                      Pago contraentrega ✅
+                    </span>
+                    <span className="text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-full bg-black/25 border border-white/10 text-zinc-300">
+                      Confirmación WhatsApp 💬
+                    </span>
+                    <span className="text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-full bg-black/25 border border-white/10 text-zinc-300">
+                      Envío rápido 🚚
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-10 flex justify-center">
+            <a
+              href="#form"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 hover:bg-indigo-500 px-7 py-4 font-black shadow-lg shadow-indigo-600/25 transition-all active:scale-95"
+            >
+              Quiero pedir contraentrega <ArrowRight size={18} />
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* HOW IT WORKS */}
       <section className="py-14 sm:py-16 px-4 max-w-6xl mx-auto">
         <div className="rounded-[2.4rem] border border-white/10 bg-zinc-900/35 overflow-hidden">
           <div className="p-7 sm:p-9 md:p-10 relative">
             <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-purple-500/10 pointer-events-none" />
             <div className="relative">
-              <h3 className="text-2xl md:text-3xl font-black mb-2 break-words text-pretty">
-                Compra en 3 pasos
-              </h3>
+              <h3 className="text-2xl md:text-3xl font-black mb-2 break-words text-pretty">Compra en 3 pasos</h3>
               <p className="text-zinc-500 text-sm md:text-base max-w-2xl break-words text-pretty">
                 Sin cuentas, sin pagos anticipados. Solo confirmación por WhatsApp y pagas al recibir.
               </p>
 
               <div className="mt-7 grid md:grid-cols-3 gap-4">
-                <StepCard
-                  n="1"
-                  icon={<Users className="text-indigo-200" size={18} />}
-                  title="Completa el formulario"
-                  desc="Nombre, WhatsApp, ciudad y dirección."
-                />
-                <StepCard
-                  n="2"
-                  icon={<PhoneCall className="text-indigo-200" size={18} />}
-                  title="Confirmamos por WhatsApp"
-                  desc="Validamos datos para envío."
-                />
-                <StepCard
-                  n="3"
-                  icon={<HandCoins className="text-indigo-200" size={18} />}
-                  title="Recibe y paga"
-                  desc="Pagas cuando lo tienes en tus manos."
-                />
+                <StepCard n="1" icon={<Users className="text-indigo-200" size={18} />} title="Completa el formulario" desc="Nombre, WhatsApp, ciudad y dirección." />
+                <StepCard n="2" icon={<PhoneCall className="text-indigo-200" size={18} />} title="Confirmamos por WhatsApp" desc="Validamos datos para envío." />
+                <StepCard n="3" icon={<HandCoins className="text-indigo-200" size={18} />} title="Recibe y paga" desc="Pagas cuando lo tienes en tus manos." />
               </div>
 
               <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
@@ -823,9 +876,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                     <Check size={40} />
                   </div>
                   <h3 className="text-3xl font-black mb-2 break-words">¡Pedido Exitoso!</h3>
-                  <p className="text-zinc-400 break-words">
-                    Un asesor te contactará por WhatsApp en breve.
-                  </p>
+                  <p className="text-zinc-400 break-words">Un asesor te contactará por WhatsApp en breve.</p>
                 </div>
               ) : (
                 <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-12">
@@ -858,28 +909,28 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                         icon={<Users size={16} className="text-indigo-200" />}
                         placeholder="Ej: Juan Pérez"
                         value={fullName}
-                        onChange={(e: any) => setFullName(e.target.value)}
+                        onChange={(e) => setFullName(e.target.value)}
                       />
                       <Input
                         label="WhatsApp / Teléfono"
                         icon={<PhoneCall size={16} className="text-indigo-200" />}
                         placeholder="Para confirmar entrega"
                         value={phone}
-                        onChange={(e: any) => setPhone(e.target.value)}
+                        onChange={(e) => setPhone(e.target.value)}
                       />
                       <Input
                         label="Ciudad"
                         icon={<MapPin size={16} className="text-indigo-200" />}
                         placeholder="Ej: Medellín"
                         value={city}
-                        onChange={(e: any) => setCity(e.target.value)}
+                        onChange={(e) => setCity(e.target.value)}
                       />
                       <Input
                         label="Dirección Exacta"
                         icon={<MapPin size={16} className="text-indigo-200" />}
                         placeholder="Calle, número, apto/barrio"
                         value={address}
-                        onChange={(e: any) => setAddress(e.target.value)}
+                        onChange={(e) => setAddress(e.target.value)}
                       />
                     </div>
 
@@ -898,9 +949,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                     <div className="rounded-2xl border border-white/10 bg-black/25 p-4 mb-5">
                       <div className="flex items-center justify-between text-sm text-zinc-300 gap-3">
                         <span className="font-bold truncate">{product?.name}</span>
-                        <span className="font-black shrink-0">
-                          ${Number(product?.price || 0).toLocaleString()}
-                        </span>
+                        <span className="font-black shrink-0">${Number(product?.price || 0).toLocaleString()}</span>
                       </div>
                       <div className="mt-2 text-[11px] text-zinc-500 flex items-center gap-2">
                         <Truck size={14} className="text-indigo-300" />
@@ -1029,9 +1078,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
 
       {/* FAQ */}
       <section className="py-16 sm:py-20 px-4 max-w-3xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-black text-center mb-10 break-words">
-          Preguntas Frecuentes
-        </h2>
+        <h2 className="text-3xl md:text-4xl font-black text-center mb-10 break-words">Preguntas Frecuentes</h2>
         <div className="space-y-4">
           <FaqItem q="¿En cuánto tiempo llega mi pedido?" a="El tiempo de entrega suele ser de 2 a 4 días hábiles según tu ciudad. Te confirmamos y coordinamos por WhatsApp." />
           <FaqItem q="¿Es seguro el pago contraentrega?" a="Sí. Solo pagas cuando recibes el producto. Antes confirmamos tu información de envío." />
@@ -1070,7 +1117,6 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[999] bg-black/80 backdrop-blur-sm p-4 sm:p-8"
             onMouseDown={(e) => {
-              // cerrar si el click es en el overlay (no en el contenido)
               if (e.target === e.currentTarget) closeLightbox();
             }}
             aria-modal="true"
@@ -1110,9 +1156,7 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                 <div className="px-4 sm:px-6 py-4 border-t border-white/10 flex items-center justify-between gap-3">
                   <button
                     type="button"
-                    onClick={() =>
-                      setLightboxIdx((i) => (i - 1 + GALLERY.length) % GALLERY.length)
-                    }
+                    onClick={() => setLightboxIdx((i) => (i - 1 + GALLERY.length) % GALLERY.length)}
                     className="rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 px-4 py-2 text-sm font-black"
                   >
                     ← Anterior
@@ -1134,9 +1178,9 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
   );
 }
 
-/* ---------------- SUBCOMPONENTES ---------------- */
+/* ---------------- SUBCOMPONENTES (tipados sin any) ---------------- */
 
-function MarqueePill({ icon, text }: { icon: any; text: string }) {
+function MarqueePill({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
     <span className="inline-flex items-center gap-2">
       {icon} {text}
@@ -1149,7 +1193,7 @@ function BadgePill({
   text,
   tone,
 }: {
-  icon: any;
+  icon: React.ReactNode;
   text: string;
   tone: "indigo" | "orange" | "neutral";
 }) {
@@ -1160,15 +1204,13 @@ function BadgePill({
       ? "bg-orange-500/10 border-orange-500/20 text-orange-200/90"
       : "bg-black/30 border-white/10 text-zinc-300";
   return (
-    <div
-      className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-[11px] font-black tracking-widest uppercase ${cls}`}
-    >
+    <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-[11px] font-black tracking-widest uppercase ${cls}`}>
       {icon} {text}
     </div>
   );
 }
 
-function Pill({ icon, text }: { icon: any; text: any }) {
+function Pill({ icon, text }: { icon: React.ReactNode; text: React.ReactNode }) {
   return (
     <div className="flex items-center gap-2 text-sm font-medium text-zinc-300 bg-black/20 border border-white/10 px-3 py-2 rounded-2xl">
       {icon} <span className="leading-none">{text}</span>
@@ -1176,7 +1218,7 @@ function Pill({ icon, text }: { icon: any; text: any }) {
   );
 }
 
-function TrustIcon({ icon, text }: { icon: any; text: string }) {
+function TrustIcon({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
     <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-zinc-300">
       <span className="text-indigo-400">{icon}</span> {text}
@@ -1184,15 +1226,7 @@ function TrustIcon({ icon, text }: { icon: any; text: string }) {
   );
 }
 
-function MiniStat({
-  icon,
-  title,
-  desc,
-}: {
-  icon: any;
-  title: string;
-  desc: string;
-}) {
+function MiniStat({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
   return (
     <div className="rounded-2xl border border-white/10 bg-zinc-900/40 p-4 flex items-center gap-3 min-w-0">
       <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/15 flex items-center justify-center text-indigo-200 shrink-0">
@@ -1211,16 +1245,12 @@ function ConversionCard({
   title,
   desc,
 }: {
-  icon: any;
+  icon: React.ReactNode;
   title: string;
   desc: string;
 }) {
   return (
-    <CardShell
-      variant="gradientBorder"
-      accent="indigo"
-      className="p-6 sm:p-7 hover:-translate-y-[2px]"
-    >
+    <CardShell variant="gradientBorder" accent="indigo" className="p-6 sm:p-7 hover:-translate-y-[2px]">
       <div className="flex items-start justify-between gap-4">
         <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
           {icon}
@@ -1230,9 +1260,7 @@ function ConversionCard({
         </span>
       </div>
       <h3 className="mt-4 text-xl font-black break-words">{title}</h3>
-      <p className="mt-2 text-sm text-zinc-400 leading-relaxed break-words text-pretty">
-        {desc}
-      </p>
+      <p className="mt-2 text-sm text-zinc-400 leading-relaxed break-words text-pretty">{desc}</p>
     </CardShell>
   );
 }
@@ -1244,7 +1272,7 @@ function StepCard({
   desc,
 }: {
   n: string;
-  icon: any;
+  icon: React.ReactNode;
   title: string;
   desc: string;
 }) {
@@ -1254,9 +1282,7 @@ function StepCard({
         <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 border border-indigo-500/15 flex items-center justify-center">
           {icon}
         </div>
-        <span className="text-[11px] font-black tracking-widest uppercase text-zinc-400">
-          Paso {n}
-        </span>
+        <span className="text-[11px] font-black tracking-widest uppercase text-zinc-400">Paso {n}</span>
       </div>
       <h4 className="font-black mb-1 break-words">{title}</h4>
       <p className="text-sm text-zinc-500 break-words text-pretty">{desc}</p>
@@ -1264,12 +1290,15 @@ function StepCard({
   );
 }
 
-function Input({ label, icon, ...props }: any) {
+type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
+  label: string;
+  icon: React.ReactNode;
+};
+
+function Input({ label, icon, ...props }: InputProps) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-[10px] font-black text-zinc-500 uppercase ml-2 tracking-widest">
-        {label}
-      </label>
+      <label className="text-[10px] font-black text-zinc-500 uppercase ml-2 tracking-widest">{label}</label>
       <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus-within:border-indigo-500 transition-all">
         <span className="shrink-0">{icon}</span>
         <input {...props} className="bg-transparent outline-none text-sm w-full min-w-0" />
@@ -1291,15 +1320,13 @@ function FaqItem({ q, a }: { q: string; a: string }) {
         <ChevronDown className={`transition-transform shrink-0 ${open ? "rotate-180" : ""}`} />
       </button>
       {open && (
-        <div className="p-5 pt-0 text-zinc-400 text-sm leading-relaxed break-words text-pretty">
-          {a}
-        </div>
+        <div className="p-5 pt-0 text-zinc-400 text-sm leading-relaxed break-words text-pretty">{a}</div>
       )}
     </div>
   );
 }
 
-function MicroProof({ icon, text }: { icon: any; text: string }) {
+function MicroProof({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
     <div className="rounded-xl border border-white/10 bg-black/30 px-3 py-2 flex items-center gap-2 text-[11px] text-zinc-300 font-bold min-w-0">
       <span className="text-indigo-300 shrink-0">{icon}</span>
