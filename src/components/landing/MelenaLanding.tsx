@@ -3,6 +3,7 @@
 import Image from "next/image";
 import React, { useEffect, useMemo, useRef, useState, useTransition } from "react";
 
+
 import { createOrder } from "@/actions/orders";
 import { motion, Variants, AnimatePresence } from "framer-motion";
 import {
@@ -53,9 +54,9 @@ type ProductDTO = {
 // ================== IMÁGENES (SUBE A /public/landing/melena/) ==================
 const HERO_IMG = "/landing/melena/hero.png"; // <- cambia por tu hero
 const GALLERY = [
-  "/landing/melena/gallery-1.webp",
-  "/landing/melena/gallery-2.webp",
-  "/landing/melena/gallery-3.webp",
+  "./melena/gallery-1.webp",
+  "./melena/gallery-2.webp",
+  "./melena/gallery-3.webp",
 ];
 // ==============================================================================
 
