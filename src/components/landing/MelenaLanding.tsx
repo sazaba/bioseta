@@ -774,15 +774,17 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
           <div className="grid gap-4 md:gap-6 md:grid-cols-3">
             {TESTIMONIALS.map((t, idx) => (
               <div key={idx} className="rounded-[2rem] border border-white/10 bg-zinc-900/35 overflow-hidden">
-                <div className="relative aspect-[9/16] w-full bg-black/30">
+           <div className="relative aspect-[9/16] w-full bg-black/30">
   <Image
     src={t.img}
     alt={`Testimonio ${t.name}`}
     fill
     sizes="(max-width: 768px) 92vw, 360px"
-    className="object-cover object-top"
+    className="object-contain"
   />
 </div>
+
+
 
                 <div className="p-6">
                   <div className="flex items-start justify-between gap-3">
