@@ -9,6 +9,9 @@ import gal3 from "./melena/gal3.webp";
 import tes1 from "./melena/testimonial-1.webp";
 // import tes2 from "./melena/testimonial-2.webp";
 // import tes3 from "./melena/testimonial-3.webp";
+import limitlessImg from "./melena/limitless.webp";
+
+const LIMITLESS_IMG = limitlessImg as StaticImageData;
 
 import { createOrder } from "@/actions/orders";
 import { motion, type Variants, AnimatePresence } from "framer-motion";
@@ -60,24 +63,6 @@ type Testimonial = {
 
 // ✅ TESTIMONIOS (top-level para que NO dé "Cannot find name 'TESTIMONIALS'")
 const TESTIMONIALS: Testimonial[] = [
-  // {
-  //   name: "Laura M.",
-  //   city: "Medellín",
-  //   title: "Más enfoque sin sentirme acelerada",
-  //   text: "Lo uso para trabajar y estudiar. Siento el día más constante y rindo mejor. Me confirmaron por WhatsApp y llegó rápido.",
-  //   rating: 5,
-  //   img: tes1,
-  //   date: "Hace 2 días",
-  // },
-  // {
-  //   name: "Daniela R.",
-  //   city: "Bogotá",
-  //   title: "Me ayudó a organizarme",
-  //   text: "Me gustó porque no tuve que pagar online. Lo recibí, pagué y todo bien. Buen empaque y la atención súper.",
-  //   rating: 5,
-  //   img: tes2,
-  //   date: "Hace 1 semana",
-  // },
   {
     name: "Juan P.",
     city: "Cali",
@@ -232,12 +217,7 @@ function RatingStars({ rating = 5 }: { rating?: number }) {
   return (
     <div className="flex items-center gap-1" aria-label={`${n} estrellas`}>
       {Array.from({ length: 5 }).map((_, i) => (
-        <Star
-          key={i}
-          size={14}
-          className={i < n ? "text-yellow-400" : "text-zinc-700"}
-          fill="currentColor"
-        />
+        <Star key={i} size={14} className={i < n ? "text-yellow-400" : "text-zinc-700"} fill="currentColor" />
       ))}
     </div>
   );
@@ -650,7 +630,13 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                     className="relative aspect-square overflow-hidden rounded-2xl border border-white/10 bg-black/25 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
                     aria-label={`Ver Galería ${i + 1} en grande`}
                   >
-                    <Image src={src} alt={`Galería ${i + 1}`} fill sizes="(max-width:640px) 30vw, 160px" className="object-cover" />
+                    <Image
+                      src={src}
+                      alt={`Galería ${i + 1}`}
+                      fill
+                      sizes="(max-width:640px) 30vw, 160px"
+                      className="object-cover"
+                    />
                   </button>
                 ))}
               </div>
@@ -675,7 +661,6 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
 
           {/* RIGHT: PRICE / CTA / QUICK CHECKOUT */}
           <motion.div variants={fadeUp} className="min-w-0">
-            {/* ✅ full responsive: evitar desbordes */}
             <h1 className="text-[28px] sm:text-5xl md:text-6xl font-black leading-[1.08] tracking-tight break-words text-pretty max-w-full">
               {product?.name || "Melena de León"}{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 break-words">
@@ -684,8 +669,31 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
             </h1>
 
             <p className="mt-3 text-zinc-400 text-[14px] sm:text-lg max-w-xl break-words text-pretty">
-              {product?.subtitle || "Enfoque más estable para tu día: trabajo, estudio y tareas exigentes."}
+              {product?.subtitle ||
+                "Enfoque más estable para tu día: trabajo, estudio y tareas exigentes."}
             </p>
+
+            {/* ✅ LIMITLESS ANGLE (sutil y creíble) */}
+            <div className="mt-5 max-w-xl">
+              <CardShell variant="outlineDashed" accent="purple" className="p-5">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-purple-500/10 border border-purple-500/15 flex items-center justify-center text-purple-200 shrink-0">
+                    <Brain size={18} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-black uppercase tracking-widest text-purple-200/90">
+                      Inspirado en “Limitless”
+                    </p>
+                    <p className="mt-1 text-sm text-zinc-300 leading-relaxed break-words text-pretty">
+                      No es ciencia ficción. Es lo más cerca que la naturaleza ha estado de ayudarte
+                      a sentir <span className="font-black text-white">claridad</span>,{" "}
+                      <span className="font-black text-white">enfoque</span> y{" "}
+                      <span className="font-black text-white">productividad</span> en tu día.
+                    </p>
+                  </div>
+                </div>
+              </CardShell>
+            </div>
 
             <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4 max-w-xl">
               <MiniStat icon={<Users size={16} />} title="Confirmación" desc="Te escribimos por WhatsApp" />
@@ -699,16 +707,19 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
               <CardShell variant="gradientBorder" accent="purple" className="p-6 sm:p-7">
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
-                    <p className="text-[11px] uppercase tracking-widest text-zinc-400 font-black">Precio hoy</p>
+                    <p className="text-[11px] uppercase tracking-widest text-zinc-400 font-black">
+                      Precio hoy
+                    </p>
                     <p className="text-3xl sm:text-4xl font-black mt-1 break-words">
                       ${Number(product?.price || 0).toLocaleString()}
                       <span className="text-xs text-zinc-400 font-bold ml-2">COP</span>
                     </p>
-                    <p className="text-[12px] text-zinc-400 mt-2">Incluye envío gratis + confirmación por WhatsApp.</p>
+                    <p className="text-[12px] text-zinc-400 mt-2">
+                      Incluye envío gratis + confirmación por WhatsApp.
+                    </p>
                   </div>
 
                   <div className="text-right shrink-0">
-                    {/* ✅ 4.9 reseñas con estrella (fill) */}
                     <div className="inline-flex items-center gap-2 rounded-full bg-black/30 border border-white/10 px-3 py-2 text-[11px] font-black">
                       <Star size={14} className="text-yellow-400" fill="currentColor" />
                       <span className="text-white">4.9</span>
@@ -728,8 +739,6 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                   >
                     Comprar contraentrega <ArrowRight size={18} />
                   </a>
-
-                  {/* ✅ Quitado botón “Ver fotos” */}
                 </div>
 
                 <div className="mt-5 grid grid-cols-2 gap-3">
@@ -743,12 +752,248 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
 
             {/* QUICK BENEFITS SHORT */}
             <div className="mt-8 grid md:grid-cols-3 gap-4">
-              <ConversionCard icon={<Brain className="text-indigo-300" />} title="Enfoque" desc="Bloques de concentración más largos para avanzar." />
-              <ConversionCard icon={<BatteryCharging className="text-yellow-300" />} title="Ritmo estable" desc="Sensación de constancia durante el día." />
-              <ConversionCard icon={<ShieldCheck className="text-green-300" />} title="Cero fricción" desc="Sin pagos online: confirmación y entrega." />
+              <ConversionCard
+                icon={<Brain className="text-indigo-300" />}
+                title="Enfoque"
+                desc="Bloques de concentración más largos para avanzar."
+              />
+              <ConversionCard
+                icon={<BatteryCharging className="text-yellow-300" />}
+                title="Ritmo estable"
+                desc="Sensación de constancia durante el día."
+              />
+              <ConversionCard
+                icon={<ShieldCheck className="text-green-300" />}
+                title="Cero fricción"
+                desc="Sin pagos online: confirmación y entrega."
+              />
             </div>
           </motion.div>
         </motion.div>
+      </section>
+
+      {/* ===================== 1) DOLORES ===================== */}
+      <section id="dolores" className="py-14 sm:py-16 px-4">
+        <div className="max-w-6xl mx-auto">
+          <HeaderBlock
+            kicker="Dolores reales"
+            title="¿Sientes que tu mente ya no rinde como antes?"
+            subtitle="No es pereza. No es falta de ganas. A veces es saturación mental: enfoque corto, mente nublada y productividad inconsistente."
+          />
+
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            <PainCard
+              icon={<Brain size={18} className="text-indigo-200" />}
+              title="Mente nublada"
+              bullets={[
+                "Lees y lo repites 2–3 veces",
+                "Sientes la mente “lenta” o pesada",
+                "Te dispersas con facilidad",
+              ]}
+            />
+            <PainCard
+              icon={<Timer size={18} className="text-indigo-200" />}
+              title="Enfoque corto"
+              bullets={[
+                "Te concentras 20–30 min y caes",
+                "Procrastinas tareas simples",
+                "Te cuesta arrancar aunque tengas tiempo",
+              ]}
+            />
+            <PainCard
+              icon={<BatteryCharging size={18} className="text-indigo-200" />}
+              title="Energía mental baja"
+              bullets={[
+                "Duermes, pero no sientes claridad",
+                "Dependes del café y aún así…",
+                "Al mediodía ya estás apagado",
+              ]}
+            />
+          </div>
+
+          {/* ✅ mini “Limitless” (más fuerte) + imagen opcional */}
+          <div className="mt-6">
+            <CardShell variant="glow" accent="purple" className="p-6 sm:p-7">
+              <div className="grid gap-6 md:grid-cols-[1fr_0.9fr] items-center">
+                <div>
+                  <p className="text-[11px] font-black uppercase tracking-widest text-purple-200/90">
+                    El ángulo “Limitless” (bien usado)
+                  </p>
+                  <h3 className="mt-2 text-2xl sm:text-3xl font-black leading-tight">
+                    Esa sensación de claridad y productividad… pero en versión natural.
+                  </h3>
+                  <p className="mt-3 text-sm text-zinc-300 leading-relaxed">
+                    ¿Recuerdas <span className="font-black text-white">Limitless</span>? Esa idea de
+                    “desbloquear tu mente”. Aquí lo planteamos de forma realista: apoyo a tu día para
+                    sostener <span className="font-black text-white">enfoque</span>,{" "}
+                    <span className="font-black text-white">claridad</span> y{" "}
+                    <span className="font-black text-white">ritmo</span> sin sentirte acelerado.
+                  </p>
+                  <div className="mt-5 flex flex-col sm:flex-row gap-3">
+                    <a
+                      href="#form"
+                      className="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 hover:bg-indigo-500 px-6 py-3.5 font-black shadow-lg shadow-indigo-600/25 transition-all active:scale-95"
+                      onClick={() => trackCTA("dolores_ir_form", { section: "dolores" })}
+                    >
+                      Quiero probarlo hoy <ArrowRight size={18} />
+                    </a>
+                    <div className="text-[11px] text-zinc-400 font-bold flex items-center gap-2">
+                      <Lock size={14} className="text-indigo-300" />
+                      Contraentrega • Confirmación WhatsApp
+                    </div>
+                  </div>
+                </div>
+
+                {/* ✅ IMAGEN OPCIONAL */}
+                <div className="rounded-[1.8rem] border border-white/10 bg-black/30 overflow-hidden">
+                  {/* Si importas LIMITLESS_IMG arriba, reemplaza este bloque por el Image real */}
+                  <div className="p-6">
+                    <div className="text-[11px] font-black uppercase tracking-widest text-zinc-400">
+                      Imagen opcional
+                    </div>
+                    <div className="mt-3 rounded-2xl border border-white/10 bg-white/5 p-5 text-sm text-zinc-300 leading-relaxed">
+                      Si quieres meter una imagen tipo “focus / mente / productividad”:
+                      <ul className="mt-3 list-disc list-inside text-zinc-400 space-y-1">
+                        <li>Agrega: <span className="text-white font-black">./melena/limitless.webp</span></li>
+                        <li>Descomenta el import al inicio</li>
+                        <li>Y cambia este bloque por un &lt;Image /&gt;</li>
+                      </ul>
+                    </div>
+
+                    {/* EJEMPLO (cuando importes LIMITLESS_IMG):
+                    <div className="relative w-full aspect-[4/3]">
+                      <Image src={LIMITLESS_IMG} alt="Inspiración focus" fill className="object-cover" />
+                    </div>
+                    */}
+                  </div>
+                </div>
+              </div>
+            </CardShell>
+          </div>
+        </div>
+      </section>
+
+      {/* ===================== 2) URGENCIA ===================== */}
+      <section id="urgencia" className="py-14 sm:py-16 px-4">
+        <div className="max-w-6xl mx-auto">
+          <HeaderBlock
+            kicker="Urgencia"
+            title="Hoy tienes la oferta activa (y se reinicia)"
+            subtitle="No lo dejes para “después”. Si estás en un momento de trabajo/estudio exigente, este es el mejor punto para arrancar."
+          />
+
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            <CardShell variant="gradientBorder" accent="indigo" className="p-6 sm:p-7">
+              <p className="text-[11px] font-black uppercase tracking-widest text-zinc-400">Cierra en</p>
+              <p className="mt-2 text-4xl font-black tabular-nums">
+                {countdown.h}:{countdown.m}:{countdown.s}
+              </p>
+              <p className="mt-2 text-sm text-zinc-400">
+                Completa el formulario para reservar tu pedido.
+              </p>
+            </CardShell>
+
+            <CardShell variant="glass" accent="purple" className="p-6 sm:p-7">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 border border-indigo-500/15 flex items-center justify-center text-indigo-200 shrink-0">
+                  <PhoneCall size={18} />
+                </div>
+                <div className="min-w-0">
+                  <p className="font-black">Confirmación rápida</p>
+                  <p className="mt-1 text-sm text-zinc-400">
+                    Te contactamos por WhatsApp para validar y enviar.
+                  </p>
+                </div>
+              </div>
+            </CardShell>
+
+            <CardShell variant="glass" accent="emerald" className="p-6 sm:p-7">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/15 flex items-center justify-center text-emerald-200 shrink-0">
+                  <HandCoins size={18} />
+                </div>
+                <div className="min-w-0">
+                  <p className="font-black">Cero riesgo</p>
+                  <p className="mt-1 text-sm text-zinc-400">Pagas solo cuando lo recibes.</p>
+                </div>
+              </div>
+            </CardShell>
+          </div>
+
+          <div className="mt-8 flex justify-center">
+            <a
+              href="#form"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 hover:bg-indigo-500 px-7 py-4 font-black shadow-lg shadow-indigo-600/25 transition-all active:scale-95"
+              onClick={() => trackCTA("urgencia_ir_form", { section: "urgencia" })}
+            >
+              Activar mi pedido hoy <ArrowRight size={18} />
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ===================== 3) ESCASEZ ===================== */}
+      <section id="escasez" className="py-14 sm:py-16 px-4">
+        <div className="max-w-6xl mx-auto">
+          <HeaderBlock
+            kicker="Escasez"
+            title="Stock limitado (lotes pequeños)"
+            subtitle="Si estás viendo esto, aún hay unidades disponibles. Cuando se agotan, se pausa la oferta."
+          />
+
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            <CardShell variant="glow" accent="amber" className="p-6 sm:p-7">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-[11px] font-black uppercase tracking-widest text-zinc-400">
+                  Disponibilidad
+                </p>
+                <Package size={18} className="text-orange-200" />
+              </div>
+
+              <p className="mt-2 text-3xl font-black">
+                {remainingStock > 0 ? `${remainingStock} unidades` : "Stock por confirmar"}
+              </p>
+              <p className="mt-2 text-sm text-zinc-400">
+                {lowStock
+                  ? "⚠️ Stock bajo: suele agotarse rápido."
+                  : "Recomendación: asegura tu unidad completando el formulario."}
+              </p>
+            </CardShell>
+
+            <CardShell variant="glass" accent="indigo" className="p-6 sm:p-7">
+              <p className="font-black">Lo que reserva tu pedido</p>
+              <ul className="mt-3 space-y-2 text-sm text-zinc-400">
+                <li className="flex gap-2">
+                  <Check size={16} className="text-indigo-300 mt-0.5 shrink-0" />
+                  Envío gratis activo hoy
+                </li>
+                <li className="flex gap-2">
+                  <Check size={16} className="text-indigo-300 mt-0.5 shrink-0" />
+                  Confirmación por WhatsApp
+                </li>
+                <li className="flex gap-2">
+                  <Check size={16} className="text-indigo-300 mt-0.5 shrink-0" />
+                  Pago contraentrega
+                </li>
+              </ul>
+            </CardShell>
+
+            <CardShell variant="glass" accent="purple" className="p-6 sm:p-7">
+              <p className="font-black">Tip de compra</p>
+              <p className="mt-2 text-sm text-zinc-400">
+                Si estás en semanas de mucha carga (trabajo/estudio), este tipo de apoyo rinde más
+                cuando lo integras a tu rutina diaria.
+              </p>
+              <a
+                href="#form"
+                className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-indigo-600 hover:bg-indigo-500 px-6 py-3.5 font-black shadow-lg shadow-indigo-600/25 transition-all active:scale-95"
+                onClick={() => trackCTA("escasez_ir_form", { section: "escasez" })}
+              >
+                Reservar ahora <ArrowRight size={18} />
+              </a>
+            </CardShell>
+          </div>
+        </div>
       </section>
 
       {/* TRUST BAR */}
@@ -761,11 +1006,13 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
         </div>
       </div>
 
-      {/* ✅ TESTIMONIOS (ubicación tipo página referencia: después del trust/beneficios y antes de “Cómo funciona”/FAQ) */}
-      <section className="py-14 sm:py-16 px-4">
+      {/* ✅ 4) TESTIMONIOS */}
+      <section id="testimonios" className="py-14 sm:py-16 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-black leading-tight px-2">Opiniones reales de clientes</h2>
+            <h2 className="text-3xl md:text-4xl font-black leading-tight px-2">
+              Testimonios reales
+            </h2>
             <p className="mt-3 text-zinc-500 text-sm md:text-base max-w-2xl mx-auto px-4">
               Compra contraentrega, confirmación por WhatsApp y entrega rápida.
             </p>
@@ -774,17 +1021,15 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
           <div className="grid gap-4 md:gap-6 md:grid-cols-3">
             {TESTIMONIALS.map((t, idx) => (
               <div key={idx} className="rounded-[2rem] border border-white/10 bg-zinc-900/35 overflow-hidden">
-           <div className="relative aspect-[9/16] w-full bg-black/30">
-  <Image
-    src={t.img}
-    alt={`Testimonio ${t.name}`}
-    fill
-    sizes="(max-width: 768px) 92vw, 360px"
-    className="object-contain"
-  />
-</div>
-
-
+                <div className="relative aspect-[9/16] w-full bg-black/30">
+                  <Image
+                    src={t.img}
+                    alt={`Testimonio ${t.name}`}
+                    fill
+                    sizes="(max-width: 768px) 92vw, 360px"
+                    className="object-contain"
+                  />
+                </div>
 
                 <div className="p-6">
                   <div className="flex items-start justify-between gap-3">
@@ -820,8 +1065,110 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
             <a
               href="#form"
               className="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 hover:bg-indigo-500 px-7 py-4 font-black shadow-lg shadow-indigo-600/25 transition-all active:scale-95"
+              onClick={() => trackCTA("testimonios_ir_form", { section: "testimonios" })}
             >
               Quiero pedir contraentrega <ArrowRight size={18} />
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ✅ 5) QUIEBRE DE OBJECIONES */}
+      <section id="objeciones" className="py-14 sm:py-16 px-4 max-w-5xl mx-auto">
+        <HeaderBlock
+          kicker="Quiebre de objeciones"
+          title="Lo que probablemente estás pensando (y es normal)"
+          subtitle="Respuestas cortas, claras y sin vueltas."
+        />
+
+        <div className="mt-8 space-y-4">
+          <SalesFaq
+            q="¿No será otra promesa más?"
+            a="Totalmente válido. Por eso lo planteamos como apoyo a tu rutina (no “milagro”). La clave es constancia + hábitos básicos. Lo bueno: pagas al recibir y tienes garantía."
+          />
+          <SalesFaq
+            q="¿Me va a acelerar como el café?"
+            a="La idea es sentir enfoque y claridad sin el subidón típico de estimulantes. Si eres sensible, empieza con la dosis más baja recomendada en la etiqueta."
+          />
+          <SalesFaq
+            q="¿Y si no me funciona?"
+            a="Por eso tienes garantía: si no te sientes satisfecho, te acompañamos con el proceso de solución según condiciones de la garantía."
+          />
+          <SalesFaq
+            q="¿Cómo sé que sí llega?"
+            a="Confirmamos por WhatsApp antes del envío y es pago contraentrega: recibes primero, pagas después."
+          />
+        </div>
+
+        <div className="mt-10 flex justify-center">
+          <a
+            href="#form"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 hover:bg-indigo-500 px-7 py-4 font-black shadow-lg shadow-indigo-600/25 transition-all active:scale-95"
+            onClick={() => trackCTA("objeciones_ir_form", { section: "objeciones" })}
+          >
+            Listo, quiero pedir <ArrowRight size={18} />
+          </a>
+        </div>
+      </section>
+
+      {/* ✅ 6) GARANTÍA (antes del form para cerrar el riesgo) */}
+      <section id="garantia" className="py-14 sm:py-16 px-4">
+        <div className="max-w-6xl mx-auto">
+          <HeaderBlock
+            kicker="Garantía"
+            title="Compra con tranquilidad"
+            subtitle="Reducimos el riesgo al máximo: contraentrega + acompañamiento + garantía."
+          />
+
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            <CardShell variant="glow" accent="emerald" className="p-6 sm:p-7">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/15 flex items-center justify-center text-emerald-200 shrink-0">
+                  <RefreshCcw size={18} />
+                </div>
+                <div className="min-w-0">
+                  <p className="font-black">Garantía de satisfacción</p>
+                  <p className="mt-1 text-sm text-zinc-400">
+                    Si no estás satisfecho, aplicas a la garantía según términos del producto.
+                  </p>
+                </div>
+              </div>
+            </CardShell>
+
+            <CardShell variant="glass" accent="indigo" className="p-6 sm:p-7">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 border border-indigo-500/15 flex items-center justify-center text-indigo-200 shrink-0">
+                  <HandCoins size={18} />
+                </div>
+                <div className="min-w-0">
+                  <p className="font-black">Pago contraentrega</p>
+                  <p className="mt-1 text-sm text-zinc-400">Recibes primero, pagas después.</p>
+                </div>
+              </div>
+            </CardShell>
+
+            <CardShell variant="glass" accent="purple" className="p-6 sm:p-7">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-purple-500/10 border border-purple-500/15 flex items-center justify-center text-purple-200 shrink-0">
+                  <PhoneCall size={18} />
+                </div>
+                <div className="min-w-0">
+                  <p className="font-black">Soporte por WhatsApp</p>
+                  <p className="mt-1 text-sm text-zinc-400">
+                    Confirmamos y coordinamos tu entrega sin fricción.
+                  </p>
+                </div>
+              </div>
+            </CardShell>
+          </div>
+
+          <div className="mt-10 flex justify-center">
+            <a
+              href="#form"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 hover:bg-indigo-500 px-7 py-4 font-black shadow-lg shadow-indigo-600/25 transition-all active:scale-95"
+              onClick={() => trackCTA("garantia_ir_form", { section: "garantia" })}
+            >
+              Pedir con garantía <ArrowRight size={18} />
             </a>
           </div>
         </div>
@@ -833,22 +1180,41 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
           <div className="p-7 sm:p-9 md:p-10 relative">
             <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-purple-500/10 pointer-events-none" />
             <div className="relative">
-              <h3 className="text-2xl md:text-3xl font-black mb-2 break-words text-pretty">Compra en 3 pasos</h3>
+              <h3 className="text-2xl md:text-3xl font-black mb-2 break-words text-pretty">
+                Compra en 3 pasos
+              </h3>
               <p className="text-zinc-500 text-sm md:text-base max-w-2xl break-words text-pretty">
                 Sin cuentas, sin pagos anticipados. Solo confirmación por WhatsApp y pagas al recibir.
               </p>
 
               <div className="mt-7 grid md:grid-cols-3 gap-4">
-                <StepCard n="1" icon={<Users className="text-indigo-200" size={18} />} title="Completa el formulario" desc="Nombre, WhatsApp, ciudad y dirección." />
-                <StepCard n="2" icon={<PhoneCall className="text-indigo-200" size={18} />} title="Confirmamos por WhatsApp" desc="Validamos datos para envío." />
-                <StepCard n="3" icon={<HandCoins className="text-indigo-200" size={18} />} title="Recibe y paga" desc="Pagas cuando lo tienes en tus manos." />
+                <StepCard
+                  n="1"
+                  icon={<Users className="text-indigo-200" size={18} />}
+                  title="Completa el formulario"
+                  desc="Nombre, WhatsApp, ciudad y dirección."
+                />
+                <StepCard
+                  n="2"
+                  icon={<PhoneCall className="text-indigo-200" size={18} />}
+                  title="Confirmamos por WhatsApp"
+                  desc="Validamos datos para envío."
+                />
+                <StepCard
+                  n="3"
+                  icon={<HandCoins className="text-indigo-200" size={18} />}
+                  title="Recibe y paga"
+                  desc="Pagas cuando lo tienes en tus manos."
+                />
               </div>
 
               <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
                 <div className="flex flex-wrap gap-2">
                   <BadgePill icon={<Lock size={14} />} text="Sin pago anticipado" tone="neutral" />
                   <BadgePill icon={<Truck size={14} />} text="Envío gratis hoy" tone="neutral" />
-                  {lowStock && <BadgePill icon={<Package size={14} />} text={`Stock bajo: ${remainingStock}`} tone="orange" />}
+                  {lowStock && (
+                    <BadgePill icon={<Package size={14} />} text={`Stock bajo: ${remainingStock}`} tone="orange" />
+                  )}
                 </div>
                 <a
                   href="#form"
@@ -957,7 +1323,9 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
                     <div className="rounded-2xl border border-white/10 bg-black/25 p-4 mb-5">
                       <div className="flex items-center justify-between text-sm text-zinc-300 gap-3">
                         <span className="font-bold truncate">{product?.name}</span>
-                        <span className="font-black shrink-0">${Number(product?.price || 0).toLocaleString()}</span>
+                        <span className="font-black shrink-0">
+                          ${Number(product?.price || 0).toLocaleString()}
+                        </span>
                       </div>
                       <div className="mt-2 text-[11px] text-zinc-500 flex items-center gap-2">
                         <Truck size={14} className="text-indigo-300" />
@@ -1084,14 +1452,28 @@ export default function MelenaLanding({ product }: { product: ProductDTO }) {
         </div>
       </section>
 
-      {/* FAQ */}
+      {/* FAQ (extra) */}
       <section className="py-16 sm:py-20 px-4 max-w-3xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-black text-center mb-10 break-words">Preguntas Frecuentes</h2>
+        <h2 className="text-3xl md:text-4xl font-black text-center mb-10 break-words">
+          Preguntas Frecuentes
+        </h2>
         <div className="space-y-4">
-          <FaqItem q="¿En cuánto tiempo llega mi pedido?" a="El tiempo de entrega suele ser de 2 a 4 días hábiles según tu ciudad. Te confirmamos y coordinamos por WhatsApp." />
-          <FaqItem q="¿Es seguro el pago contraentrega?" a="Sí. Solo pagas cuando recibes el producto. Antes confirmamos tu información de envío." />
-          <FaqItem q="¿Qué pasa si necesito cambiar mis datos?" a="Cuando te contactemos por WhatsApp puedes corregir ciudad, dirección o teléfono antes del envío." />
-          <FaqItem q="¿Cómo debo usarlo?" a="Sigue las indicaciones del empaque. Si tienes condiciones médicas o estás en tratamiento, consulta a un profesional." />
+          <FaqItem
+            q="¿En cuánto tiempo llega mi pedido?"
+            a="El tiempo de entrega suele ser de 2 a 4 días hábiles según tu ciudad. Te confirmamos y coordinamos por WhatsApp."
+          />
+          <FaqItem
+            q="¿Es seguro el pago contraentrega?"
+            a="Sí. Solo pagas cuando recibes el producto. Antes confirmamos tu información de envío."
+          />
+          <FaqItem
+            q="¿Qué pasa si necesito cambiar mis datos?"
+            a="Cuando te contactemos por WhatsApp puedes corregir ciudad, dirección o teléfono antes del envío."
+          />
+          <FaqItem
+            q="¿Cómo debo usarlo?"
+            a="Sigue las indicaciones del empaque. Si tienes condiciones médicas o estás en tratamiento, consulta a un profesional."
+          />
         </div>
       </section>
 
@@ -1212,7 +1594,9 @@ function BadgePill({
       ? "bg-orange-500/10 border-orange-500/20 text-orange-200/90"
       : "bg-black/30 border-white/10 text-zinc-300";
   return (
-    <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-[11px] font-black tracking-widest uppercase ${cls}`}>
+    <div
+      className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-[11px] font-black tracking-widest uppercase ${cls}`}
+    >
       {icon} {text}
     </div>
   );
@@ -1327,9 +1711,7 @@ function FaqItem({ q, a }: { q: string; a: string }) {
         <span className="text-sm md:text-base break-words text-pretty">{q}</span>
         <ChevronDown className={`transition-transform shrink-0 ${open ? "rotate-180" : ""}`} />
       </button>
-      {open && (
-        <div className="p-5 pt-0 text-zinc-400 text-sm leading-relaxed break-words text-pretty">{a}</div>
-      )}
+      {open && <div className="p-5 pt-0 text-zinc-400 text-sm leading-relaxed break-words text-pretty">{a}</div>}
     </div>
   );
 }
@@ -1339,6 +1721,74 @@ function MicroProof({ icon, text }: { icon: React.ReactNode; text: string }) {
     <div className="rounded-xl border border-white/10 bg-black/30 px-3 py-2 flex items-center gap-2 text-[11px] text-zinc-300 font-bold min-w-0">
       <span className="text-indigo-300 shrink-0">{icon}</span>
       <span className="truncate">{text}</span>
+    </div>
+  );
+}
+
+/* ==================== NUEVOS SUBCOMPONENTES (estructura) ==================== */
+
+function HeaderBlock({
+  kicker,
+  title,
+  subtitle,
+}: {
+  kicker: string;
+  title: string;
+  subtitle: string;
+}) {
+  return (
+    <div className="text-center">
+      <p className="text-[11px] font-black uppercase tracking-widest text-indigo-200/90">{kicker}</p>
+      <h2 className="mt-2 text-3xl md:text-4xl font-black leading-tight px-2">{title}</h2>
+      <p className="mt-3 text-zinc-500 text-sm md:text-base max-w-2xl mx-auto px-4">{subtitle}</p>
+    </div>
+  );
+}
+
+function PainCard({
+  icon,
+  title,
+  bullets,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  bullets: string[];
+}) {
+  return (
+    <CardShell variant="glass" accent="indigo" className="p-6 sm:p-7">
+      <div className="flex items-start gap-3">
+        <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 border border-indigo-500/15 flex items-center justify-center text-indigo-200 shrink-0">
+          {icon}
+        </div>
+        <div className="min-w-0">
+          <p className="font-black text-lg">{title}</p>
+          <ul className="mt-3 space-y-2 text-sm text-zinc-400">
+            {bullets.map((b, i) => (
+              <li key={i} className="flex gap-2">
+                <Check size={16} className="text-indigo-300 mt-0.5 shrink-0" />
+                <span className="break-words text-pretty">{b}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </CardShell>
+  );
+}
+
+function SalesFaq({ q, a }: { q: string; a: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="border border-white/10 bg-zinc-900/35 rounded-2xl overflow-hidden">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full p-5 flex justify-between items-center text-left font-black gap-3"
+        type="button"
+      >
+        <span className="text-sm md:text-base break-words text-pretty">{q}</span>
+        <ChevronDown className={`transition-transform shrink-0 ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && <div className="p-5 pt-0 text-zinc-400 text-sm leading-relaxed break-words text-pretty">{a}</div>}
     </div>
   );
 }
