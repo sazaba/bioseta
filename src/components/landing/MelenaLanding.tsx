@@ -53,9 +53,9 @@ type ProductDTO = {
 // ================== IMÁGENES (SUBE A /public/landing/melena/) ==================
 const HERO_IMG = "/landing/melena/hero.png"; // <- cambia por tu hero
 const GALLERY = [
-  "/landing/melena/gallery-1.png",
-  "/landing/melena/gallery-2.png",
-  "/landing/melena/gallery-3.png",
+  "/landing/melena/gallery-1.webp",
+  "/landing/melena/gallery-2.webp",
+  "/landing/melena/gallery-3.webp",
 ];
 // ==============================================================================
 
