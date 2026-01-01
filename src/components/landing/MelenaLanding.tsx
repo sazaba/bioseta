@@ -60,15 +60,15 @@ type Testimonial = {
 
 // ✅ TESTIMONIOS (top-level para que NO dé "Cannot find name 'TESTIMONIALS'")
 const TESTIMONIALS: Testimonial[] = [
-  {
-    name: "Laura M.",
-    city: "Medellín",
-    title: "Más enfoque sin sentirme acelerada",
-    text: "Lo uso para trabajar y estudiar. Siento el día más constante y rindo mejor. Me confirmaron por WhatsApp y llegó rápido.",
-    rating: 5,
-    img: tes1,
-    date: "Hace 2 días",
-  },
+  // {
+  //   name: "Laura M.",
+  //   city: "Medellín",
+  //   title: "Más enfoque sin sentirme acelerada",
+  //   text: "Lo uso para trabajar y estudiar. Siento el día más constante y rindo mejor. Me confirmaron por WhatsApp y llegó rápido.",
+  //   rating: 5,
+  //   img: tes1,
+  //   date: "Hace 2 días",
+  // },
   // {
   //   name: "Daniela R.",
   //   city: "Bogotá",
@@ -78,15 +78,15 @@ const TESTIMONIALS: Testimonial[] = [
   //   img: tes2,
   //   date: "Hace 1 semana",
   // },
-  // {
-  //   name: "Juan P.",
-  //   city: "Cali",
-  //   title: "Buen producto y entrega rápida",
-  //   text: "Pedí contraentrega. Confirmación por WhatsApp y llegó en 48h. Lo recomiendo si tienes días pesados de trabajo.",
-  //   rating: 5,
-  //   img: tes3,
-  //   date: "Hace 2 semanas",
-  // },
+  {
+    name: "Juan P.",
+    city: "Cali",
+    title: "Buen producto y entrega rápida",
+    text: "Pedí contraentrega. Confirmación por WhatsApp y llegó en 48h. Lo recomiendo si tienes días pesados de trabajo.",
+    rating: 5,
+    img: tes1,
+    date: "Hace 2 semanas",
+  },
 ];
 
 // --- ANIMACIONES ---
