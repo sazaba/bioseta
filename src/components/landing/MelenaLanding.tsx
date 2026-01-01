@@ -3,9 +3,9 @@
 import Image, { type StaticImageData } from "next/image";
 import React, { useEffect, useMemo, useRef, useState, useTransition } from "react";
 
-import gal1 from "./melena/gallery-1.webp";
-import gal2 from "./melena/gallery-2.webp";
-import gal3 from "./melena/gallery-3.webp";
+import gal1 from "./melena/gal1.webp";
+import gal2 from "./melena/gal2.webp";
+import gal3 from "./melena/gal3.webp";
 import tes1 from "./melena/testimonial-1.webp";
 // import tes2 from "./melena/testimonial-2.webp";
 // import tes3 from "./melena/testimonial-3.webp";
