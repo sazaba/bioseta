@@ -7,7 +7,7 @@ import gal1 from "./melena/gal1.webp";
 import gal2 from "./melena/gal2.webp";
 import gal3 from "./melena/gal3.webp";
 import tes1 from "./melena/testimonial-1.webp";
-// import tes2 from "./melena/testimonial-2.webp";
+import tes2 from "./melena/testimonial-2.webp";
 // import tes3 from "./melena/testimonial-3.webp";
 import limitlessImg from "./melena/limitless.webp";
 
@@ -73,6 +73,16 @@ const TESTIMONIALS: Testimonial[] = [
     img: tes1,
     date: "Hace 2 semanas",
   },
+  {
+  name: "Emmanuel G.",
+  city: "Cali",
+  title: "Cumple lo que promete",
+  text: "Trabajo muchas horas al día y necesitaba algo que me ayudara con el enfoque. Hice el pedido contraentrega, me confirmaron por WhatsApp y llegó rápido. En mi caso sí sentí la diferencia.",
+  rating: 5,
+  img: tes2,
+  date: "Hace 1 semanas",
+},
+
 ];
 
 // --- ANIMACIONES ---
